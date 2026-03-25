@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To Be Verb Quiz - Game Music Edition</title>
+    <style>
+        :root {
+            --primary: #4a90e2;
+            --success: #2ecc71;
+            --error: #e74c3c;
+            --bg: #f4f7f6;
+            --translation: #3498db;
+        }
+
+        body { 
+            font-family: 'Segoe UI', Arial, sans-serif; 
+            background: var(--bg); 
+            display: flex; 
+            justify-content: center; 
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        /* --- ĐIỀU KHIỂN NHẠC --- */
+        .music-control {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+            background: white;
+            padding: 10px;
+            border-radius: 50%;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            cursor: pointer;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            transition: 0.3s;
+            border: 2px solid var(--primary);
+        }
+        .music-control:hover { transform: scale(1.1) rotate(10deg); }
+
+        /* --- TRANG BÌA & HIỆU ỨNG --- */
+        .quiz-container { 
+            background: white; 
+            width: 100%; 
+            max-width: 550px; 
+            border-radius: 25px; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1); 
+            padding: 35px; 
+            position: relative;
+            z-index: 10;
+        }
+
+        #start-screen { text-align: center; padding: 20px 0; }
+
+        .start-icon {
+            font-size: 5.5rem;
+            margin-bottom: 25px;
+            display: inline-block;
+            animation: floatingIcon 3s ease-in-out infinite;
+            filter: drop-shadow(0 8px 15px rgba(0,0,0,0.1));
+        }
+
+        @keyframes floatingIcon {
+            0%, 100% { transform: translateY(0px) rotate(0deg) scale(1); }
+            25% { transform: translateY(-20px) rotate(10deg) scale(1.1); }
+            50% { transform: translateY(0px) rotate(0deg) scale(1); }
+            75% { transform: translateY(-20px) rotate(-10deg) scale(1.1); }
+        }
+
+        .wave-wrapper {
+            position: fixed;
+            bottom: 0; left: 0; width: 100%; height: 150px;
+            overflow: hidden; z-index: 1;
+        }
+
+        .wave-svg {
+            width: 200%; height: 100%;
+            animation: moveWave 12s linear infinite;
+        }
+
+        @keyframes moveWave {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        /* --- UI COMPONENTS --- */
+        .header-section { text-align: center; border-bottom: 2px solid #f0f0f0; margin-bottom: 20px; padding-bottom: 15px; }
+        h1 { color: var(--primary); font-size: 1.7rem; margin: 0 0 10px 0; }
+        
+        .progress-bar { height: 10px; background: #eee; border-radius: 5px; margin-bottom: 25px; overflow: hidden; }
+        #progress { height: 100%; background: var(--primary); width: 0%; transition: 0.5s ease; }
+
+        h2 { color: #333; font-size: 1.4rem; margin-bottom: 15px; min-height: 45px; line-height: 1.4; }
+        
+        #translation-text { 
+            color: var(--translation); font-style: italic; margin-bottom: 25px; padding: 10px 15px;
+            display: none; border-left: 4px solid var(--translation); background: #f0faff; border-radius: 0 8px 8px 0;
+        }
+
+        .options { display: flex; flex-direction: column; gap: 14px; margin-bottom: 30px; }
+        
+        button.opt-btn { 
+            padding: 18px; border: 2px solid #ececec; border-radius: 15px; background: white; cursor: pointer;
+            font-size: 1.15rem; transition: 0.3s; text-align: left; font-weight: 600; outline: none;
+        }
+
+        button.opt-btn:hover:not(:disabled) { 
+            border-color: var(--primary); 
+            background: #f4f9ff; 
+            animation: wobbly 0.5s ease-in-out;
+            box-shadow: 0 5px 15px rgba(74, 144, 226, 0.1);
+        }
+
+        @keyframes wobbly {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.03) rotate(1.5deg); }
+        }
+
+        button.correct { background: var(--success) !important; color: white; border-color: var(--success); transform: scale(1.02); }
+        button.wrong { background: var(--error) !important; color: white; border-color: var(--error); animation: shake 0.5s; }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-10px); }
+            40%, 80% { transform: translateX(10px); }
+        }
+
+        .navigation { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #f0f0f0; padding-top: 25px; }
+        .nav-btn { padding: 14px 28px; border-radius: 10px; border: none; cursor: pointer; font-weight: bold; font-size: 1rem; transition: 0.3s; }
+        
+        #start-btn, .btn-restart { 
+            background: var(--primary); color: white; padding: 18px 45px; font-size: 1.2rem; 
+            box-shadow: 0 5px 20px rgba(74, 144, 226, 0.4);
+            animation: pulseBtn 2s infinite;
+        }
+
+        @keyframes pulseBtn {
+            0% { transform: scale(1); box-shadow: 0 5px 15px rgba(74, 144, 226, 0.4); }
+            50% { transform: scale(1.08); box-shadow: 0 8px 25px rgba(74, 144, 226, 0.6); }
+            100% { transform: scale(1); box-shadow: 0 5px 15px rgba(74, 144, 226, 0.4); }
+        }
+
+        #prev-btn { background: #bdc3c7; color: white; }
+        #prev-btn:hover:not(:disabled) { background: #95a5a6; }
+        
+        #next-btn { background: var(--primary); color: white; opacity: 0.4; cursor: not-allowed; }
+        #next-btn.active { opacity: 1; cursor: pointer; animation: pulseBtn 2s infinite; }
+        
+        #quiz-content, #result-screen { display: none; }
+    </style>
+</head>
+<body>
+
+<div class="music-control" onclick="toggleMusic()" id="music-btn">🔇</div>
+
+<audio id="bg-music" loop>
+    <source src="https://vnso-pt-7-tf-a128-z3.zmdcdn.me/25de35937e1e650b577265725f162e6f?authen=exp=1774627563~acl=/25de35937e1e650b577265725f162e6f*~hmac=37d9728c9b8d4c33f4bef14a8d69ef2c" type="audio/mpeg">
+</audio>
+
+<audio id="snd-correct" src="https://tiengdong.com/wp-content/uploads/am-thanh-cau-tra-loi-dung-right-answer-capcut-www_tiengdong_com.mp3?_=1" preload="auto"></audio>
+<audio id="snd-wrong" src="https://cdn.pixabay.com/audio/2021/08/04/audio_39b5f497b1.mp3" preload="auto"></audio>
+
+<audio id="snd-congrats" src="https://tiengdong.com/wp-content/uploads/Tieng-yeah-tre-con-www_tiengdong_com.mp3?_=1" preload="auto"></audio>
+<div class="wave-wrapper">
+    <svg class="wave-svg" viewBox="0 0 1440 320" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <path fill="#4a90e2" fill-opacity="0.1" d="M0,160L48,176C96,192,192,224,288,213.3C384,203,480,149,576,144C672,139,768,181,864,181.3C960,181,1056,139,1152,122.7C1248,107,1344,117,1392,122.7L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
+    </svg>
+</div>
+
+<div class="quiz-container">
+    <div id="start-screen">
+        <div class="start-icon">📝</div>
+        <h1>To Be Verb Challenge</h1>
+        <p style="color: #7f8c8d; margin-bottom: 35px; font-size: 1.1rem;">Bấm bắt đầu để quẩy cùng nhạc game!</p>
+        <button id="start-btn" class="nav-btn" onclick="startQuiz()">BẮT ĐẦU NGAY</button>
+    </div>
+
+    <div id="quiz-content">
+        <div class="header-section">
+            <h1>English Quiz</h1>
+        </div>
+        <div class="progress-bar"><div id="progress"></div></div>
+        <div id="q-num" style="font-weight: bold; color: #bdc3c7; margin-bottom: 10px; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;"></div>
+        <h2 id="question-text">Loading...</h2>
+        <div id="translation-text"></div> 
+        <div class="options" id="options-container"></div>
+        <div class="navigation">
+            <button id="prev-btn" class="nav-btn" onclick="goPrev()">← Quay lại</button>
+            <button id="next-btn" class="nav-btn" onclick="goNext()" disabled>Tiếp theo →</button>
+        </div>
+    </div>
+
+    <div id="result-screen" style="text-align: center;">
+        <div style="font-size: 5rem; margin-bottom: 20px;">🏆</div>
+        <h2 style="color: var(--success); font-size: 2rem;">Hoàn thành!</h2>
+        <div id="score-summary" style="font-size: 1.4rem; font-weight: bold; margin-bottom: 25px; color: #34495e;"></div>
+        <button class="btn-restart nav-btn" onclick="location.reload()">Chơi lại từ đầu</button>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        { q: "1. She _____ from Naples.", options: ["are", "is"], correct: 1, trans: "Cô ấy **LÀ** người đến từ Naples." },
+        { q: "2. They _____ from Italy.", options: ["are", "is"], correct: 0, trans: "Họ **LÀ** người đến từ Ý." },
+        { q: "3. I _____ English, I am Australian.", options: ["not am", "am not"], correct: 1, trans: "Tôi **KHÔNG PHẢI LÀ** người Anh, tôi là người Úc." },
+        { q: "4. The students _____ from different countries.", options: ["are", "am"], correct: 0, trans: "Các sinh viên **ĐẾN TỪ** nhiều quốc gia khác nhau." },
+        { q: "5. We _____ tired, let's keep going.", options: ["is not", "are not"], correct: 1, trans: "Chúng tôi **KHÔNG** mệt, hãy tiếp tục đi nào." },
+        { q: "6. It _____ my cat.", options: ["not is", "is not"], correct: 1, trans: "Nó **KHÔNG PHẢI LÀ** con mèo của tôi." },
+        { q: "7. My father _____ a doctor.", options: ["am", "is"], correct: 1, trans: "Bố tôi **LÀ** một bác sĩ." },
+        { q: "8. You _____ very kind.", options: ["are", "is"], correct: 0, trans: "Bạn **THÌ** rất tốt bụng." },
+        { q: "9. The weather _____ hot today.", options: ["is", "are"], correct: 0, trans: "Thời tiết hôm nay **THÌ** nóng." },
+        { q: "10. This book _____ interesting.", options: ["are", "is"], correct: 1, trans: "Cuốn sách này **THÌ** thú vị." },
+        { q: "11. My parents _____ at home.", options: ["are", "is"], correct: 0, trans: "Bố mẹ tôi **ĐANG Ở** nhà." },
+        { q: "12. I _____ a student.", options: ["am", "is"], correct: 0, trans: "Tôi **LÀ** một học sinh." },
+        { q: "13. These apples _____ red.", options: ["is", "are"], correct: 1, trans: "Những quả táo này **THÌ** màu đỏ." },
+        { q: "14. My brother _____ hungry.", options: ["is not", "am not"], correct: 0, trans: "Anh trai tôi **KHÔNG** đói." },
+        { q: "15. We _____ late for school.", options: ["is not", "are not"], correct: 1, trans: "Chúng tôi **KHÔNG** bị trễ học." }
+    ];
+
+    let currentIdx = 0;
+    let userAnswers = new Array(questions.length).fill(null);
+    let correctOnFirstTry = 0;
+    let attemptsPerQuestion = new Array(questions.length).fill(0);
+    const bgMusic = document.getElementById('bg-music');
+
+    function toggleMusic() {
+        if (bgMusic.paused) {
+            bgMusic.play();
+            document.getElementById('music-btn').innerText = "🔊";
+        } else {
+            bgMusic.pause();
+            document.getElementById('music-btn').innerText = "🔇";
+        }
+    }
+
+    function startQuiz() {
+        document.getElementById('start-screen').style.display = 'none';
+        document.getElementById('quiz-content').style.display = 'block';
+        
+        bgMusic.play().then(() => {
+            document.getElementById('music-btn').innerText = "🔊";
+        }).catch(e => console.log("Cần click để phát nhạc"));
+        
+        loadQuestion();
+    }
+
+    function playSound(id) {
+        const sound = document.getElementById(id);
+        if (sound) {
+            sound.pause();
+            sound.currentTime = 0; 
+            sound.play().catch(() => {});
+        }
+    }
+
+    function loadQuestion() {
+        const q = questions[currentIdx];
+        const transDiv = document.getElementById('translation-text');
+        document.getElementById('q-num').innerText = `Câu hỏi ${currentIdx + 1} / ${questions.length}`;
+        document.getElementById('question-text').innerText = q.q;
+        document.getElementById('progress').style.width = `${((currentIdx + 1) / questions.length) * 100}%`;
+        
+        if (userAnswers[currentIdx] === true) {
+            transDiv.innerHTML = q.trans.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+            transDiv.style.display = 'block';
+        } else {
+            transDiv.style.display = 'none';
+        }
+
+        const container = document.getElementById('options-container');
+        container.innerHTML = '';
+        document.getElementById('prev-btn').disabled = currentIdx === 0;
+        updateNextButton();
+
+        q.options.forEach((opt, index) => {
+            const btn = document.createElement('button');
+            btn.className = 'opt-btn';
+            btn.innerText = opt;
+            if (userAnswers[currentIdx] === true && index === q.correct) btn.classList.add('correct');
+            btn.onclick = () => checkAnswer(index, btn);
+            container.appendChild(btn);
+        });
+    }
+
+    function checkAnswer(selected, btn) {
+        if (userAnswers[currentIdx] === true || btn.classList.contains('wrong')) return;
+        if (selected === questions[currentIdx].correct) {
+            btn.classList.add('correct');
+            playSound('snd-correct');
+            userAnswers[currentIdx] = true;
+            const transDiv = document.getElementById('translation-text');
+            transDiv.innerHTML = questions[currentIdx].trans.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+            transDiv.style.display = 'block';
+            if (attemptsPerQuestion[currentIdx] === 0) correctOnFirstTry++;
+            updateNextButton();
+        } else {
+            btn.classList.add('wrong');
+            playSound('snd-wrong');
+            attemptsPerQuestion[currentIdx]++;
+            setTimeout(() => btn.classList.remove('wrong'), 500);
+        }
+    }
+
+    function updateNextButton() {
+        const btn = document.getElementById('next-btn');
+        if (userAnswers[currentIdx] === true) {
+            btn.disabled = false;
+            btn.classList.add('active');
+            btn.innerText = currentIdx === questions.length - 1 ? "Xem kết quả" : "Tiếp theo →";
+        } else {
+            btn.disabled = true;
+            btn.classList.remove('active');
+        }
+    }
+
+    function goNext() {
+        if (currentIdx < questions.length - 1) {
+            currentIdx++;
+            loadQuestion();
+        } else {
+            showResult();
+        }
+    }
+
+    function goPrev() {
+        if (currentIdx > 0) {
+            currentIdx--;
+            loadQuestion();
+        }
+    }
+
+    function showResult() {
+        // 1. Tắt nhạc nền ngay lập tức
+    bgMusic.pause();
+    bgMusic.currentTime = 0; // Đưa nhạc nền về giây đầu tiên (tùy chọn)
+
+    // 2. Hiển thị màn hình kết quả
+    document.getElementById('quiz-content').style.display = 'none';
+    document.getElementById('result-screen').style.display = 'block';
+    
+    // 3. Cập nhật điểm số
+    document.getElementById('score-summary').innerText = `Bạn đạt: ${correctOnFirstTry}/${questions.length} điểm tuyệt đối!`;
+    
+    // 4. Phát nhạc chúc mừng (nhạc cuối)
+    playSound('snd-congrats');
+    document.getElementById('music-btn').innerText = "🔇";
+    }
+</script>
+</body>
+</html>
