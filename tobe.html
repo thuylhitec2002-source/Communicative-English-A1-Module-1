@@ -24,6 +24,21 @@
             overflow: hidden;
         }
 
+        /* --- STYLE LOGIN --- */
+        #login-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #f8f9fa; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; z-index: 9999;
+        }
+        .google-btn {
+            background: white; color: #2d3436; border: 1px solid #dfe6e9;
+            padding: 1rem 2rem; border-radius: 50px; cursor: pointer;
+            display: flex; align-items: center; gap: 12px; font-weight: bold;
+            box-shadow: 0 8px 15px rgba(0,0,0,0.05); transition: 0.3s;
+        }
+        .google-btn:hover { transform: translateY(-3px); box-shadow: 0 12px 20px rgba(0,0,0,0.1); }
+        #main-content { display: none; width: 100%; height: 100%; } /* Ẩn game khi chưa login */
+
         /* --- ĐIỀU KHIỂN NHẠC --- */
         .music-control {
             position: fixed;
@@ -56,6 +71,7 @@
             padding: 35px; 
             position: relative;
             z-index: 10;
+            margin: auto;
         }
 
         #start-screen { text-align: center; padding: 20px 0; }
@@ -136,10 +152,9 @@
         .navigation { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #f0f0f0; padding-top: 25px; }
         .nav-btn { padding: 14px 28px; border-radius: 10px; border: none; cursor: pointer; font-weight: bold; font-size: 1rem; transition: 0.3s; }
         
-        #start-btn, .btn-restart { 
+        #start-btn, .btn-restart, #login-btn { 
             background: var(--primary); color: white; padding: 18px 45px; font-size: 1.2rem; 
             box-shadow: 0 5px 20px rgba(74, 144, 226, 0.4);
-            animation: pulseBtn 2s infinite;
         }
 
         @keyframes pulseBtn {
@@ -159,52 +174,105 @@
 </head>
 <body>
 
-<div class="music-control" onclick="toggleMusic()" id="music-btn">🔇</div>
-
-<audio id="bg-music" loop>
-    <source src="https://vnso-pt-7-tf-a128-z3.zmdcdn.me/25de35937e1e650b577265725f162e6f?authen=exp=1774627563~acl=/25de35937e1e650b577265725f162e6f*~hmac=37d9728c9b8d4c33f4bef14a8d69ef2c" type="audio/mpeg">
-</audio>
-
-<audio id="snd-correct" src="https://tiengdong.com/wp-content/uploads/am-thanh-cau-tra-loi-dung-right-answer-capcut-www_tiengdong_com.mp3?_=1" preload="auto"></audio>
-<audio id="snd-wrong" src="https://cdn.pixabay.com/audio/2021/08/04/audio_39b5f497b1.mp3" preload="auto"></audio>
-
-<audio id="snd-congrats" src="https://tiengdong.com/wp-content/uploads/Tieng-yeah-tre-con-www_tiengdong_com.mp3?_=1" preload="auto"></audio>
-<div class="wave-wrapper">
-    <svg class="wave-svg" viewBox="0 0 1440 320" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-        <path fill="#4a90e2" fill-opacity="0.1" d="M0,160L48,176C96,192,192,224,288,213.3C384,203,480,149,576,144C672,139,768,181,864,181.3C960,181,1056,139,1152,122.7C1248,107,1344,117,1392,122.7L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
-    </svg>
+<div id="login-screen">
+    <h2 style="font-family: sans-serif;">HỆ THỐNG TRỰC TUYẾN</h2>
+    <p style="color: #636e72;">Vui lòng đăng nhập để tiếp tục</p>
+    <button id="login-btn" class="google-btn">
+        <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59L2.56 13.22C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path></svg>
+        Tiếp tục với Google
+    </button>
+    <p id="login-msg" style="color: red; font-weight: bold; margin-top: 15px;"></p>
 </div>
 
-<div class="quiz-container">
-    <div id="start-screen">
-        <div class="start-icon">📝</div>
-        <h1>To Be Verb Challenge</h1>
-        <p style="color: #7f8c8d; margin-bottom: 35px; font-size: 1.1rem;">Bấm bắt đầu để quẩy cùng nhạc game!</p>
-        <button id="start-btn" class="nav-btn" onclick="startQuiz()">BẮT ĐẦU NGAY</button>
+<div id="main-content">
+    <div class="music-control" onclick="toggleMusic()" id="music-btn">🔇</div>
+
+    <audio id="bg-music" loop>
+        <source src="https://vnso-pt-7-tf-a128-z3.zmdcdn.me/25de35937e1e650b577265725f162e6f?authen=exp=1774627563~acl=/25de35937e1e650b577265725f162e6f*~hmac=37d9728c9b8d4c33f4bef14a8d69ef2c" type="audio/mpeg">
+    </audio>
+
+    <audio id="snd-correct" src="https://tiengdong.com/wp-content/uploads/am-thanh-cau-tra-loi-dung-right-answer-capcut-www_tiengdong_com.mp3?_=1" preload="auto"></audio>
+    <audio id="snd-wrong" src="https://cdn.pixabay.com/audio/2021/08/04/audio_39b5f497b1.mp3" preload="auto"></audio>
+    <audio id="snd-congrats" src="https://tiengdong.com/wp-content/uploads/Tieng-yeah-tre-con-www_tiengdong_com.mp3?_=1" preload="auto"></audio>
+
+    <div class="wave-wrapper">
+        <svg class="wave-svg" viewBox="0 0 1440 320" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+            <path fill="#4a90e2" fill-opacity="0.1" d="M0,160L48,176C96,192,192,224,288,213.3C384,203,480,149,576,144C672,139,768,181,864,181.3C960,181,1056,139,1152,122.7C1248,107,1344,117,1392,122.7L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
+        </svg>
     </div>
 
-    <div id="quiz-content">
-        <div class="header-section">
-            <h1>English Quiz</h1>
+    <div class="quiz-container">
+        <div id="start-screen">
+            <div class="start-icon">📝</div>
+            <h1>To Be Verb Challenge</h1>
+            <p style="color: #7f8c8d; margin-bottom: 35px; font-size: 1.1rem;">Bấm bắt đầu để quẩy cùng nhạc game!</p>
+            <button id="start-btn" class="nav-btn" onclick="startQuiz()">BẮT ĐẦU NGAY</button>
         </div>
-        <div class="progress-bar"><div id="progress"></div></div>
-        <div id="q-num" style="font-weight: bold; color: #bdc3c7; margin-bottom: 10px; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;"></div>
-        <h2 id="question-text">Loading...</h2>
-        <div id="translation-text"></div> 
-        <div class="options" id="options-container"></div>
-        <div class="navigation">
-            <button id="prev-btn" class="nav-btn" onclick="goPrev()">← Quay lại</button>
-            <button id="next-btn" class="nav-btn" onclick="goNext()" disabled>Tiếp theo →</button>
-        </div>
-    </div>
 
-    <div id="result-screen" style="text-align: center;">
-        <div style="font-size: 5rem; margin-bottom: 20px;">🏆</div>
-        <h2 style="color: var(--success); font-size: 2rem;">Hoàn thành!</h2>
-        <div id="score-summary" style="font-size: 1.4rem; font-weight: bold; margin-bottom: 25px; color: #34495e;"></div>
-        <button class="btn-restart nav-btn" onclick="location.reload()">Chơi lại từ đầu</button>
+        <div id="quiz-content">
+            <div class="header-section">
+                <h1>English Quiz</h1>
+            </div>
+            <div class="progress-bar"><div id="progress"></div></div>
+            <div id="q-num" style="font-weight: bold; color: #bdc3c7; margin-bottom: 10px; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;"></div>
+            <h2 id="question-text">Loading...</h2>
+            <div id="translation-text"></div> 
+            <div class="options" id="options-container"></div>
+            <div class="navigation">
+                <button id="prev-btn" class="nav-btn" onclick="goPrev()">← Quay lại</button>
+                <button id="next-btn" class="nav-btn" onclick="goNext()" disabled>Tiếp theo →</button>
+            </div>
+        </div>
+
+        <div id="result-screen" style="text-align: center;">
+            <div style="font-size: 5rem; margin-bottom: 20px;">🏆</div>
+            <h2 style="color: var(--success); font-size: 2rem;">Hoàn thành!</h2>
+            <div id="score-summary" style="font-size: 1.4rem; font-weight: bold; margin-bottom: 25px; color: #34495e;"></div>
+            <button class="btn-restart nav-btn" onclick="location.reload()">Chơi lại từ đầu</button>
+        </div>
     </div>
 </div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+    import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyCdlTVHwiLOGMnrFe12DE1dQSEHZaJ594I",
+        authDomain: "nguyen-am-tieng-anh.firebaseapp.com",
+        projectId: "nguyen-am-tieng-anh",
+        storageBucket: "nguyen-am-tieng-anh.firebasestorage.app",
+        messagingSenderId: "878440633705",
+        appId: "1:878440633705:web:755de6cb273eb139ebd9f8",
+        measurementId: "G-EM8Y1QW6QH"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth();
+    const db = getFirestore(app);
+    const provider = new GoogleAuthProvider();
+
+    document.getElementById("login-btn").onclick = async () => {
+        try {
+            const res = await signInWithPopup(auth, provider);
+            const q = query(collection(db, "Tienganh_so_cap"), where("email", "==", res.user.email));
+            const snap = await getDocs(q);
+
+            if (!snap.empty) {
+                document.getElementById("login-screen").style.display = "none";
+                document.getElementById("main-content").style.display = "flex";
+                // Không tự động phát nhạc ở đây để tránh chính sách trình duyệt, 
+                // nhạc sẽ phát khi user bấm "BẮT ĐẦU NGAY"
+            } else {
+                document.getElementById("login-msg").innerText = "Email không có quyền truy cập!";
+                await signOut(auth);
+            }
+        } catch (e) {
+            document.getElementById("login-msg").innerText = "Lỗi đăng nhập hoặc bị hủy.";
+        }
+    };
+</script>
 
 <script>
     const questions = [
@@ -338,20 +406,13 @@
     }
 
     function showResult() {
-        // 1. Tắt nhạc nền ngay lập tức
-    bgMusic.pause();
-    bgMusic.currentTime = 0; // Đưa nhạc nền về giây đầu tiên (tùy chọn)
-
-    // 2. Hiển thị màn hình kết quả
-    document.getElementById('quiz-content').style.display = 'none';
-    document.getElementById('result-screen').style.display = 'block';
-    
-    // 3. Cập nhật điểm số
-    document.getElementById('score-summary').innerText = `Bạn đạt: ${correctOnFirstTry}/${questions.length} điểm tuyệt đối!`;
-    
-    // 4. Phát nhạc chúc mừng (nhạc cuối)
-    playSound('snd-congrats');
-    document.getElementById('music-btn').innerText = "🔇";
+        bgMusic.pause();
+        bgMusic.currentTime = 0;
+        document.getElementById('quiz-content').style.display = 'none';
+        document.getElementById('result-screen').style.display = 'block';
+        document.getElementById('score-summary').innerText = `Bạn đạt: ${correctOnFirstTry}/${questions.length} điểm tuyệt đối!`;
+        playSound('snd-congrats');
+        document.getElementById('music-btn').innerText = "🔇";
     }
 </script>
 </body>
