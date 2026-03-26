@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Nghe Số 0-20 - Mobile Stable</title>
+    <title>Nghe Số 0-20 - Mobile Final</title>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -59,6 +59,8 @@
             box-shadow: 0 5px 15px rgba(108, 92, 231, 0.2); margin-top: 15px;
         }
         @keyframes shake { 0%, 100% {transform: translateX(0);} 25% {transform: translateX(-5px);} 75% {transform: translateX(5px);} }
+        /* Box hiển thị lỗi */
+        #error-box { color: var(--error); font-size: 0.85rem; margin-top: 10px; font-weight: 600; word-break: break-word; }
     </style>
 </head>
 <body>
@@ -66,11 +68,12 @@
 <div id="auth-overlay">
     <div class="auth-card">
         <h2 style="color: var(--secondary); margin-top: 0;">🎧 Luyện Nghe Số</h2>
-        <p id="auth-status">Vui lòng đăng nhập</p>
+        <p id="auth-status" style="font-weight: 600; color: #2d3436;">Vui lòng đăng nhập</p>
         <button id="login-btn" class="google-btn">
             <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59L2.56 13.22C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path></svg>
             Tiếp tục với Google
         </button>
+        <div id="error-box"></div>
     </div>
 </div>
 
@@ -109,7 +112,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
-    import { getAuth, setPersistence, browserLocalPersistence, signInWithRedirect, getRedirectResult, onAuthStateChanged, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+    import { getAuth, signInWithPopup, onAuthStateChanged, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
     import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -125,55 +128,63 @@
     const auth = getAuth();
     const db = getFirestore(app);
     const provider = new GoogleAuthProvider();
+    
+    // Tự động điều chỉnh cấu hình Popup cho mobile
+    provider.setCustomParameters({ prompt: 'select_account' });
 
-    // 1. Ép trình duyệt ghi nhớ đăng nhập
-    setPersistence(auth, browserLocalPersistence);
+    const statusEl = document.getElementById("auth-status");
+    const errorEl = document.getElementById("error-box");
 
-    async function initAuth() {
-        // 2. Bắt kết quả trả về từ Google Redirect ngay khi load trang
-        try {
-            const result = await getRedirectResult(auth);
-            if (result?.user) {
-                await checkAccess(result.user);
-                return;
-            }
-        } catch (e) {
-            console.error("Lỗi Redirect:", e);
-            document.getElementById("auth-status").innerText = "Lỗi đăng nhập. Hãy thử lại.";
+    // Lắng nghe trạng thái đăng nhập
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            await checkAccess(user);
         }
-
-        // 3. Lưới bảo hiểm: Nếu đã login trước đó, tự động vào game
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                await checkAccess(user);
-            }
-        });
-    }
+    });
 
     async function checkAccess(user) {
-        const status = document.getElementById("auth-status");
-        status.innerText = "Đang kiểm tra quyền...";
+        statusEl.innerText = "Đang kiểm tra dữ liệu...";
+        statusEl.style.color = "var(--secondary)";
+        errorEl.innerText = "";
         
-        const q = query(collection(db, "Tienganh_so_cap"), where("email", "==", user.email));
-        const snap = await getDocs(q);
-        
-        if (!snap.empty) {
-            document.getElementById("auth-overlay").style.display = "none";
-            document.getElementById("welcome-screen").style.display = "block";
-        } else {
-            status.innerText = "Email không có quyền truy cập!";
+        try {
+            const q = query(collection(db, "Tienganh_so_cap"), where("email", "==", user.email));
+            const snap = await getDocs(q);
+            
+            if (!snap.empty) {
+                document.getElementById("auth-overlay").style.display = "none";
+                document.getElementById("welcome-screen").style.display = "block";
+            } else {
+                statusEl.innerText = "Từ chối truy cập!";
+                errorEl.innerText = `Email ${user.email} chưa được cấp quyền.`;
+                await signOut(auth);
+            }
+        } catch (err) {
+            statusEl.innerText = "Lỗi kết nối CSDL!";
+            errorEl.innerText = err.message;
             await signOut(auth);
         }
     }
 
-    document.getElementById("login-btn").onclick = () => {
-        document.getElementById("auth-status").innerText = "Đang chuyển hướng sang Google...";
-        signInWithRedirect(auth, provider);
+    document.getElementById("login-btn").onclick = async () => {
+        statusEl.innerText = "Đang mở cửa sổ đăng nhập...";
+        errorEl.innerText = "";
+        try {
+            // Chuyển lại dùng Popup vì Redirect hay bị lỗi CORS trên GitHub Pages
+            const res = await signInWithPopup(auth, provider);
+            if (res.user) {
+                await checkAccess(res.user);
+            }
+        } catch (err) {
+            statusEl.innerText = "Đăng nhập thất bại!";
+            // In thẳng mã lỗi ra màn hình để chẩn đoán
+            errorEl.innerText = `Lỗi: ${err.code} - ${err.message}`;
+            console.error("Auth Error:", err);
+        }
     };
+</script>
 
-    initAuth();
-
-    // --- GAME LOGIC ---
+<script>
     const numberData = {
         0: ["Zero", "/ˈzɪərəʊ/"], 1: ["One", "/wʌn/"], 2: ["Two", "/tuː/"], 3: ["Three", "/θriː/"], 4: ["Four", "/fɔː/"],
         5: ["Five", "/faɪv/"], 6: ["Six", "/sɪks/"], 7: ["Seven", "/ˈsev.ən/"], 8: ["Eight", "/eɪt/"], 9: ["Nine", "/naɪn/"],
