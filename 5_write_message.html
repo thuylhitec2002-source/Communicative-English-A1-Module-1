@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Writing Challenge - Pro Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6c5ce7;
+            --primary-hover: #F8F7FF;
+            --success: #2ecc71;
+            --error: #e74c3c;
+            --bg: #f0f2f5;
+            --text-main: #2d3436;
+            --text-sub: #636E72;
+        }
+
+        * { box-sizing: border-box; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+
+        body { 
+            font-family: 'Quicksand', sans-serif; 
+            background-color: var(--bg); 
+            margin: 0; 
+            display: flex; justify-content: center; align-items: center;
+            min-height: 100vh; overflow-x: hidden;
+        }
+
+        /* --- LOGIN & WELCOME UI --- */
+        #login-screen, #welcome-screen {
+            position: fixed; inset: 0; background: var(--bg);
+            display: flex; justify-content: center; align-items: center; z-index: 9999;
+        }
+
+        .card-long {
+            background: #FFFFFF; padding: 5rem 3.5rem; border-radius: 3rem;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.05); text-align: center;
+            max-width: 540px; width: 90%; display: flex; flex-direction: column; gap: 3.5rem;
+            animation: slideUp 0.8s ease-out;
+        }
+
+        .header-content { display: flex; flex-direction: column; gap: 1.2rem; }
+        .header-content h2 { font-size: 2.2rem; font-weight: 700; color: var(--primary); margin: 0; letter-spacing: -1px; }
+        .header-content p { color: var(--text-sub); font-size: 1.1rem; margin: 0; line-height: 1.6; }
+
+        .google-btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 14px;
+            background: #FFFFFF; color: var(--text-main); border: 1.5px solid #E5E7EB;
+            padding: 1rem 3rem; border-radius: 100px; cursor: pointer;
+            font-weight: 700; font-size: 1.05rem; font-family: inherit;
+        }
+        .google-btn:hover { border-color: var(--primary); background: var(--primary-hover); transform: translateY(-3px); }
+
+        /* --- MUSIC CONTROL --- */
+        .music-toggle {
+            position: fixed; top: 25px; left: 25px; z-index: 1000;
+            background: white; border: 2px solid var(--primary); color: var(--primary);
+            width: 45px; height: 45px; border-radius: 50%; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem; box-shadow: 0 4px 12px rgba(108, 92, 231, 0.15);
+        }
+
+        /* --- MAIN GAME UI --- */
+        #main-app { display: none; width: 100%; max-width: 750px; padding: 20px; animation: fadeIn 0.6s ease; }
+        .game-card { background: white; border-radius: 2.5rem; box-shadow: 0 15px 40px rgba(0,0,0,0.06); padding: 40px; position: relative; }
+        
+        h1 { color: var(--primary); font-size: 1.8rem; margin: 0 0 15px 0; border-left: 6px solid var(--primary); padding-left: 15px; }
+        .instruction { background: #fff9db; padding: 15px; border-radius: 15px; font-style: italic; color: #5f27cd; margin-bottom: 25px; border: 1px solid #ffe066; }
+
+        .email-box { background: #f8f9fa; border: 2px solid #e9ecef; border-radius: 20px; padding: 30px; position: relative; line-height: 2.2; }
+        .email-box::before { content: "New Message"; position: absolute; top: -15px; left: 25px; background: var(--primary); color: white; padding: 4px 20px; border-radius: 10px; font-size: 0.8rem; font-weight: 800; text-transform: uppercase; }
+
+        .quiz-dropdown {
+            appearance: none; background: #fff; border: 2px solid #dfe6e9; border-radius: 10px;
+            padding: 4px 28px 4px 12px; font-size: 1rem; font-weight: 700; color: var(--primary);
+            cursor: pointer; outline: none; vertical-align: middle; font-family: inherit;
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%236c5ce7%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%0-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+            background-repeat: no-repeat; background-position: right 10px top 50%; background-size: 10px auto;
+        }
+
+        .quiz-dropdown.correct { border-color: var(--success); background-color: #eafff2; color: var(--success); }
+        .quiz-dropdown.wrong { border-color: var(--error); background-color: #fff2f2; color: var(--error); animation: shake 0.4s; }
+
+        .translation { color: #636e72; font-size: 0.95rem; font-style: italic; display: none; margin-top: 8px; border-left: 3px solid #dfe6e9; padding-left: 12px; background: #fafafa; border-radius: 0 10px 10px 0; }
+        .trans-key { font-weight: 800; text-transform: uppercase; }
+        .text-correct { color: var(--success) !important; text-decoration: underline; }
+        .text-error { color: var(--error) !important; }
+
+        .footer-btns { margin-top: 35px; display: flex; flex-direction: column; align-items: center; gap: 15px; }
+        .btn-main { padding: 16px 45px; border-radius: 100px; border: none; background: var(--primary); color: white; font-weight: 800; cursor: pointer; font-size: 1.1rem; font-family: inherit; width: 280px; box-shadow: 0 8px 20px rgba(108, 92, 231, 0.2); }
+        .btn-main:hover { transform: translateY(-3px); box-shadow: 0 12px 25px rgba(108, 92, 231, 0.3); }
+        .btn-secondary { background: #fab1a0; color: #d63031; }
+
+        /* Animations */
+        @keyframes slideUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes shake { 0%, 100% {transform: translateX(0);} 25% {transform: translateX(-5px);} 75% {transform: translateX(5px);} }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+
+        .balloon { position: fixed; bottom: -120px; width: 50px; height: 70px; border-radius: 50%; z-index: 999; animation: floatUp linear forwards; pointer-events: none; }
+        @keyframes floatUp { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-120vh); opacity: 0; } }
+
+        #result-display { font-size: 2rem; font-weight: 800; color: var(--primary); margin-bottom: 20px; display: none; }
+    </style>
+</head>
+<body>
+
+<div id="login-screen">
+    <div class="card-long">
+        <div class="header-content">
+            <h2>Hệ Thống Trực Tuyến</h2>
+            <p>Vui lòng đăng nhập để bắt đầu thử thách viết Email chuyên nghiệp của bạn.</p>
+        </div>
+        <button id="login-btn" class="google-btn">
+            <svg width="22" height="22" viewBox="0 0 48 48">
+                <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path>
+                <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path>
+                <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59L2.56 13.22C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path>
+                <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path>
+            </svg>
+            Tiếp tục với Google
+        </button>
+        <div id="login-msg" style="color:var(--error); font-weight:700;"></div>
+    </div>
+</div>
+
+<div id="welcome-screen" style="display: none;">
+    <div class="card-long">
+        <div class="header-content">
+            <span style="font-size: 80px; margin-bottom: 10px; animation: bounce 2s infinite;">📧</span>
+            <h2>Chào mừng bạn!</h2>
+            <p>Hôm nay chúng ta sẽ cùng học cách viết một Email giới thiệu bản thân cực chuẩn. Sẵn sàng chưa?</p>
+        </div>
+        <button class="btn-main" onclick="startGame()">BẮT ĐẦU NGAY 🚀</button>
+    </div>
+</div>
+
+<div id="main-app">
+    <button class="music-toggle" onclick="toggleMusic()" id="music-btn">🔊</button>
+    
+    <div class="game-card">
+        <h1>Writing an E-mail 📧</h1>
+        <div class="instruction">
+            <strong>Hướng dẫn:</strong> Chọn đáp án đúng cho các ô trống để hoàn thành Email.
+        </div>
+
+        <div class="email-box">
+            <div class="quiz-line">
+                <select class="quiz-dropdown" data-id="1" data-answer="Hello"><option value="">...</option><option value="Hello">Hello</option><option value="Good">Good</option></select> everyone. 
+                <div class="translation">Dịch: <span class="trans-key" data-id="1">XIN CHÀO</span> tất cả mọi người.</div>
+            </div>
+            <div class="quiz-line">
+                My name <select class="quiz-dropdown" data-id="2" data-answer="is"><option value="">...</option><option value="am">am</option><option value="is">is</option><option value="are">are</option></select> Anna. 
+                <div class="translation">Dịch: Tên của tôi <span class="trans-key" data-id="2">LÀ</span> Anna.</div>
+            </div>
+            <div class="quiz-line">
+                I am from <select class="quiz-dropdown" data-id="3" data-answer="Germany"><option value="">...</option><option value="German">German</option><option value="Germany">Germany</option></select> 
+                <div class="translation">Dịch: Tôi đến từ <span class="trans-key" data-id="3">NƯỚC ĐỨC</span>.</div>
+            </div>
+            <div class="quiz-line">
+                and I <select class="quiz-dropdown" data-id="4" data-answer="am"><option value="">...</option><option value="am">am</option><option value="is">is</option></select> 28 years old.
+                <div class="translation">Dịch: và tôi <span class="trans-key" data-id="4">THÌ</span> 28 tuổi.</div>
+            </div>
+            <div class="quiz-line">
+                I am <select class="quiz-dropdown" data-id="5" data-answer="a"><option value="">...</option><option value="a">a</option><option value="an">an</option></select> new colleague in the marketing team.
+                <div class="translation">Dịch: Tôi là <span class="trans-key" data-id="5">MỘT</span> đồng nghiệp mới.</div>
+            </div>
+            <div class="quiz-line">
+                I speak <select class="quiz-dropdown" data-id="6" data-answer="German"><option value="">...</option><option value="German">German</option><option value="Germany">Germany</option></select> and English.
+                <div class="translation">Dịch: Tôi nói <span class="trans-key" data-id="6">TIẾNG ĐỨC</span>.</div>
+            </div>
+            <div class="quiz-line">I look forward to meeting you at the office!</div>
+        </div>
+
+        <div class="footer-btns">
+            <div id="result-display"></div>
+            <button id="btn-check" class="btn-main" onclick="checkAnswers()">Kiểm tra & Nộp bài ✅</button>
+            <button class="btn-main btn-secondary" onclick="toggleTranslation()">Dịch bài (Hiện/Ẩn) 📖</button>
+            <button id="btn-restart" class="btn-main" style="display:none; background:#b2bec3;" onclick="resetToWelcome()">Làm lại từ đầu 🔄</button>
+        </div>
+    </div>
+</div>
+
+<audio id="bg-music" src="https://cdn.pixabay.com/audio/2025/01/31/audio_210b378eb7.mp3" loop></audio>
+<audio id="snd-correct" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3"></audio>
+<audio id="snd-wrong" src="https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3"></audio>
+<audio id="snd-win" src="https://tiengdong.com/wp-content/uploads/Am-thanh-chuc-mung-chien-thang-www_tiengdong_com.mp3?_=1"></audio>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+    import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyCdlTVHwiLOGMnrFe12DE1dQSEHZaJ594I",
+        authDomain: "nguyen-am-tieng-anh.firebaseapp.com",
+        projectId: "nguyen-am-tieng-anh",
+        storageBucket: "nguyen-am-tieng-anh.firebasestorage.app",
+        messagingSenderId: "878440633705",
+        appId: "1:878440633705:web:755de6cb273eb139ebd9f8"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth();
+    const db = getFirestore(app);
+    const provider = new GoogleAuthProvider();
+
+    document.getElementById("login-btn").onclick = async () => {
+        const msg = document.getElementById("login-msg");
+        msg.innerText = "Đang kiểm tra quyền truy cập...";
+        try {
+            const res = await signInWithPopup(auth, provider);
+            const q = query(collection(db, "Tienganh_so_cap"), where("email", "==", res.user.email));
+            const snap = await getDocs(q);
+            if (!snap.empty) {
+                document.getElementById("login-screen").style.display = "none";
+                document.getElementById("welcome-screen").style.display = "flex";
+            } else {
+                msg.innerText = "Email không được cấp quyền!";
+                await signOut(auth);
+            }
+        } catch (e) { msg.innerText = "Lỗi đăng nhập!"; }
+    };
+</script>
+
+<script>
+    const bgMusic = document.getElementById('bg-music');
+
+    function startGame() {
+        document.getElementById('welcome-screen').style.display = 'none';
+        document.getElementById('main-app').style.display = 'block';
+        bgMusic.play().catch(() => {});
+    }
+
+    function toggleMusic() {
+        const btn = document.getElementById('music-btn');
+        if (bgMusic.paused) { bgMusic.play(); btn.innerText = "🔊"; }
+        else { bgMusic.pause(); btn.innerText = "🔇"; }
+    }
+
+    function resetToWelcome() {
+        // Reset UI
+        document.getElementById('main-app').style.display = 'none';
+        document.getElementById('welcome-screen').style.display = 'flex';
+        document.getElementById('result-display').style.display = 'none';
+        document.getElementById('btn-restart').style.display = 'none';
+        document.getElementById('btn-check').style.display = 'block';
+        // Reset Inputs
+        document.querySelectorAll('.quiz-dropdown').forEach(s => {
+            s.value = ""; s.className = "quiz-dropdown";
+        });
+        document.querySelectorAll('.trans-key').forEach(k => {
+            k.className = "trans-key";
+        });
+    }
+
+    function checkAnswers() {
+        const dropdowns = document.querySelectorAll('.quiz-dropdown');
+        let score = 0; let allFilled = true;
+        dropdowns.forEach(select => { if (select.value === "") allFilled = false; });
+        if (!allFilled) { alert("Hãy điền hết các ô trống em nhé!"); return; }
+
+        dropdowns.forEach(select => {
+            const id = select.getAttribute('data-id');
+            const correctAnswer = select.getAttribute('data-answer');
+            const transKey = document.querySelector(`.trans-key[data-id="${id}"]`);
+
+            if (select.value === correctAnswer) {
+                select.classList.add('correct');
+                if(transKey) transKey.classList.add('text-correct');
+                score++;
+            } else {
+                select.classList.add('wrong');
+                if(transKey) transKey.classList.add('text-error');
+            }
+        });
+
+        const resDisplay = document.getElementById('result-display');
+        resDisplay.innerText = `Kết quả: ${score} / ${dropdowns.length} đúng!`;
+        resDisplay.style.display = 'block';
+
+        if (score === dropdowns.length) {
+            document.getElementById('snd-win').play().catch(()=>{});
+            createBalloons();
+        } else {
+            document.getElementById('snd-wrong').play();
+        }
+        document.getElementById('btn-check').style.display = 'none';
+        document.getElementById('btn-restart').style.display = 'block';
+    }
+
+    function toggleTranslation() {
+        const trans = document.querySelectorAll('.translation');
+        trans.forEach(t => t.style.display = (t.style.display === 'none' || t.style.display === '') ? 'block' : 'none');
+    }
+
+    function createBalloons() {
+        const colors = ['#ff7675', '#74b9ff', '#55efc4', '#ffeaa7', '#a29bfe'];
+        for (let i = 0; i < 40; i++) {
+            const b = document.createElement('div');
+            b.className = 'balloon';
+            b.style.left = Math.random() * 100 + 'vw';
+            b.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            b.style.animationDuration = (3 + Math.random() * 2) + 's';
+            b.style.animationDelay = Math.random() * 2 + 's';
+            document.body.appendChild(b);
+            setTimeout(() => b.remove(), 6000);
+        }
+    }
+</script>
+
+</body>
+</html>
