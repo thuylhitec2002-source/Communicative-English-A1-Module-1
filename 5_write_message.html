@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Email Writing Challenge - Firebase Edition</title>
+    <title>Email Writing Challenge - Audio Edition</title>
     <style>
         :root { 
             --primary: #007bff; 
@@ -71,12 +71,12 @@
             background-repeat: no-repeat; background-position: right 8px center; background-size: 8px auto;
         }
 
-        .correct { background-color: var(--success) !important; color: white !important; }
-        .wrong { background-color: var(--error) !important; color: white !important; animation: shake 0.3s; }
+        .correct { background-color: var(--success) !important; color: white !important; border-color: var(--success) !important; }
+        .wrong { background-color: var(--error) !important; color: white !important; border-color: var(--error) !important; animation: shake 0.3s; }
         @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
 
         .translation { width: 100%; color: #888; font-size: 0.9rem; font-style: italic; display: none; margin-top: 5px; padding-left: 10px; border-left: 2px solid #eee; }
-        .music-toggle { position: fixed; top: 20px; left: 20px; background: white; border: 1px solid #ddd; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; }
+        .music-toggle { position: fixed; top: 20px; left: 20px; background: white; border: 1px solid #ddd; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; z-index: 100; }
         .balloon { position: fixed; bottom: -100px; width: 40px; height: 60px; border-radius: 50%; z-index: 999; animation: floatUp linear forwards; }
         @keyframes floatUp { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-120vh); opacity: 0; } }
     </style>
@@ -160,13 +160,15 @@
     const db = getFirestore(app);
     const provider = new GoogleAuthProvider();
 
-    // LOGIN FIREBASE
+    // KHAI BÁO ÂM THANH ĐÚNG/SAI
+    const sfxCorrect = new Audio('https://tiengdong.com/wp-content/uploads/Right-answer-sound-effect-www_tiengdong_com.mp3?_=1');
+    const sfxWrong = new Audio('https://tiengdong.com/wp-content/uploads/Am-thanh-tra-loi-sai-www_tiengdong_com.mp3?_=1');
+
     document.getElementById("login-btn").onclick = async () => {
         try {
             const res = await signInWithPopup(auth, provider);
             const q = query(collection(db, "Tienganh_so_cap"), where("email", "==", res.user.email));
             const snap = await getDocs(q);
-            
             if (!snap.empty) {
                 document.getElementById("user-welcome").innerText = "Chào " + res.user.displayName + "!";
                 showScreen('start-screen');
@@ -179,7 +181,6 @@
         }
     };
 
-    // GAME FUNCTIONS
     const bgMusic = document.getElementById('bg-music');
 
     window.startGame = function() {
@@ -201,7 +202,9 @@
 
     window.checkAnswers = function() {
         let score = 0;
+        let isAllCorrect = true;
         const selects = document.querySelectorAll('.quiz-dropdown');
+
         selects.forEach(s => {
             s.classList.remove('correct', 'wrong');
             if(s.value === s.dataset.answer) {
@@ -209,14 +212,23 @@
                 score++;
             } else {
                 s.classList.add('wrong');
+                isAllCorrect = false; // Chỉ cần 1 câu sai là tính sai
             }
         });
+
+        // PHÁT ÂM THANH DỰA TRÊN KẾT QUẢ
+        if (isAllCorrect) {
+            sfxCorrect.play();
+            createBalloons();
+        } else {
+            sfxWrong.play();
+        }
+
         const res = document.getElementById('result-display');
         res.innerText = `Kết quả: ${score}/${selects.length} câu đúng!`;
         res.style.display = 'block';
         document.getElementById('btn-check').style.display = 'none';
         document.getElementById('btn-restart').style.display = 'inline-block';
-        if(score === selects.length) createBalloons();
     };
 
     window.resetGame = function() {
