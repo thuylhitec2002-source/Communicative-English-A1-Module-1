@@ -1,17 +1,20 @@
-loginBtn.onclick = async () => {
+document.getElementById("login-btn").onclick = async () => {
+        const statusEl = document.getElementById("auth-status");
+        const errorEl = document.getElementById("error-box");
+        
         statusEl.innerText = "Đang mở cửa sổ Google...";
         statusEl.style.color = "var(--secondary)";
         errorEl.innerText = "";
+        
         try {
             const result = await signInWithPopup(auth, provider);
-            // Nếu thành công, onAuthStateChanged sẽ tự động chạy
             console.log("Đăng nhập popup thành công với:", result.user.email);
         } catch (err) {
-            console.error("Lỗi đăng nhập:", err);
+            console.error("Lỗi đăng nhập chi tiết:", err);
             statusEl.innerText = "Đăng nhập thất bại!";
             statusEl.style.color = "var(--error)";
             
-            // In chi tiết mã lỗi để bắt bệnh
+            // Phân tích mã lỗi
             if (err.code === 'auth/popup-closed-by-user') {
                 errorEl.innerText = "Bạn đã đóng cửa sổ đăng nhập trước khi hoàn tất.";
             } else if (err.code === 'auth/unauthorized-domain') {
