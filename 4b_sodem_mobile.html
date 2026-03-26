@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Nghe Số 0-20 - Mobile Edition</title>
+    <title>Nghe Số 0-20 - Mobile Stable</title>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -11,16 +11,12 @@
             --error: #ff7675; --hint: #fdcb6e; --bg: #f8f9fa;
             --text-main: #2d3436; --shadow: 0 8px 25px rgba(0,0,0,0.08);
         }
-
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
         body { 
             font-family: 'Quicksand', sans-serif; background: var(--bg); 
             margin: 0; display: flex; justify-content: center; align-items: flex-start;
             min-height: 100vh; padding: 15px;
         }
-
-        /* --- AUTH OVERLAY --- */
         #auth-overlay {
             position: fixed; inset: 0; background: var(--bg);
             display: flex; justify-content: center; align-items: center; z-index: 9999;
@@ -34,19 +30,10 @@
             background: #fff; border: 1.5px solid #eee; padding: 1rem 1.5rem;
             border-radius: 100px; cursor: pointer; font-weight: 700; font-family: inherit;
         }
-
-        /* --- CONTAINERS --- */
         #welcome-screen, #main-game, #result-screen { display: none; width: 100%; animation: fadeIn 0.4s; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
         .card { background: #fff; padding: 20px; border-radius: 25px; box-shadow: var(--shadow); text-align: center; }
-
-        /* --- GRID MOBILE: 4 CỘT --- */
-        .numbers-grid { 
-            display: grid; grid-template-columns: repeat(4, 1fr); 
-            gap: 10px; margin: 20px 0; 
-        }
-        
+        .numbers-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 20px 0; }
         .num-btn { 
             aspect-ratio: 1/1; font-size: 1.4rem; font-weight: 700;
             border: 2px solid #eee; border-radius: 15px; background: #fff;
@@ -56,27 +43,21 @@
         .num-btn.correct { background: var(--success)!important; color: #fff!important; border-color: var(--success)!important; box-shadow: 0 4px 0 #27ae60!important; }
         .num-btn.wrong { background: var(--error)!important; color: #fff!important; border-color: var(--error)!important; box-shadow: 0 4px 0 #e74c3c!important; animation: shake 0.4s; }
         .num-btn.highlight { background: var(--hint)!important; border-color: var(--hint)!important; box-shadow: 0 0 15px var(--hint); }
-
-        /* --- GAME ELEMENTS --- */
         .display-word { background: #f0f7ff; padding: 15px; border-radius: 20px; margin-bottom: 20px; border: 2px solid #e1f0ff; }
         #word-text { font-size: 1.8rem; font-weight: 800; color: var(--secondary); }
-        
         .btn-play { 
             width: 75px; height: 75px; border-radius: 50%; background: var(--primary); 
             border: none; box-shadow: 0 6px 15px rgba(0,206,201,0.3);
             display: inline-flex; align-items: center; justify-content: center;
         }
         .btn-play svg { fill: #fff; width: 40px; height: 40px; }
-
         .progress-bar { height: 12px; background: #eee; border-radius: 10px; overflow: hidden; margin: 10px 0; }
         #progress-fill { height: 100%; background: var(--secondary); width: 0%; transition: 0.4s; }
-
         .btn-main { 
             width: 100%; padding: 16px; border-radius: 100px; border: none; 
             background: var(--secondary); color: #fff; font-weight: 700; font-size: 1.1rem;
             box-shadow: 0 5px 15px rgba(108, 92, 231, 0.2); margin-top: 15px;
         }
-
         @keyframes shake { 0%, 100% {transform: translateX(0);} 25% {transform: translateX(-5px);} 75% {transform: translateX(5px);} }
     </style>
 </head>
@@ -96,26 +77,23 @@
 <div id="welcome-screen" class="card">
     <span style="font-size: 60px;">🎧</span>
     <h1>Sẵn sàng chưa?</h1>
-    <p>Nhấn nút để bắt đầu thử thách nghe số 0-20 dành riêng cho điện thoại.</p>
+    <p>Bắt đầu thử thách nghe số 0-20.</p>
     <button class="btn-main" onclick="startGame()">BẮT ĐẦU 🚀</button>
 </div>
 
 <div id="main-game" class="card">
     <div class="progress-bar"><div id="progress-fill"></div></div>
     <div style="font-size: 0.9rem; color: #888; margin-bottom: 15px;" id="progress-text">Câu 1/21</div>
-    
     <div class="display-word">
         <span id="word-text">...</span>
         <div id="phonetic-text" style="color: #0984e3; font-style: italic; margin-top: 5px;"></div>
     </div>
-
     <div style="display: flex; justify-content: center; gap: 15px; margin-bottom: 20px;">
         <button class="btn-play" onclick="playCurrent()">
             <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
         </button>
         <button onclick="showHint()" style="background:white; border:2.5px solid var(--hint); border-radius:15px; padding:0 15px; color:#d35400; font-weight:700;">💡 Gợi ý</button>
     </div>
-
     <div class="numbers-grid" id="grid"></div>
 </div>
 
@@ -131,7 +109,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
-    import { getAuth, signInWithRedirect, getRedirectResult, onAuthStateChanged, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+    import { getAuth, setPersistence, browserLocalPersistence, signInWithRedirect, getRedirectResult, onAuthStateChanged, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
     import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -148,40 +126,54 @@
     const db = getFirestore(app);
     const provider = new GoogleAuthProvider();
 
-    // MOBILE AUTH LOGIC
-    async function initAuth() {
-        onAuthStateChanged(auth, async (user) => {
-            if (user) await checkAccess(user);
-        });
+    // 1. Ép trình duyệt ghi nhớ đăng nhập
+    setPersistence(auth, browserLocalPersistence);
 
+    async function initAuth() {
+        // 2. Bắt kết quả trả về từ Google Redirect ngay khi load trang
         try {
             const result = await getRedirectResult(auth);
-            if (result?.user) await checkAccess(result.user);
-        } catch (e) { console.error(e); }
+            if (result?.user) {
+                await checkAccess(result.user);
+                return;
+            }
+        } catch (e) {
+            console.error("Lỗi Redirect:", e);
+            document.getElementById("auth-status").innerText = "Lỗi đăng nhập. Hãy thử lại.";
+        }
+
+        // 3. Lưới bảo hiểm: Nếu đã login trước đó, tự động vào game
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                await checkAccess(user);
+            }
+        });
     }
 
     async function checkAccess(user) {
         const status = document.getElementById("auth-status");
         status.innerText = "Đang kiểm tra quyền...";
+        
         const q = query(collection(db, "Tienganh_so_cap"), where("email", "==", user.email));
         const snap = await getDocs(q);
+        
         if (!snap.empty) {
             document.getElementById("auth-overlay").style.display = "none";
             document.getElementById("welcome-screen").style.display = "block";
         } else {
-            status.innerText = "Email không có quyền!";
+            status.innerText = "Email không có quyền truy cập!";
             await signOut(auth);
         }
     }
 
     document.getElementById("login-btn").onclick = () => {
+        document.getElementById("auth-status").innerText = "Đang chuyển hướng sang Google...";
         signInWithRedirect(auth, provider);
     };
 
     initAuth();
-</script>
 
-<script>
+    // --- GAME LOGIC ---
     const numberData = {
         0: ["Zero", "/ˈzɪərəʊ/"], 1: ["One", "/wʌn/"], 2: ["Two", "/tuː/"], 3: ["Three", "/θriː/"], 4: ["Four", "/fɔː/"],
         5: ["Five", "/faɪv/"], 6: ["Six", "/sɪks/"], 7: ["Seven", "/ˈsev.ən/"], 8: ["Eight", "/eɪt/"], 9: ["Nine", "/naɪn/"],
@@ -192,7 +184,7 @@
 
     let questions = [], currentIdx = 0, score = 0, targetNum = null, canClick = true, hintUsed = false;
 
-    function startGame() {
+    window.startGame = function() {
         document.getElementById('welcome-screen').style.display = 'none';
         document.getElementById('main-game').style.display = 'block';
         questions = Object.keys(numberData).sort(() => Math.random() - 0.5);
@@ -219,7 +211,7 @@
         playCurrent();
     }
 
-    function playCurrent() {
+    window.playCurrent = function() {
         const synth = window.speechSynthesis;
         synth.cancel();
         const utter = new SpeechSynthesisUtterance(numberData[targetNum][0]);
@@ -227,7 +219,7 @@
         synth.speak(utter);
     }
 
-    function showHint() {
+    window.showHint = function() {
         if(!canClick) return;
         hintUsed = true;
         const b = document.getElementById('btn-'+targetNum);
