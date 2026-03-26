@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vocabulary Pro: Smooth Slide Edition</title>
+    <style>
+        :root {
+            --primary: #6c5ce7;
+            --secondary: #a29bfe;
+            --bg: #f0f2f5;
+            --text: #2d3436;
+            --white: #ffffff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        .screen { display: none; width: 100%; max-width: 800px; text-align: center; }
+        .screen.active { display: block; }
+
+        h1 { color: var(--primary); margin-bottom: 20px; }
+
+        /* --- MỤC LỤC --- */
+        .grid-menu {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .menu-item {
+            background: var(--white); padding: 20px; border-radius: 15px;
+            font-weight: bold; cursor: pointer; transition: 0.3s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+        .menu-item:hover { transform: translateY(-3px); border: 2px solid var(--primary); }
+
+        /* --- HIỆU ỨNG TRƯỢT (SLIDE) --- */
+        #slider-container {
+            width: 100%;
+            max-width: 450px;
+            height: 420px;
+            margin: 20px auto;
+            position: relative;
+        }
+
+        /* Animation lướt sang trái */
+        .slide-in { animation: slideInRight 0.4s ease-out forwards; }
+        @keyframes slideInRight {
+            from { transform: translateX(50px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .card-container {
+            perspective: 1000px;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        /* Hiệu ứng Xoay (Chỉ dùng khi lật mặt) */
+        .card {
+            position: relative;
+            width: 100%; height: 100%;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-style: preserve-3d;
+        }
+        .card.is-flipped { transform: rotateY(180deg); }
+
+        .card-face {
+            position: absolute;
+            width: 100%; height: 100%;
+            backface-visibility: hidden;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            border-radius: 30px; background: var(--white); padding: 30px; box-sizing: border-box;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .card-back { transform: rotateY(180deg); background: #fdfbff; }
+        
+        /* Nội dung */
+        .label { font-size: 0.75rem; font-weight: 800; color: white; text-transform: uppercase; margin-bottom: 15px; background: var(--primary); padding: 5px 15px; border-radius: 50px; }
+        .word { font-size: 3rem; margin: 10px 0; font-weight: 900; }
+        .ipa { font-family: 'Courier New', monospace; color: #0984e3; font-size: 1.2rem; margin-bottom: 10px; }
+        .meaning { font-size: 1.6rem; color: #636e72; border-top: 2px dashed #eee; padding-top: 15px; width: 80%; }
+
+        /* Nút Loa */
+        .btn-speaker {
+            background: var(--primary); color: white; border: none;
+            width: 50px; height: 50px; border-radius: 50%;
+            font-size: 1.2rem; cursor: pointer; margin-top: 20px;
+            display: flex; align-items: center; justify-content: center;
+            transition: 0.2s;
+        }
+        .btn-speaker:hover { transform: scale(1.1); }
+
+        /* Điều khiển */
+        .controls { display: flex; justify-content: center; align-items: center; gap: 20px; margin-top: 10px; }
+        .btn {
+            background: var(--white); border: 2px solid var(--primary); color: var(--primary);
+            padding: 10px 25px; border-radius: 50px; font-weight: bold;
+            cursor: pointer; transition: 0.3s;
+        }
+        .btn:hover { background: var(--primary); color: white; }
+        .btn-home { margin-bottom: 20px; background: #636e72; border: none; color: white; }
+
+    </style>
+</head>
+<body>
+
+    <div id="screen-menu" class="screen active">
+        <h1>Vocabulary Menu 📕</h1>
+        <div class="grid-menu" id="grid-menu"></div>
+    </div>
+
+    <div id="screen-learn" class="screen">
+        <button class="btn btn-home" onclick="showScreen('screen-menu')">🏠 Quay lại Menu</button>
+        
+        <div id="slider-container">
+            <div class="card-container" onclick="flipCard()">
+                <div class="card" id="card">
+                    <div class="card-face card-front">
+                        <div class="label">Country</div>
+                        <div class="word" id="front-word">...</div>
+                        <div class="ipa" id="front-ipa">...</div>
+                        <div class="meaning" id="front-meaning">...</div>
+                        <button class="btn-speaker" onclick="event.stopPropagation(); speakText()">🔊</button>
+                    </div>
+                    <div class="card-face card-back">
+                        <div class="label">Nationality</div>
+                        <div class="word" id="back-word">...</div>
+                        <div class="ipa" id="back-ipa">...</div>
+                        <div class="meaning" id="back-meaning">...</div>
+                        <button class="btn-speaker" onclick="event.stopPropagation(); speakText()">🔊</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="btn" onclick="changeCard(-1)">← Trước</button>
+            <span id="progress-text" style="font-weight: bold;">1 / 17</span>
+            <button class="btn" onclick="changeCard(1)">Sau →</button>
+        </div>
+    </div>
+
+    <div id="screen-finish" class="screen">
+        <h1 style="font-size: 4rem;">🎉</h1>
+        <h1>Hoàn thành!</h1>
+        <p>Bạn đã xem qua tất cả các từ.</p>
+        <button class="btn" style="background: var(--primary); color: white;" onclick="showScreen('screen-menu')">Học lại</button>
+    </div>
+
+    <script>
+        const vocabData = [
+            { en1: "Vietnam", ipa1: "/ˌvjetˈnæm/", vn1: "Việt Nam", en2: "Vietnamese", ipa2: "/ˌvjetnəˈmiːz/", vn2: "Người Việt Nam" },
+            { en1: "Singapore", ipa1: "/ˈsɪŋəpɔː(r)/", vn1: "Singapore", en2: "Singaporean", ipa2: "/ˌsɪŋəˈpɔːriən/", vn2: "Người Singapore" },
+            { en1: "Cambodia", ipa1: "/kæmˈbəʊdiə/", vn1: "Campuchia", en2: "Cambodian", ipa2: "/kæmˈbəʊdiən/", vn2: "Người Campuchia" },
+            { en1: "Thailand", ipa1: "/ˈtaɪlænd/", vn1: "Thái Lan", en2: "Thai", ipa2: "/taɪ/", vn2: "Người Thái" },
+            { en1: "Japan", ipa1: "/dʒəˈpæn/", vn1: "Nhật Bản", en2: "Japanese", ipa2: "/ˌdʒæpəˈniːz/", vn2: "Người Nhật" },
+            { en1: "South Korea", ipa1: "/ˌsaʊθ kəˈriːə/", vn1: "Hàn Quốc", en2: "Korean", ipa2: "/kəˈriːən/", vn2: "Người Hàn Quốc" },
+            { en1: "USA", ipa1: "/ˌjuː es ˈeɪ/", vn1: "Nước Mỹ", en2: "American", ipa2: "/əˈmerɪkən/", vn2: "Người Mỹ" },
+            { en1: "England", ipa1: "/ˈɪŋɡlənd/", vn1: "Nước Anh", en2: "English", ipa2: "/ˈɪŋɡlɪʃ/", vn2: "Người Anh" },
+            { en1: "Australia", ipa1: "/ɒˈstreɪliə/", vn1: "Nước Úc", en2: "Australian", ipa2: "/ɒˈstreɪliən/", vn2: "Người Úc" },
+            { en1: "Germany", ipa1: "/ˈdʒɜːməni/", vn1: "Nước Đức", en2: "German", ipa2: "/ˈdʒɜːmən/", vn2: "Người Đức" },
+            { en1: "Italy", ipa1: "/ˈɪtəli/", vn1: "Nước Ý", en2: "Italian", ipa2: "/ɪˈtæliən/", vn2: "Người Ý" },
+            { en1: "France", ipa1: "/frɑːns/", vn1: "Nước Pháp", en2: "French", ipa2: "/frentʃ/", vn2: "Người Pháp" },
+            { en1: "Spain", ipa1: "/speɪn/", vn1: "Tây Ban Nha", en2: "Spanish", ipa2: "/ˈspænɪʃ/", vn2: "Người Tây Ban Nha" },
+            { en1: "China", ipa1: "/ˈtʃaɪnə/", vn1: "Trung Quốc", en2: "Chinese", ipa2: "/ˌtʃaɪˈniːz/", vn2: "Người Trung Quốc" },
+            { en1: "Canada", ipa1: "/ˈkænədə/", vn1: "Nước Canada", en2: "Canadian", ipa2: "/kəˈneɪdiən/", vn2: "Người Canada" },
+            { en1: "Greece", ipa1: "/ɡriːs/", vn1: "Hy Lạp", en2: "Greek", ipa2: "/ɡriːk/", vn2: "Người Hy Lạp" },
+            { en1: "Malaysia", ipa1: "/məˈleɪziə/", vn1: "Malaysia", en2: "Malaysian", ipa2: "/məˈleɪziən/", vn2: "Người Malaysia" }
+        ];
+
+        let currentIdx = 0;
+        const card = document.getElementById('card');
+        const sliderContainer = document.getElementById('slider-container');
+
+        function initMenu() {
+            const menu = document.getElementById('grid-menu');
+            vocabData.forEach((item, index) => {
+                const btn = document.createElement('div');
+                btn.className = 'menu-item';
+                btn.innerText = item.en1;
+                btn.onclick = () => { currentIdx = index; showScreen('screen-learn'); updateCardContent(false); };
+                menu.appendChild(btn);
+            });
+        }
+
+        function showScreen(id) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+
+        function flipCard() {
+            card.classList.toggle('is-flipped');
+            setTimeout(speakText, 300);
+        }
+
+        // Cập nhật nội dung và trigger hiệu ứng trượt
+        function updateCardContent(shouldSlide) {
+            const item = vocabData[currentIdx];
+            
+            // 1. Reset trạng thái thẻ về mặt trước ngay lập tức (không hiệu ứng xoay)
+            card.style.transition = 'none'; 
+            card.classList.remove('is-flipped');
+            
+            // 2. Cập nhật chữ
+            document.getElementById('front-word').innerText = item.en1;
+            document.getElementById('front-ipa').innerText = item.ipa1;
+            document.getElementById('front-meaning').innerText = item.vn1;
+            document.getElementById('back-word').innerText = item.en2;
+            document.getElementById('back-ipa').innerText = item.ipa2;
+            document.getElementById('back-meaning').innerText = item.vn2;
+            document.getElementById('progress-text').innerText = `${currentIdx + 1} / ${vocabData.length}`;
+
+            // 3. Kích hoạt lại transition sau khi reset
+            setTimeout(() => { card.style.transition = 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)'; }, 10);
+
+            // 4. Hiệu ứng trượt
+            if (shouldSlide) {
+                sliderContainer.classList.remove('slide-in');
+                void sliderContainer.offsetWidth; 
+                sliderContainer.classList.add('slide-in');
+            }
+
+            speakText();
+        }
+
+        function changeCard(step) {
+            currentIdx += step;
+            if (currentIdx >= vocabData.length) { showScreen('screen-finish'); return; }
+            if (currentIdx < 0) currentIdx = vocabData.length - 1;
+            updateCardContent(true); // Có hiệu ứng slide khi đổi từ
+        }
+
+        function speakText() {
+            const isBack = card.classList.contains('is-flipped');
+            const text = isBack ? vocabData[currentIdx].en2 : vocabData[currentIdx].en1;
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const msg = new SpeechSynthesisUtterance(text);
+                msg.lang = 'en-US';
+                msg.rate = 0.85;
+                window.speechSynthesis.speak(msg);
+            }
+        }
+
+        initMenu();
+    </script>
+</body>
+</html>
