@@ -1,10 +1,13 @@
-<script>
 const numberData = {
-0: ["Zero", "/ˈzɪərəʊ/"], 1: ["One", "/wʌn/"], 2: ["Two", "/tuː/"], 3: ["Three", "/θriː/"], 4: ["Four", "/fɔː/"],
-5: ["Five", "/faɪv/"], 6: ["Six", "/sɪks/"], 7: ["Seven", "/ˈsev.ən/"], 8: ["Eight", "/eɪt/"], 9: ["Nine", "/naɪn/"],
-10: ["Ten", "/ten/"], 11: ["Eleven", "/ɪˈlev.ən/"], 12: ["Twelve", "/twelv/"], 13: ["Thirteen", "/ˌθɜːˈtiːn/"],
-14: ["Fourteen", "/ˌfɔːˈtiːn/"], 15: ["Fifteen", "/ˌfɪfˈtiːn/"], 16: ["Sixteen", "/ˌsɪkˈstiːn/"],
-17: ["Seventeen", "/ˌsev.ənˈtiːn/"], 18: ["Eighteen", "/ˌeɪˈtiːn/"], 19: ["Nineteen", "/ˌnaɪnˈtiːn/"], 20: ["Twenty", "/ˈtwen.ti/"]
+    0: ["Zero", "/ˈzɪərəʊ/"], 1: ["One", "/wʌn/"], 2: ["Two", "/tuː/"],
+    3: ["Three", "/θriː/"], 4: ["Four", "/fɔː/"], 5: ["Five", "/faɪv/"],
+    6: ["Six", "/sɪks/"], 7: ["Seven", "/ˈsev.ən/"], 8: ["Eight", "/eɪt/"],
+    9: ["Nine", "/naɪn/"], 10: ["Ten", "/ten/"], 11: ["Eleven", "/ɪˈlev.ən/"],
+    12: ["Twelve", "/twelv/"], 13: ["Thirteen", "/ˌθɜːˈtiːn/"],
+    14: ["Fourteen", "/ˌfɔːˈtiːn/"], 15: ["Fifteen", "/ˌfɪfˈtiːn/"],
+    16: ["Sixteen", "/ˌsɪkˈstiːn/"], 17: ["Seventeen", "/ˌsev.ənˈtiːn/"],
+    18: ["Eighteen", "/ˌeɪˈtiːn/"], 19: ["Nineteen", "/ˌnaɪnˈtiːn/"],
+    20: ["Twenty", "/ˈtwen.ti/"]
 };
 
 let questions = [];
@@ -14,145 +17,189 @@ let targetNum = null;
 let canClick = true;
 let hintUsed = false;
 
-const sndCorrect = document.getElementById('snd-correct');
-const sndWrong = document.getElementById('snd-wrong');
+let sndCorrect, sndWrong;
+
+// Khởi tạo audio sau khi DOM ready
+document.addEventListener('DOMContentLoaded', () => {
+    sndCorrect = document.getElementById('snd-correct');
+    sndWrong = document.getElementById('snd-wrong');
+});
+
+// Hàm phát âm thanh an toàn
+function playSound(sound) {
+    if (!sound) return;
+    sound.currentTime = 0;
+    sound.play().catch(() => {});
+}
+
+// Unlock audio cho mobile
+function unlockAudio() {
+    // Unlock speech synthesis
+    if ('speechSynthesis' in window) {
+        const unlockUtterance = new SpeechSynthesisUtterance('');
+        unlockUtterance.volume = 0;
+        window.speechSynthesis.speak(unlockUtterance);
+    }
+
+    // Unlock audio elements
+    [sndCorrect, sndWrong].forEach(snd => {
+        if (snd) {
+            snd.play().then(() => {
+                snd.pause();
+                snd.currentTime = 0;
+            }).catch(() => {});
+        }
+    });
+}
+
+// Reset tất cả biến về trạng thái ban đầu
+function resetGame() {
+    questions = [];
+    currentIdx = 0;
+    score = 0;
+    targetNum = null;
+    canClick = true;
+    hintUsed = false;
+}
 
 window.startGame = function() {
+    unlockAudio();
 
-    // unlock speech
-    const unlockUtterance = new SpeechSynthesisUtterance('');
-    window.speechSynthesis.speak(unlockUtterance);
+    // Reset game state
+    resetGame();
 
-    // unlock audio
-    sndCorrect.play().then(()=>{
-        sndCorrect.pause();
-        sndCorrect.currentTime = 0;
-    }).catch(()=>{});
-
-    sndWrong.play().then(()=>{
-        sndWrong.pause();
-        sndWrong.currentTime = 0;
-    }).catch(()=>{});
-
+    // Ẩn/hiện màn hình
     document.getElementById('welcome-screen').style.display = 'none';
+    document.getElementById('result-screen').style.display = 'none';
     document.getElementById('main-game').style.display = 'block';
 
+    // Tạo danh sách câu hỏi ngẫu nhiên
     questions = Object.keys(numberData)
         .map(n => parseInt(n))
         .sort(() => Math.random() - 0.5);
 
+    // Tạo grid buttons
     const grid = document.getElementById('grid');
     grid.innerHTML = '';
 
-    for(let i=0;i<=20;i++){
+    for (let i = 0; i <= 20; i++) {
         const b = document.createElement('button');
         b.className = 'num-btn';
-        b.id = 'btn-'+i;
+        b.id = 'btn-' + i;
         b.innerText = i;
-        b.onclick = () => check(i,b);
+        b.onclick = () => check(i, b);
         grid.appendChild(b);
     }
 
     load();
-}
+};
 
-function load(){
+// Chơi lại từ đầu
+window.restartGame = function() {
+    startGame();
+};
 
-    if(currentIdx >= 21){
+function load() {
+    if (currentIdx >= questions.length) {
         finish();
         return;
     }
 
     canClick = true;
     hintUsed = false;
-
     targetNum = questions[currentIdx];
 
     document.getElementById('word-text').innerText = numberData[targetNum][0];
     document.getElementById('phonetic-text').innerText = numberData[targetNum][1];
+    document.getElementById('progress-text').innerText = `Câu ${currentIdx + 1}/${questions.length}`;
+    document.getElementById('progress-fill').style.width = `${((currentIdx) / questions.length) * 100}%`;
 
-    document.getElementById('progress-text').innerText = `Câu ${currentIdx+1}/21`;
+    // Reset trạng thái các button
+    document.querySelectorAll('.num-btn').forEach(b => {
+        b.classList.remove('correct', 'wrong', 'highlight');
+        b.disabled = false;
+    });
 
-    document.getElementById('progress-fill').style.width =
-        `${(currentIdx/21)*100}%`;
-
-    document.querySelectorAll('.num-btn')
-        .forEach(b => b.classList.remove('correct','wrong','highlight'));
-
-    setTimeout(playCurrent,120);
+    setTimeout(playCurrent, 120);
 }
 
-window.playCurrent = function(){
+window.playCurrent = function() {
+    if (!('speechSynthesis' in window)) return;
 
-    if(window.speechSynthesis.speaking){
+    // Cancel bất kỳ speech nào đang chạy
+    if (window.speechSynthesis.speaking || window.speechSynthesis.pending) {
         window.speechSynthesis.cancel();
     }
 
-    const utter = new SpeechSynthesisUtterance(numberData[targetNum][0]);
-    utter.lang = 'en-US';
-    utter.rate = 0.85;
+    // Delay nhỏ sau khi cancel để tránh bug trên một số trình duyệt
+    setTimeout(() => {
+        const utter = new SpeechSynthesisUtterance(numberData[targetNum][0]);
+        utter.lang = 'en-US';
+        utter.rate = 0.85;
+        window.speechSynthesis.speak(utter);
+    }, 50);
+};
 
-    window.speechSynthesis.speak(utter);
-}
-
-window.showHint = function(){
-
-    if(!canClick) return;
+window.showHint = function() {
+    if (!canClick) return;
 
     hintUsed = true;
 
-    const b = document.getElementById('btn-'+targetNum);
+    const b = document.getElementById('btn-' + targetNum);
+    if (!b) return;
 
     b.classList.add('highlight');
 
-    setTimeout(()=>{
+    setTimeout(() => {
         b.classList.remove('highlight');
-    },1000);
-}
+    }, 1000);
+};
 
-function check(n,b){
+function check(n, b) {
+    if (!canClick) return;
 
-    if(!canClick) return;
-
-    if(n === targetNum){
-
+    if (n === targetNum) {
         canClick = false;
 
-        if(!hintUsed) score++;
+        if (!hintUsed) score++;
 
         b.classList.add('correct');
+        playSound(sndCorrect);
 
-        sndCorrect.currentTime = 0;
-        sndCorrect.play().catch(()=>{});
-
-        setTimeout(()=>{
+        setTimeout(() => {
             currentIdx++;
             load();
-        },800);
+        }, 800);
 
-    }else{
-
+    } else {
         b.classList.add('wrong');
+        playSound(sndWrong);
 
-        sndWrong.currentTime = 0;
-        sndWrong.play().catch(()=>{});
-
-        setTimeout(()=>{
+        setTimeout(() => {
             b.classList.remove('wrong');
-        },400);
+        }, 400);
     }
 }
 
-function finish(){
-
+function finish() {
     document.getElementById('main-game').style.display = 'none';
     document.getElementById('result-screen').style.display = 'block';
 
-    document.getElementById('res-score').innerText = `${score}/21`;
+    const total = questions.length;
+    document.getElementById('res-score').innerText = `${score}/${total}`;
 
-    document.getElementById('res-msg').innerText =
-        score === 21
-        ? "Tuyệt vời! Bạn là thiên tài số học."
-        : "Khá lắm! Hãy thử lại nhé.";
+    let msg;
+    const percent = score / total;
+
+    if (percent === 1) {
+        msg = "Tuyệt vời! Bạn là thiên tài số học! 🎉";
+    } else if (percent >= 0.8) {
+        msg = "Xuất sắc! Bạn gần như hoàn hảo! ⭐";
+    } else if (percent >= 0.5) {
+        msg = "Khá lắm! Cố gắng thêm nhé! 💪";
+    } else {
+        msg = "Hãy luyện tập thêm nhé! 📚";
+    }
+
+    document.getElementById('res-msg').innerText = msg;
 }
-</script>
