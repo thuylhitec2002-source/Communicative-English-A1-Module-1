@@ -11,92 +11,103 @@
             --error: #ff7675; --hint: #fdcb6e; --bg: #f8f9fa;
             --text-main: #2d3436; --text-sub: #636E72;
         }
-        * { box-sizing: border-box; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); -webkit-tap-highlight-color: transparent; }
+
+        * { box-sizing: border-box; transition: all 0.2s ease; -webkit-tap-highlight-color: transparent; }
+
         body { 
             font-family: 'Quicksand', sans-serif; background: var(--bg); 
-            display: flex; justify-content: center; align-items: center;
-            min-height: 100vh; margin: 0; color: var(--text-main); overflow-x: hidden;
+            margin: 0; min-height: 100vh; display: flex; justify-content: center; align-items: center;
         }
-        #loading-overlay {
-            position: fixed; inset: 0; background: var(--bg);
-            display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 10000;
-        }
-        .spinner { border: 5px solid #f3f3f3; border-top: 5px solid var(--secondary); border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        .card { background: white; padding: 30px; border-radius: 2.5rem; box-shadow: 0 20px 40px rgba(0,0,0,0.05); text-align: center; width: 90%; max-width: 500px; }
-        #login-screen { display: none; }
-        .google-btn {
-            display: inline-flex; align-items: center; justify-content: center; gap: 12px;
-            background: white; border: 1.5px solid #ddd; padding: 12px 25px; border-radius: 100px; 
-            font-weight: 700; cursor: pointer; font-family: inherit; width: 100%;
+        #loading-overlay {
+            position: fixed; inset: 0; background: white; z-index: 9999;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
-        #welcome-screen { display: none; }
-        #main-game { display: none; width: 100%; max-width: 700px; padding: 15px; }
+
+        .card {
+            background: white; padding: 2rem; border-radius: 2.5rem;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.05); text-align: center;
+            width: 90%; max-width: 500px; display: none;
+        }
+
+        /* LOGIN */
+        .google-btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+            background: white; border: 1.5px solid #ddd; padding: 15px; border-radius: 100px;
+            width: 100%; font-weight: 700; cursor: pointer; font-family: inherit; margin-top: 20px;
+        }
+
+        /* GAME */
+        #main-game { max-width: 750px; }
         .display-word { background: #f0f7ff; padding: 20px; border-radius: 20px; border: 2px solid #e1f0ff; margin-bottom: 20px; }
-        #word-text { font-size: 2.2rem; font-weight: 800; color: var(--secondary); }
-        .numbers-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 20px 0; }
+        #word-text { font-size: 2.2rem; font-weight: 800; color: var(--secondary); display: block; }
+        
+        .numbers-grid { 
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 20px 0; 
+        }
         @media (min-width: 600px) { .numbers-grid { grid-template-columns: repeat(7, 1fr); } }
+
         .num-btn { 
-            aspect-ratio: 1/1; border: 2px solid #eee; border-radius: 15px; background: white; 
+            aspect-ratio: 1/1; border: 2px solid #eee; border-radius: 12px; background: white;
             font-weight: 700; font-size: 1.2rem; cursor: pointer; box-shadow: 0 4px 0 #eee;
         }
-        .correct { background: var(--success)!important; color: white; border-color: var(--success)!important; }
-        .wrong { background: var(--error)!important; color: white; border-color: var(--error)!important; }
-        .progress-bar { height: 10px; background: #eee; border-radius: 10px; overflow: hidden; }
-        #progress-fill { height: 100%; background: var(--secondary); width: 0%; transition: 0.5s; }
-        .btn-main { padding: 15px 30px; border-radius: 50px; border: none; background: var(--secondary); color: white; font-weight: 700; cursor: pointer; width: 100%; font-size: 1.1rem; }
-        #result-screen { display: none; }
+        .correct { background: var(--success)!important; color: white; border-color: var(--success)!important; box-shadow: 0 4px 0 #27ae60!important; }
+        .wrong { background: var(--error)!important; color: white; border-color: var(--error)!important; box-shadow: 0 4px 0 #e74c3c!important; }
+        .highlight { background: var(--hint)!important; color: white; transform: scale(1.1); }
+
+        .btn-main { padding: 15px 30px; border-radius: 50px; border: none; background: var(--secondary); color: white; font-weight: 700; width: 100%; cursor: pointer; font-family: inherit; }
+        .progress-bar { height: 10px; background: #eee; border-radius: 10px; overflow: hidden; margin-top: 10px; }
+        #progress-fill { height: 100%; background: var(--secondary); width: 0%; }
     </style>
 </head>
 <body>
 
-<div id="loading-overlay"><div class="spinner"></div><p>Đang kiểm tra...</p></div>
+<div id="loading-overlay"><b>ĐANG TẢI...</b></div>
 
 <div id="login-screen" class="card">
-    <h2 style="color:var(--secondary)">Đăng Nhập</h2>
-    <p>Sử dụng Google để bắt đầu</p>
-    <button id="login-btn" class="google-btn">Tiếp tục với Google</button>
+    <h2 style="color:var(--secondary)">Học Số 0-20</h2>
+    <p>Vui lòng đăng nhập bằng Google</p>
+    <button id="login-btn" class="google-btn">
+        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20">
+        Tiếp tục với Google
+    </button>
     <div id="login-msg" style="color:red; margin-top:10px;"></div>
 </div>
 
 <div id="welcome-screen" class="card">
-    <span style="font-size:60px;">🎧</span>
-    <h1 id="user-welcome">Chào mừng!</h1>
+    <span style="font-size: 60px;">🎧</span>
+    <h1 id="user-welcome">Chào bạn!</h1>
     <button class="btn-main" onclick="startGame()">BẮT ĐẦU CHƠI 🚀</button>
-    <button onclick="logout()" style="background:none; border:none; color:#aaa; margin-top:15px; text-decoration:underline;">Đăng xuất</button>
+    <button onclick="logout()" style="background:none; border:none; color:#aaa; margin-top:20px; text-decoration:underline; cursor:pointer;">Đăng xuất</button>
 </div>
 
-<div id="main-game">
-    <div class="card" style="max-width:100%">
-        <div id="game-content">
-            <div class="display-word">
-                <span id="word-text">...</span>
-                <div id="phonetic-text" style="color:#0984e3; font-style:italic;">...</div>
-            </div>
-            <div style="display:flex; gap:15px; justify-content:center; margin-bottom:20px;">
-                <button onclick="playCurrentNumber()" style="width:70px; height:70px; border-radius:50%; border:none; background:var(--primary); color:white; font-size:30px; cursor:pointer;">🔊</button>
-                <button onclick="showHint()" style="background:white; border:2px solid var(--hint); border-radius:15px; padding:0 20px; font-weight:700; color:#d35400;">💡 Gợi ý</button>
-            </div>
-            <div class="numbers-grid" id="grid"></div>
-            <div class="progress-bar"><div id="progress-fill"></div></div>
+<div id="main-game" class="card">
+    <div id="game-content">
+        <div class="display-word">
+            <span id="word-text">...</span>
+            <small id="phonetic-text" style="color:#0984e3; font-style:italic;">...</small>
         </div>
-        <div id="result-screen">
-            <h2>Kết quả</h2>
-            <h1 id="res-score" style="color:var(--secondary); font-size:3rem;">0/21</h1>
-            <button class="btn-main" onclick="resetGameToWelcome()">Chơi lại</button>
+        <div style="display:flex; gap:10px; justify-content:center; margin-bottom:20px;">
+            <button onclick="playCurrentNumber()" style="width:60px; height:60px; border-radius:50%; border:none; background:var(--primary); color:white; font-size:24px;">🔊</button>
+            <button onclick="showHint()" style="background:white; border:2px solid var(--hint); border-radius:12px; padding:0 15px; font-weight:700; color:#d35400;">Gợi ý</button>
         </div>
+        <div class="numbers-grid" id="grid"></div>
+        <div class="progress-bar"><div id="progress-fill"></div></div>
+    </div>
+    <div id="result-screen" style="display:none;">
+        <h2>Kết quả</h2>
+        <h1 id="res-score" style="color:var(--secondary); font-size:3rem;">0/21</h1>
+        <button class="btn-main" onclick="location.reload()">Chơi lại</button>
     </div>
 </div>
 
 <audio id="snd-correct" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3" preload="auto"></audio>
 <audio id="snd-wrong" src="https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3" preload="auto"></audio>
-<audio id="snd-win" src="https://tiengdong.com/wp-content/uploads/Am-thanh-chuc-mung-chien-thang-www_tiengdong_com.mp3?_=1" preload="auto"></audio>
 
 <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
-    import { getAuth, setPersistence, browserLocalPersistence, signInWithRedirect, getRedirectResult, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
-    import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+    import { getAuth, signInWithRedirect, getRedirectResult, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+    import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyCdlTVHwiLOGMnrFe12DE1dQSEHZaJ594I",
@@ -108,129 +119,104 @@
     };
 
     const app = initializeApp(firebaseConfig);
-    const auth = getAuth();
+    const auth = getAuth(app);
     const db = getFirestore(app);
     const provider = new GoogleAuthProvider();
 
-    // Fix lỗi Chrome: Ép ghi nhớ session cực mạnh
-    setPersistence(auth, browserLocalPersistence).then(() => {
-        return getRedirectResult(auth);
-    }).catch(e => console.error("Lỗi Redirect:", e));
+    // Xử lý đăng nhập xong quay về
+    getRedirectResult(auth).catch(e => console.error(e));
 
     onAuthStateChanged(auth, async (user) => {
-        const overlay = document.getElementById("loading-overlay");
+        document.getElementById("loading-overlay").style.display = "none";
         if (user) {
             const q = query(collection(db, "Tienganh_so_cap"), where("email", "==", user.email));
             const snap = await getDocs(q);
             if (!snap.empty) {
                 document.getElementById("user-welcome").innerText = "Chào, " + user.displayName;
-                document.getElementById("login-screen").style.display = "none";
-                document.getElementById("welcome-screen").style.display = "block";
+                showScreen("welcome-screen");
             } else {
-                await signOut(auth);
-                alert("Email chưa được cấp quyền!");
+                alert("Tài khoản chưa được cấp phép!");
+                signOut(auth);
             }
         } else {
-            document.getElementById("login-screen").style.display = "flex";
-            document.getElementById("welcome-screen").style.display = "none";
+            showScreen("login-screen");
         }
-        overlay.style.display = "none";
     });
 
     document.getElementById("login-btn").onclick = () => signInWithRedirect(auth, provider);
-    window.logout = () => signOut(auth).then(() => location.reload());
+    window.logout = () => signOut(auth);
+
+    function showScreen(id) {
+        document.querySelectorAll('.card').forEach(c => c.style.display = 'none');
+        document.getElementById(id).style.display = 'block';
+    }
 </script>
 
 <script>
     const numberData = { 0:["Zero","/ˈzɪərəʊ/"], 1:["One","/wʌn/"], 2:["Two","/tuː/"], 3:["Three","/θriː/"], 4:["Four","/fɔː/"], 5:["Five","/faɪv/"], 6:["Six","/sɪks/"], 7:["Seven","/ˈsev.ən/"], 8:["Eight","/eɪt/"], 9:["Nine","/naɪn/"], 10:["Ten","/ten/"], 11:["Eleven","/ɪˈlev.ən/"], 12:["Twelve","/twelv/"], 13:["Thirteen","/ˌθɜːˈtiːn/"], 14:["Fourteen","/ˌfɔːˈtiːn/"], 15:["Fifteen","/ˌfɪfˈtiːn/"], 16:["Sixteen","/ˌsɪkˈstiːn/"], 17:["Seventeen","/ˌsev.ənˈtiːn/"], 18:["Eighteen","/ˌeɪˈtiːn/"], 19:["Nineteen","/ˌnaɪnˈtiːn/"], 20:["Twenty","/ˈtwen.ti/"] };
     let questions = [], step = 0, score = 0, target = null, canClick = true, hintUsed = false;
 
-    // QUAN TRỌNG: Mồi âm thanh khi bấm nút Start
-    function startGame() {
-        // Giải phóng âm thanh cho Mobile
+    window.startGame = () => {
+        // Mồi âm thanh
         document.getElementById('snd-correct').play().then(() => {
             document.getElementById('snd-correct').pause();
             document.getElementById('snd-correct').currentTime = 0;
         }).catch(() => {});
         
-        // Mồi thử bộ đọc giọng nói
-        window.speechSynthesis.cancel();
-        const mồi = new SpeechSynthesisUtterance("");
-        window.speechSynthesis.speak(mồi);
+        showScreenGame();
+    }
 
-        document.getElementById('welcome-screen').style.display = 'none';
+    function showScreenGame() {
+        document.querySelectorAll('.card').forEach(c => c.style.display = 'none');
         document.getElementById('main-game').style.display = 'block';
-        initGame();
-    }
-
-    function initGame() {
         questions = Object.keys(numberData).sort(() => Math.random() - 0.5);
-        step = 0; score = 0;
-        const grid = document.getElementById('grid');
-        grid.innerHTML = '';
-        for (let i = 0; i <= 20; i++) {
-            const btn = document.createElement('button');
-            btn.className = 'num-btn'; btn.id = 'btn-' + i; btn.innerText = i;
-            btn.onclick = () => checkAnswer(i, btn);
-            grid.appendChild(btn);
+        const grid = document.getElementById('grid'); grid.innerHTML = '';
+        for(let i=0; i<=20; i++){
+            const b = document.createElement('button'); b.className='num-btn'; b.id='n-'+i; b.innerText=i;
+            b.onclick = () => check(i, b); grid.appendChild(b);
         }
-        loadQuestion();
+        load();
     }
 
-    function loadQuestion() {
-        if (step >= 21) { finishGame(); return; }
+    function load() {
+        if(step >= 21) { finish(); return; }
         canClick = true; hintUsed = false; target = questions[step];
         document.getElementById('word-text').innerText = numberData[target][0];
         document.getElementById('phonetic-text').innerText = numberData[target][1];
-        document.getElementById('progress-fill').style.width = `${(step / 21) * 100}%`;
+        document.getElementById('progress-fill').style.width = (step/21*100)+'%';
         document.querySelectorAll('.num-btn').forEach(b => b.classList.remove('correct','wrong','highlight'));
         setTimeout(playCurrentNumber, 600);
     }
 
-    function playCurrentNumber() {
+    window.playCurrentNumber = () => {
         window.speechSynthesis.cancel();
-        const utter = new SpeechSynthesisUtterance(numberData[target][0]);
-        utter.lang = 'en-US'; utter.rate = 0.8;
-        window.speechSynthesis.speak(utter);
+        const u = new SpeechSynthesisUtterance(numberData[target][0]);
+        u.lang = 'en-US'; u.rate = 0.8; window.speechSynthesis.speak(u);
     }
 
-    function checkAnswer(num, btn) {
-        if (!canClick) return;
-        if (num == target) {
+    function check(n, b) {
+        if(!canClick) return;
+        if(n == target) {
             canClick = false; if(!hintUsed) score++;
-            btn.classList.add('correct');
-            // Chạy âm thanh tink tink
-            const s = document.getElementById('snd-correct');
-            s.currentTime = 0; s.play().catch(e => console.log("Lỗi âm thanh:", e));
-            setTimeout(() => { step++; loadQuestion(); }, 1000);
+            b.classList.add('correct');
+            document.getElementById('snd-correct').play();
+            setTimeout(() => { step++; load(); }, 1000);
         } else {
-            btn.classList.add('wrong');
-            const s = document.getElementById('snd-wrong');
-            s.currentTime = 0; s.play().catch(() => {});
-            setTimeout(() => btn.classList.remove('wrong'), 500);
+            b.classList.add('wrong');
+            document.getElementById('snd-wrong').play();
+            setTimeout(() => b.classList.remove('wrong'), 500);
         }
     }
 
-    function showHint() {
-        if (!canClick) return;
-        hintUsed = true;
-        const btn = document.getElementById('btn-' + target);
-        btn.classList.add('highlight');
-        setTimeout(() => btn.classList.remove('highlight'), 1200);
+    window.showHint = () => {
+        if(!canClick) return; hintUsed = true;
+        document.getElementById('n-'+target).classList.add('highlight');
     }
 
-    function finishGame() {
+    function finish() {
         document.getElementById('game-content').style.display = 'none';
         document.getElementById('result-screen').style.display = 'block';
-        document.getElementById('res-score').innerText = `${score} / 21`;
-        document.getElementById('snd-win').play().catch(() => {});
-    }
-
-    function resetGameToWelcome() {
-        document.getElementById('result-screen').style.display = 'none';
-        document.getElementById('game-content').style.display = 'block';
-        document.getElementById('main-game').style.display = 'none';
-        document.getElementById('welcome-screen').style.display = 'block';
+        document.getElementById('res-score').innerText = score + ' / 21';
     }
 </script>
 
