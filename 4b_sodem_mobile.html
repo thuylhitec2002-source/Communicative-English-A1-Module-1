@@ -1,292 +1,275 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Nghe Số 0-20 - Final with Logout</title>
-<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
-<style>
-:root {
---primary: #00cec9; --secondary: #6c5ce7; --success: #2ecc71;
---error: #ff7675; --hint: #fdcb6e; --bg: #f8f9fa;
---text-main: #2d3436; --shadow: 0 8px 25px rgba(0,0,0,0.08);
-}
-* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-body {
-font-family: 'Quicksand', sans-serif; background: var(--bg);
-margin: 0; display: flex; justify-content: center; align-items: flex-start;
-min-height: 100vh; padding: 15px;
-}
-#auth-overlay {
-position: fixed; inset: 0; background: var(--bg);
-display: flex; justify-content: center; align-items: center; z-index: 9999;
-}
-.auth-card {
-background: #fff; padding: 2.5rem 1.5rem; border-radius: 2.5rem;
-box-shadow: var(--shadow); text-align: center; width: 90%; max-width: 400px;
-}
-.google-btn {
-display: inline-flex; align-items: center; gap: 12px;
-background: #fff; border: 1.5px solid #eee; padding: 1rem 1.5rem;
-border-radius: 100px; cursor: pointer; font-weight: 700; font-family: inherit;
-}
-#welcome-screen, #main-game, #result-screen { display: none; width: 100%; animation: fadeIn 0.4s; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-.card { background: #fff; padding: 20px; border-radius: 25px; box-shadow: var(--shadow); text-align: center; }
-.numbers-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 20px 0; }
-.num-btn {
-aspect-ratio: 1/1; font-size: 1.4rem; font-weight: 700;
-border: 2px solid #eee; border-radius: 15px; background: #fff;
-box-shadow: 0 5px 0 #eee; cursor: pointer; font-family: inherit;
-}
-.num-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 #eee; }
-.num-btn.correct { background: var(--success)!important; color: #fff!important; border-color: var(--success)!important; box-shadow: 0 4px 0 #27ae60!important; }
-.num-btn.wrong { background: var(--error)!important; color: #fff!important; border-color: var(--error)!important; box-shadow: 0 4px 0 #e74c3c!important; animation: shake 0.4s; }
-.num-btn.highlight { background: var(--hint)!important; border-color: var(--hint)!important; box-shadow: 0 0 15px var(--hint); }
-.display-word { background: #f0f7ff; padding: 15px; border-radius: 20px; margin-bottom: 20px; border: 2px solid #e1f0ff; }
-#word-text { font-size: 1.8rem; font-weight: 800; color: var(--secondary); }
-.btn-play {
-width: 75px; height: 75px; border-radius: 50%; background: var(--primary);
-border: none; box-shadow: 0 6px 15px rgba(0,206,201,0.3);
-display: inline-flex; align-items: center; justify-content: center;
-}
-.btn-play svg { fill: #fff; width: 40px; height: 40px; }
-.progress-bar { height: 12px; background: #eee; border-radius: 10px; overflow: hidden; margin: 10px 0; }
-#progress-fill { height: 100%; background: var(--secondary); width: 0%; transition: 0.4s; }
-.btn-main {
-width: 100%; padding: 16px; border-radius: 100px; border: none;
-background: var(--secondary); color: #fff; font-weight: 700; font-size: 1.1rem;
-box-shadow: 0 5px 15px rgba(108, 92, 231, 0.2); margin-top: 15px;
-}
-@keyframes shake { 0%, 100% {transform: translateX(0);} 25% {transform: translateX(-5px);} 75% {transform: translateX(5px);} }
-#error-box { color: var(--error); font-size: 0.85rem; margin-top: 10px; font-weight: 600; word-break: break-word; }
-.btn-logout { background: none; border: none; color: #a4b0be; font-weight: bold; cursor: pointer; text-decoration: underline; font-size: 1rem; margin-top: 20px; font-family: inherit;}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Nghe Số 0-20 - Mobile Audio Fixed</title>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #00cec9; --secondary: #6c5ce7; --success: #2ecc71;
+            --error: #ff7675; --hint: #fdcb6e; --bg: #f8f9fa;
+            --text-main: #2d3436; --shadow: 0 8px 25px rgba(0,0,0,0.08);
+        }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { 
+            font-family: 'Quicksand', sans-serif; background: var(--bg); 
+            margin: 0; display: flex; justify-content: center; align-items: flex-start;
+            min-height: 100vh; padding: 15px;
+        }
+        #auth-overlay {
+            position: fixed; inset: 0; background: var(--bg);
+            display: flex; justify-content: center; align-items: center; z-index: 9999;
+        }
+        .auth-card {
+            background: #fff; padding: 2.5rem 1.5rem; border-radius: 2.5rem;
+            box-shadow: var(--shadow); text-align: center; width: 90%; max-width: 400px;
+        }
+        .google-btn {
+            display: inline-flex; align-items: center; gap: 12px;
+            background: #fff; border: 1.5px solid #eee; padding: 1rem 1.5rem;
+            border-radius: 100px; cursor: pointer; font-weight: 700; font-family: inherit;
+        }
+        #welcome-screen, #main-game, #result-screen { display: none; width: 100%; animation: fadeIn 0.4s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .card { background: #fff; padding: 20px; border-radius: 25px; box-shadow: var(--shadow); text-align: center; }
+        .numbers-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 20px 0; }
+        .num-btn { 
+            aspect-ratio: 1/1; font-size: 1.4rem; font-weight: 700;
+            border: 2px solid #eee; border-radius: 15px; background: #fff;
+            box-shadow: 0 5px 0 #eee; cursor: pointer; font-family: inherit;
+        }
+        .num-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 #eee; }
+        .num-btn.correct { background: var(--success)!important; color: #fff!important; border-color: var(--success)!important; box-shadow: 0 4px 0 #27ae60!important; }
+        .num-btn.wrong { background: var(--error)!important; color: #fff!important; border-color: var(--error)!important; box-shadow: 0 4px 0 #e74c3c!important; animation: shake 0.4s; }
+        .num-btn.highlight { background: var(--hint)!important; border-color: var(--hint)!important; box-shadow: 0 0 15px var(--hint); }
+        .display-word { background: #f0f7ff; padding: 15px; border-radius: 20px; margin-bottom: 20px; border: 2px solid #e1f0ff; }
+        #word-text { font-size: 1.8rem; font-weight: 800; color: var(--secondary); }
+        .btn-play { 
+            width: 75px; height: 75px; border-radius: 50%; background: var(--primary); 
+            border: none; box-shadow: 0 6px 15px rgba(0,206,201,0.3);
+            display: inline-flex; align-items: center; justify-content: center;
+        }
+        .btn-play svg { fill: #fff; width: 40px; height: 40px; }
+        .progress-bar { height: 12px; background: #eee; border-radius: 10px; overflow: hidden; margin: 10px 0; }
+        #progress-fill { height: 100%; background: var(--secondary); width: 0%; transition: 0.4s; }
+        .btn-main { 
+            width: 100%; padding: 16px; border-radius: 100px; border: none; 
+            background: var(--secondary); color: #fff; font-weight: 700; font-size: 1.1rem;
+            box-shadow: 0 5px 15px rgba(108, 92, 231, 0.2); margin-top: 15px;
+        }
+        @keyframes shake { 0%, 100% {transform: translateX(0);} 25% {transform: translateX(-5px);} 75% {transform: translateX(5px);} }
+        #error-box { color: var(--error); font-size: 0.85rem; margin-top: 10px; font-weight: 600; word-break: break-word; }
+    </style>
 </head>
 <body>
 
 <div id="auth-overlay">
-<div class="auth-card">
-<h2 style="color: var(--secondary); margin-top: 0;">🎧 Luyện Nghe Số</h2>
-<p id="auth-status" style="font-weight: 600; color: #2d3436;">Vui lòng đăng nhập</p>
-<button id="login-btn" class="google-btn">
-<svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59L2.56 13.22C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path></svg>
-Tiếp tục với Google
-</button>
-<div id="error-box"></div>
-</div>
+    <div class="auth-card">
+        <h2 style="color: var(--secondary); margin-top: 0;">🎧 Luyện Nghe Số</h2>
+        <p id="auth-status" style="font-weight: 600; color: #2d3436;">Vui lòng đăng nhập</p>
+        <button id="login-btn" class="google-btn">
+            <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59L2.56 13.22C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path></svg>
+            Tiếp tục với Google
+        </button>
+        <div id="error-box"></div>
+    </div>
 </div>
 
 <div id="welcome-screen" class="card">
-<span style="font-size: 60px;">🎧</span>
-<h1>Sẵn sàng chưa?</h1>
-<p>Bắt đầu thử thách nghe số 0-20.</p>
-<button class="btn-main" onclick="startGame()">BẮT ĐẦU 🚀</button>
-<button class="btn-logout" onclick="logoutAccount()">Đăng xuất tài khoản</button>
+    <span style="font-size: 60px;">🎧</span>
+    <h1>Sẵn sàng chưa?</h1>
+    <p>Bắt đầu thử thách nghe số 0-20.</p>
+    <button class="btn-main" onclick="startGame()">BẮT ĐẦU 🚀</button>
 </div>
 
 <div id="main-game" class="card">
-<div class="progress-bar"><div id="progress-fill"></div></div>
-<div style="font-size: 0.9rem; color: #888; margin-bottom: 15px;" id="progress-text">Câu 1/21</div>
-<div class="display-word">
-<span id="word-text">...</span>
-<div id="phonetic-text" style="color: #0984e3; font-style: italic; margin-top: 5px;"></div>
-</div>
-<div style="display: flex; justify-content: center; gap: 15px; margin-bottom: 20px;">
-<button class="btn-play" onclick="playCurrent()">
-<svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
-</button>
-<button onclick="showHint()" style="background:white; border:2.5px solid var(--hint); border-radius:15px; padding:0 15px; color:#d35400; font-weight:700;">💡 Gợi ý</button>
-</div>
-<div class="numbers-grid" id="grid"></div>
+    <div class="progress-bar"><div id="progress-fill"></div></div>
+    <div style="font-size: 0.9rem; color: #888; margin-bottom: 15px;" id="progress-text">Câu 1/21</div>
+    <div class="display-word">
+        <span id="word-text">...</span>
+        <div id="phonetic-text" style="color: #0984e3; font-style: italic; margin-top: 5px;"></div>
+    </div>
+    <div style="display: flex; justify-content: center; gap: 15px; margin-bottom: 20px;">
+        <button class="btn-play" onclick="playCurrent()">
+            <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+        </button>
+        <button onclick="showHint()" style="background:white; border:2.5px solid var(--hint); border-radius:15px; padding:0 15px; color:#d35400; font-weight:700;">💡 Gợi ý</button>
+    </div>
+    <div class="numbers-grid" id="grid"></div>
 </div>
 
 <div id="result-screen" class="card">
-<h1>Kết quả</h1>
-<h2 id="res-score" style="font-size: 3rem; color: var(--secondary);">0/21</h2>
-<p id="res-msg"></p>
-<button class="btn-main" onclick="location.reload()">CHƠI LẠI 🔄</button>
+    <h1>Kết quả</h1>
+    <h2 id="res-score" style="font-size: 3rem; color: var(--secondary);">0/21</h2>
+    <p id="res-msg"></p>
+    <button class="btn-main" onclick="location.reload()">CHƠI LẠI 🔄</button>
 </div>
 
 <audio id="snd-correct" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3"></audio>
 <audio id="snd-wrong" src="https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3"></audio>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
-import { getAuth, signInWithPopup, onAuthStateChanged, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
-import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+    import { getAuth, signInWithPopup, onAuthStateChanged, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+    import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
-```
-const firebaseConfig = {
-    apiKey: "AIzaSyCdlTVHwiLOGMnrFe12DE1dQSEHZaJ594I",
-    authDomain: "nguyen-am-tieng-anh.firebaseapp.com",
-    projectId: "nguyen-am-tieng-anh",
-    storageBucket: "nguyen-am-tieng-anh.firebasestorage.app",
-    messagingSenderId: "878440633705",
-    appId: "1:878440633705:web:755de6cb273eb139ebd9f8"
-};
+    const firebaseConfig = {
+        apiKey: "AIzaSyCdlTVHwiLOGMnrFe12DE1dQSEHZaJ594I",
+        authDomain: "nguyen-am-tieng-anh.firebaseapp.com",
+        projectId: "nguyen-am-tieng-anh",
+        storageBucket: "nguyen-am-tieng-anh.firebasestorage.app",
+        messagingSenderId: "878440633705",
+        appId: "1:878440633705:web:755de6cb273eb139ebd9f8"
+    };
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth();
-const db = getFirestore(app);
-const provider = new GoogleAuthProvider();
-provider.setCustomParameters({ prompt: 'select_account' });
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth();
+    const db = getFirestore(app);
+    const provider = new GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: 'select_account' });
 
-const statusEl = document.getElementById("auth-status");
-const errorEl = document.getElementById("error-box");
+    const statusEl = document.getElementById("auth-status");
+    const errorEl = document.getElementById("error-box");
 
-onAuthStateChanged(auth, async (user) => {
-    if (user) {
-        await checkAccess(user);
-    } else {
-        // Nếu không có user, hiển thị lại màn hình đăng nhập
-        document.getElementById("auth-overlay").style.display = "flex";
-        document.getElementById("welcome-screen").style.display = "none";
-        statusEl.innerText = "Vui lòng đăng nhập";
-        statusEl.style.color = "#2d3436";
-    }
-});
+    onAuthStateChanged(auth, async (user) => {
+        if (user) await checkAccess(user);
+    });
 
-async function checkAccess(user) {
-    statusEl.innerText = "Đang kiểm tra dữ liệu...";
-    statusEl.style.color = "var(--secondary)";
-    errorEl.innerText = "";
-
-    try {
-        const q = query(collection(db, "Tienganh_so_cap"), where("email", "==", user.email));
-        const snap = await getDocs(q);
-
-        if (!snap.empty) {
-            document.getElementById("auth-overlay").style.display = "none";
-            document.getElementById("welcome-screen").style.display = "block";
-        } else {
-            statusEl.innerText = "Từ chối truy cập!";
-            errorEl.innerText = `Email ${user.email} chưa được cấp quyền.`;
+    async function checkAccess(user) {
+        statusEl.innerText = "Đang kiểm tra dữ liệu...";
+        statusEl.style.color = "var(--secondary)";
+        errorEl.innerText = "";
+        
+        try {
+            const q = query(collection(db, "Tienganh_so_cap"), where("email", "==", user.email));
+            const snap = await getDocs(q);
+            
+            if (!snap.empty) {
+                document.getElementById("auth-overlay").style.display = "none";
+                document.getElementById("welcome-screen").style.display = "block";
+            } else {
+                statusEl.innerText = "Từ chối truy cập!";
+                errorEl.innerText = `Email ${user.email} chưa được cấp quyền.`;
+                await signOut(auth);
+            }
+        } catch (err) {
+            statusEl.innerText = "Lỗi kết nối CSDL!";
+            errorEl.innerText = err.message;
             await signOut(auth);
         }
-    } catch (err) {
-        statusEl.innerText = "Lỗi kết nối CSDL!";
-        errorEl.innerText = err.message;
-        await signOut(auth);
     }
-}
 
-document.getElementById("login-btn").onclick = async () => {
-    statusEl.innerText = "Đang mở cửa sổ đăng nhập...";
-    errorEl.innerText = "";
-    try {
-        const res = await signInWithPopup(auth, provider);
-        if (res.user) await checkAccess(res.user);
-    } catch (err) {
-        statusEl.innerText = "Đăng nhập thất bại!";
-        errorEl.innerText = `Lỗi: ${err.message}`;
-    }
-};
-
-// Hàm đăng xuất
-window.logoutAccount = async function() {
-    await signOut(auth);
-    location.reload(); // Tải lại trang sau khi đăng xuất
-};
-```
-
+    document.getElementById("login-btn").onclick = async () => {
+        statusEl.innerText = "Đang mở cửa sổ đăng nhập...";
+        errorEl.innerText = "";
+        try {
+            const res = await signInWithPopup(auth, provider);
+            if (res.user) await checkAccess(res.user);
+        } catch (err) {
+            statusEl.innerText = "Đăng nhập thất bại!";
+            errorEl.innerText = `Lỗi: ${err.message}`;
+        }
+    };
 </script>
 
 <script>
-const numberData = {
-0: ["Zero", "/ˈzɪərəʊ/"], 1: ["One", "/wʌn/"], 2: ["Two", "/tuː/"], 3: ["Three", "/θriː/"], 4: ["Four", "/fɔː/"],
-5: ["Five", "/faɪv/"], 6: ["Six", "/sɪks/"], 7: ["Seven", "/ˈsev.ən/"], 8: ["Eight", "/eɪt/"], 9: ["Nine", "/naɪn/"],
-10: ["Ten", "/ten/"], 11: ["Eleven", "/ɪˈlev.ən/"], 12: ["Twelve", "/twelv/"], 13: ["Thirteen", "/ˌθɜːˈtiːn/"],
-14: ["Fourteen", "/ˌfɔːˈtiːn/"], 15: ["Fifteen", "/ˌfɪfˈtiːn/"], 16: ["Sixteen", "/ˌsɪkˈstiːn/"],
-17: ["Seventeen", "/ˌsev.ənˈtiːn/"], 18: ["Eighteen", "/ˌeɪˈtiːn/"], 19: ["Nineteen", "/ˌnaɪnˈtiːn/"], 20: ["Twenty", "/ˈtwen.ti/"]
-};
+    const numberData = {
+        0: ["Zero", "/ˈzɪərəʊ/"], 1: ["One", "/wʌn/"], 2: ["Two", "/tuː/"], 3: ["Three", "/θriː/"], 4: ["Four", "/fɔː/"],
+        5: ["Five", "/faɪv/"], 6: ["Six", "/sɪks/"], 7: ["Seven", "/ˈsev.ən/"], 8: ["Eight", "/eɪt/"], 9: ["Nine", "/naɪn/"],
+        10: ["Ten", "/ten/"], 11: ["Eleven", "/ɪˈlev.ən/"], 12: ["Twelve", "/twelv/"], 13: ["Thirteen", "/ˌθɜːˈtiːn/"],
+        14: ["Fourteen", "/ˌfɔːˈtiːn/"], 15: ["Fifteen", "/ˌfɪfˈtiːn/"], 16: ["Sixteen", "/ˌsɪkˈstiːn/"],
+        17: ["Seventeen", "/ˌsev.ənˈtiːn/"], 18: ["Eighteen", "/ˌeɪˈtiːn/"], 19: ["Nineteen", "/ˌnaɪnˈtiːn/"], 20: ["Twenty", "/ˈtwen.ti/"]
+    };
 
-```
-let questions = [], currentIdx = 0, score = 0, targetNum = null, canClick = true, hintUsed = false;
+    let questions = [], currentIdx = 0, score = 0, targetNum = null, canClick = true, hintUsed = false;
 
-window.startGame = function() {
-    const unlockUtterance = new SpeechSynthesisUtterance('');
-    window.speechSynthesis.speak(unlockUtterance);
+    window.startGame = function() {
+        // MỞ KHÓA ÂM THANH NGAY KHI NGƯỜI DÙNG BẤM "BẮT ĐẦU"
+        const unlockUtterance = new SpeechSynthesisUtterance('');
+        window.speechSynthesis.speak(unlockUtterance);
+        
+        // Mở khóa các file Audio
+        document.getElementById('snd-correct').play().then(() => {
+            document.getElementById('snd-correct').pause();
+            document.getElementById('snd-correct').currentTime = 0;
+        }).catch(()=>{});
+        
+        document.getElementById('snd-wrong').play().then(() => {
+            document.getElementById('snd-wrong').pause();
+            document.getElementById('snd-wrong').currentTime = 0;
+        }).catch(()=>{});
 
-    document.getElementById('snd-correct').play().then(() => {
-        document.getElementById('snd-correct').pause();
-        document.getElementById('snd-correct').currentTime = 0;
-    }).catch(()=>{});
-
-    document.getElementById('snd-wrong').play().then(() => {
-        document.getElementById('snd-wrong').pause();
-        document.getElementById('snd-wrong').currentTime = 0;
-    }).catch(()=>{});
-
-    document.getElementById('welcome-screen').style.display = 'none';
-    document.getElementById('main-game').style.display = 'block';
-    questions = Object.keys(numberData).sort(() => Math.random() - 0.5);
-    const grid = document.getElementById('grid');
-    grid.innerHTML = '';
-    for(let i=0; i<=20; i++) {
-        const b = document.createElement('button');
-        b.className = 'num-btn'; b.id = 'btn-'+i; b.innerText = i;
-        b.onclick = () => check(i, b);
-        grid.appendChild(b);
+        // Chuyển màn hình và tải câu hỏi
+        document.getElementById('welcome-screen').style.display = 'none';
+        document.getElementById('main-game').style.display = 'block';
+        questions = Object.keys(numberData).sort(() => Math.random() - 0.5);
+        const grid = document.getElementById('grid');
+        grid.innerHTML = '';
+        for(let i=0; i<=20; i++) {
+            const b = document.createElement('button');
+            b.className = 'num-btn'; b.id = 'btn-'+i; b.innerText = i;
+            b.onclick = () => check(i, b);
+            grid.appendChild(b);
+        }
+        load();
     }
-    load();
-}
 
-function load() {
-    if (currentIdx >= 21) { finish(); return; }
-    canClick = true; hintUsed = false;
-    targetNum = questions[currentIdx];
-    document.getElementById('word-text').innerText = numberData[targetNum][0];
-    document.getElementById('phonetic-text').innerText = numberData[targetNum][1];
-    document.getElementById('progress-text').innerText = `Câu ${currentIdx + 1}/21`;
-    document.getElementById('progress-fill').style.width = `${(currentIdx / 21) * 100}%`;
-    document.querySelectorAll('.num-btn').forEach(b => b.classList.remove('correct', 'wrong', 'highlight'));
-
-    setTimeout(() => playCurrent(), 100);
-}
-
-window.playCurrent = function() {
-    if (window.speechSynthesis.speaking) {
-        window.speechSynthesis.cancel();
+    function load() {
+        if (currentIdx >= 21) { finish(); return; }
+        canClick = true; hintUsed = false;
+        targetNum = questions[currentIdx];
+        document.getElementById('word-text').innerText = numberData[targetNum][0];
+        document.getElementById('phonetic-text').innerText = numberData[targetNum][1];
+        document.getElementById('progress-text').innerText = `Câu ${currentIdx + 1}/21`;
+        document.getElementById('progress-fill').style.width = `${(currentIdx / 21) * 100}%`;
+        document.querySelectorAll('.num-btn').forEach(b => b.classList.remove('correct', 'wrong', 'highlight'));
+        
+        // Tự động đọc câu hỏi mới (cần delay nhỏ để tránh lỗi kẹt giọng trên iOS)
+        setTimeout(() => playCurrent(), 100);
     }
-    setTimeout(() => {
-        const utter = new SpeechSynthesisUtterance(numberData[targetNum][0]);
-        utter.lang = 'en-US';
-        utter.rate = 0.85;
-        window.speechSynthesis.speak(utter);
-    }, 50);
-}
 
-window.showHint = function() {
-    if(!canClick) return;
-    hintUsed = true;
-    const b = document.getElementById('btn-'+targetNum);
-    b.classList.add('highlight');
-    setTimeout(() => b.classList.remove('highlight'), 1000);
-}
-
-function check(n, b) {
-    if(!canClick) return;
-    if(n == targetNum) {
-        canClick = false; if(!hintUsed) score++;
-        b.classList.add('correct');
-        document.getElementById('snd-correct').play().catch(()=>{});
-        setTimeout(() => { currentIdx++; load(); }, 800);
-    } else {
-        b.classList.add('wrong');
-        document.getElementById('snd-wrong').play().catch(()=>{});
-        setTimeout(() => b.classList.remove('wrong'), 400);
+    window.playCurrent = function() {
+        // Sửa lỗi kẹt giọng đọc (bug cancel) trên Safari/iOS
+        if (window.speechSynthesis.speaking) {
+            window.speechSynthesis.cancel();
+        }
+        setTimeout(() => {
+            const utter = new SpeechSynthesisUtterance(numberData[targetNum][0]);
+            utter.lang = 'en-US'; 
+            utter.rate = 0.85; // Tốc độ chuẩn cho mobile
+            window.speechSynthesis.speak(utter);
+        }, 50);
     }
-}
 
-function finish() {
-    document.getElementById('main-game').style.display = 'none';
-    document.getElementById('result-screen').style.display = 'block';
-    document.getElementById('res-score').innerText = `${score}/21`;
-    document.getElementById('res-msg').innerText = score === 21 ? "Tuyệt vời! Bạn là thiên tài số học." : "Khá lắm! Hãy thử lại nhé.";
-}
-```
+    window.showHint = function() {
+        if(!canClick) return;
+        hintUsed = true;
+        const b = document.getElementById('btn-'+targetNum);
+        b.classList.add('highlight');
+        setTimeout(() => b.classList.remove('highlight'), 1000);
+    }
 
+    function check(n, b) {
+        if(!canClick) return;
+        if(n == targetNum) {
+            canClick = false; if(!hintUsed) score++;
+            b.classList.add('correct');
+            document.getElementById('snd-correct').play().catch(()=>{});
+            setTimeout(() => { currentIdx++; load(); }, 800);
+        } else {
+            b.classList.add('wrong');
+            document.getElementById('snd-wrong').play().catch(()=>{});
+            setTimeout(() => b.classList.remove('wrong'), 400);
+        }
+    }
+
+    function finish() {
+        document.getElementById('main-game').style.display = 'none';
+        document.getElementById('result-screen').style.display = 'block';
+        document.getElementById('res-score').innerText = `${score}/21`;
+        document.getElementById('res-msg').innerText = score === 21 ? "Tuyệt vời! Bạn là thiên tài số học." : "Khá lắm! Hãy thử lại nhé.";
+    }
 </script>
 </body>
 </html>
