@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Information Game - Pro Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root { 
+            --primary: #6366f1; 
+            --primary-hover: #F8F7FF;
+            --success: #10b981; 
+            --error: #ef4444; 
+            --bg: #eef2ff; 
+            --text-main: #2d3436;
+            --text-sub: #636E72;
+        }
+        
+        * { box-sizing: border-box; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
+
+        body { 
+            font-family: 'Quicksand', sans-serif; 
+            background: var(--bg); margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px;
+            overflow-x: hidden;
+        }
+
+        /* --- LOGIN UI: LONG CARD --- */
+        #login-screen {
+            position: fixed; inset: 0; background: var(--bg);
+            display: flex; justify-content: center; align-items: center; z-index: 9999;
+        }
+
+        .login-card {
+            background: #FFFFFF;
+            padding: 5.5rem 3.5rem;
+            border-radius: 3rem;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.05);
+            text-align: center;
+            max-width: 540px; 
+            width: 90%;
+            display: flex;
+            flex-direction: column;
+            gap: 3.5rem; 
+        }
+
+        .login-header { display: flex; flex-direction: column; gap: 1.2rem; }
+        .login-header h2 { font-size: 2.2rem; font-weight: 700; color: var(--primary); margin: 0; letter-spacing: -1px; line-height: 1.2; }
+        .login-header p { color: var(--text-sub); font-size: 1.15rem; margin: 0; font-weight: 500; line-height: 1.6; }
+
+        .google-btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 14px;
+            background: #FFFFFF; color: var(--text-main); border: 1.5px solid #E5E7EB;
+            padding: 1rem 3rem; border-radius: 100px; cursor: pointer;
+            font-weight: 700; font-size: 1.05rem; font-family: inherit;
+        }
+
+        .google-btn:hover { border-color: var(--primary); background: var(--primary-hover); transform: translateY(-3px); }
+
+        #login-msg { color: var(--error); font-size: 0.95rem; font-weight: 700; min-height: 1.4rem; }
+
+        /* --- MUSIC CONTROL --- */
+        .music-toggle {
+            position: fixed; top: 25px; left: 25px; z-index: 1000;
+            background: white; border: 2px solid var(--primary); color: var(--primary);
+            width: 45px; height: 45px; border-radius: 50%; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
+        }
+
+        /* --- GAME UI --- */
+        #main-app { display: none; width: 100%; max-width: 550px; flex-direction: column; align-items: center; }
+        
+        .card { 
+            background: white; width: 100%; padding: 35px; border-radius: 2.5rem; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.08); text-align: center; position: relative; 
+        }
+        
+        .hidden { display: none !important; }
+
+        .icon-header { font-size: 60px; margin-bottom: 10px; display: block; animation: bounce 2s infinite; }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+
+        .info-row { text-align: left; margin-bottom: 15px; padding: 15px; border-radius: 1.2rem; background: #f8fafc; border: 2px solid transparent; }
+        .label { font-weight: 800; color: #475569; margin-bottom: 8px; display: block; font-size: 0.95rem; text-transform: uppercase; }
+        
+        select { 
+            width: 100%; padding: 12px; border-radius: 10px; border: 2px solid #cbd5e1; 
+            font-size: 1rem; font-weight: 700; cursor: pointer; outline: none; 
+            background-color: white; font-family: inherit; color: var(--primary);
+        }
+        select.correct { border-color: var(--success); background: #f0fdf4; color: #166534; }
+        select.wrong { border-color: var(--error); background: #fef2f2; color: #991b1b; }
+
+        .explanation { font-size: 0.9rem; color: #64748b; margin-top: 10px; display: none; font-style: italic; line-height: 1.5; border-left: 4px solid var(--primary); padding-left: 12px; background: var(--primary-hover); padding: 8px 12px; border-radius: 0 8px 8px 0; }
+        .show-exp { display: block; }
+
+        .btn-main { width: 100%; padding: 18px; background: var(--primary); color: white; border: none; border-radius: 1rem; font-size: 1.1rem; font-weight: 800; cursor: pointer; margin-top: 10px; font-family: inherit; text-transform: uppercase; box-shadow: 0 8px 20px rgba(99, 102, 241, 0.2); }
+        .btn-main:hover { transform: translateY(-3px); box-shadow: 0 12px 25px rgba(99, 102, 241, 0.3); }
+
+        .balloon { position: fixed; bottom: -120px; width: 45px; height: 60px; border-radius: 50%; z-index: 9999; animation: floatUp forwards linear; }
+        @keyframes floatUp { 0% { transform: translateY(0) rotate(0deg); opacity: 1; } 100% { transform: translateY(-130vh) rotate(30deg); opacity: 0; } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+    <div id="login-screen">
+        <div class="login-card">
+            <div class="login-header">
+                <h2>Hệ Thống Trực Tuyến</h2>
+                <p>Vui lòng đăng nhập để bắt đầu thử thách Contact Master của bạn.</p>
+            </div>
+            <button id="login-btn" class="google-btn">
+                <svg width="22" height="22" viewBox="0 0 48 48">
+                    <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path>
+                    <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path>
+                    <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59L2.56 13.22C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path>
+                    <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path>
+                </svg>
+                Tiếp tục với Google
+            </button>
+            <div id="login-msg"></div>
+        </div>
+    </div>
+
+    <div id="main-app">
+        <button class="music-toggle" onclick="toggleMusic()" id="music-btn">🔊</button>
+        
+        <div id="welcome" class="card">
+            <span class="icon-header">📋</span>
+            <h1 style="color: var(--primary); margin: 0; font-size: 2rem; font-weight: 800;">CONTACT MASTER</h1>
+            <p style="color: var(--text-sub); margin: 15px 0 25px; font-weight: 500;">Chinh phục thử thách 7 thông tin liên hệ!</p>
+            <button class="btn-main" onclick="startGame()">BẮT ĐẦU CHƠI 🚀</button>
+        </div>
+
+        <div id="game" class="card hidden">
+            <div class="quiz-container">
+                <div class="info-row">
+                    <label class="label">1. E-mail address:</label>
+                    <select class="quiz-item" data-answer="alex@gmail.com" data-exp="Giải thích: Email cần có dấu '@' và tên miền như .com.">
+                        <option value="">-- Chọn đáp án --</option>
+                        <option value="alex.gmail@com">alex.gmail@com</option>
+                        <option value="alex@gmail.com">alex@gmail.com</option>
+                        <option value="alex@gmailcom">alex@gmailcom</option>
+                    </select>
+                    <div class="explanation"></div>
+                </div>
+                <div class="info-row"><label class="label">2. Mobile phone number:</label><select class="quiz-item" data-answer="+84 901 234 567" data-exp="Giải thích: Mã vùng Việt Nam là +84."><option value="">-- Chọn đáp án --</option><option value="+84 901 234 567">+84 901 234 567</option><option value="090-abc-xyz">090-abc-xyz</option><option value="number-090123">number-090123</option></select><div class="explanation"></div></div>
+                <div class="info-row"><label class="label">3. Address:</label><select class="quiz-item" data-answer="123 Blue Street" data-exp="Giải thích: Địa chỉ gồm số nhà + tên đường."><option value="">-- Chọn đáp án --</option><option value="Street Blue 123">Street Blue 123</option><option value="123 Blue Street">123 Blue Street</option><option value="Live in 123">Live in 123</option></select><div class="explanation"></div></div>
+                <div class="info-row"><label class="label">4. Postal code:</label><select class="quiz-item" data-answer="700000" data-exp="Giải thích: Postal code là một dãy mã số bưu chính."><option value="">-- Chọn đáp án --</option><option value="700000">700000</option><option value="Zip-Code-70">Zip-Code-70</option><option value="Seven Zero">Seven Zero</option></select><div class="explanation"></div></div>
+                <div class="info-row"><label class="label">5. City/Town:</label><select class="quiz-item" data-answer="Ho Chi Minh City" data-exp="Giải thích: Dùng danh từ riêng chỉ thành phố."><option value="">-- Chọn đáp án --</option><option value="Vietnamese">Vietnamese</option><option value="Asia">Asia</option><option value="Ho Chi Minh City">Ho Chi Minh City</option></select><div class="explanation"></div></div>
+                <div class="info-row"><label class="label">6. Province:</label><select class="quiz-item" data-answer="Gia Lai" data-exp="Giải thích: Province nghĩa là Tỉnh."><option value="">-- Chọn đáp án --</option><option value="Gia Lai">Gia Lai</option><option value="District 1">District 1</option><option value="South Area">South Area</option></select><div class="explanation"></div></div>
+                <div class="info-row"><label class="label">7. Country:</label><select class="quiz-item" data-answer="Vietnam" data-exp="Giải thích: Dùng danh từ Vietnam cho Quốc gia."><option value="">-- Chọn đáp án --</option><option value="Vietnamese">Vietnamese</option><option value="Vietnam">Vietnam</option><option value="The Vietnam">The Vietnam</option></select><div class="explanation"></div></div>
+            </div>
+
+            <div id="result-text" style="font-weight: 800; font-size: 1.2rem; margin: 20px 0;"></div>
+            <button id="btn-submit" class="btn-main" onclick="checkAnswers()">KIỂM TRA ✅</button>
+            <button id="btn-restart" class="btn-main hidden" onclick="resetToWelcome()">CHƠI LẠI 🔄</button>
+        </div>
+    </div>
+
+    <audio id="bg-music" src="https://cdn.pixabay.com/audio/2025/01/31/audio_210b378eb7.mp3" loop></audio>
+    <audio id="snd-correct" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3"></audio>
+    <audio id="snd-wrong" src="https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3"></audio>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+        import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCdlTVHwiLOGMnrFe12DE1dQSEHZaJ594I",
+            authDomain: "nguyen-am-tieng-anh.firebaseapp.com",
+            projectId: "nguyen-am-tieng-anh",
+            storageBucket: "nguyen-am-tieng-anh.firebasestorage.app",
+            messagingSenderId: "878440633705",
+            appId: "1:878440633705:web:755de6cb273eb139ebd9f8"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth();
+        const db = getFirestore(app);
+        const provider = new GoogleAuthProvider();
+
+        document.getElementById("login-btn").onclick = async () => {
+            const msg = document.getElementById("login-msg");
+            msg.innerText = "Đang kiểm tra...";
+            try {
+                const res = await signInWithPopup(auth, provider);
+                const q = query(collection(db, "Tienganh_so_cap"), where("email", "==", res.user.email));
+                const snap = await getDocs(q);
+                if (!snap.empty) {
+                    document.getElementById("login-screen").style.display = "none";
+                    document.getElementById("main-app").style.display = "flex";
+                } else {
+                    msg.innerText = "Email không có trong danh sách!";
+                    await signOut(auth);
+                }
+            } catch (e) { msg.innerText = "Lỗi đăng nhập!"; }
+        };
+    </script>
+
+    <script>
+        const bgMusic = document.getElementById('bg-music');
+
+        function toggleMusic() {
+            const btn = document.getElementById('music-btn');
+            if (bgMusic.paused) {
+                bgMusic.play(); btn.innerText = "🔊";
+            } else {
+                bgMusic.pause(); btn.innerText = "🔇";
+            }
+        }
+
+        function startGame() {
+            document.getElementById('welcome').classList.add('hidden');
+            document.getElementById('game').classList.remove('hidden');
+            bgMusic.play().catch(() => {});
+        }
+
+        function resetToWelcome() {
+            document.getElementById('welcome').classList.remove('hidden');
+            document.getElementById('game').classList.add('hidden');
+            document.getElementById('btn-submit').classList.remove('hidden');
+            document.getElementById('btn-restart').classList.add('hidden');
+            document.getElementById('result-text').innerText = "";
+            document.querySelectorAll('.quiz-item').forEach(item => {
+                item.value = "";
+                item.className = "quiz-item";
+                item.nextElementSibling.classList.remove('show-exp');
+            });
+        }
+
+        function checkAnswers() {
+            const items = document.querySelectorAll('.quiz-item');
+            let score = 0;
+            let allFilled = true;
+
+            items.forEach(item => { if(item.value === "") allFilled = false; });
+            if(!allFilled) { alert("Bạn ơi, hãy chọn đầy đủ nhé!"); return; }
+
+            items.forEach(item => {
+                const correct = item.getAttribute('data-answer');
+                const expDiv = item.nextElementSibling;
+                expDiv.innerText = item.getAttribute('data-exp');
+                expDiv.classList.add('show-exp');
+                if(item.value === correct) {
+                    item.classList.add('correct'); score++;
+                } else {
+                    item.classList.add('wrong');
+                }
+            });
+
+            const resText = document.getElementById('result-text');
+            if(score === items.length) {
+                resText.innerText = "🌟 LÀM TỐT LẮM! BẠN LÀ BẬC THẦY THÔNG TIN!";
+                resText.style.color = "#10b981";
+                document.getElementById('snd-correct').play();
+                createBalloons();
+            } else {
+                resText.innerText = `KẾT QUẢ: ${score}/${items.length} ĐÚNG. CỐ LÊN!`;
+                resText.style.color = "#ef4444";
+                document.getElementById('snd-wrong').play();
+            }
+
+            document.getElementById('btn-submit').classList.add('hidden');
+            document.getElementById('btn-restart').classList.remove('hidden');
+            bgMusic.pause();
+        }
+
+        function createBalloons() {
+            const colors = ['#6366f1', '#10b981', '#ff7675', '#74b9ff', '#ffeaa7'];
+            for(let i=0; i<50; i++) {
+                const b = document.createElement('div');
+                b.className = 'balloon';
+                b.style.left = Math.random() * 100 + 'vw';
+                b.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                b.style.animationDuration = (3 + Math.random() * 3) + 's';
+                b.style.animationDelay = (Math.random() * 2) + 's';
+                document.body.appendChild(b);
+                setTimeout(() => b.remove(), 7000);
+            }
+        }
+    </script>
+</body>
+</html>
