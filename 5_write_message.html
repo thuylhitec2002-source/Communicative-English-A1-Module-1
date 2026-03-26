@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Email Writing Challenge - Secured Edition</title>
+    <title>Email Writing Challenge - Firebase Edition</title>
     <style>
         :root { 
             --primary: #007bff; 
@@ -34,10 +34,18 @@
 
         @keyframes floating { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
 
-        /* Mặc định ẩn tất cả, chỉ hiện class active */
         .screen { display: none; }
         .active { display: block !important; animation: zoomIn 0.4s; }
         @keyframes zoomIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+
+        h1, h2 { color: var(--primary); font-weight: 800; letter-spacing: -0.5px; }
+        
+        .google-btn {
+            background: white; color: #2d3436; border: 1px solid #dfe6e9; padding: 1rem 2rem; border-radius: 50px; 
+            cursor: pointer; display: inline-flex; align-items: center; gap: 12px; font-weight: bold; margin: 20px auto;
+            box-shadow: 0 8px 15px rgba(0,0,0,0.05); transition: 0.3s; font-family: inherit;
+        }
+        .google-btn:hover { transform: translateY(-3px); box-shadow: 0 12px 20px rgba(0,0,0,0.1); }
 
         .btn-main { 
             background: linear-gradient(135deg, var(--primary), var(--secondary)); 
@@ -47,11 +55,6 @@
             margin: 5px; font-family: inherit;
         }
         .btn-main:hover { transform: translateY(-3px); box-shadow: 0 12px 25px rgba(0, 123, 255, 0.4); }
-
-        .login-google {
-            background: #fff; color: #444; border: 1.5px solid #eee;
-            display: inline-flex; align-items: center; gap: 10px;
-        }
 
         .email-box {
             background: #fcfcfc; border: 2px dashed #e0e0e0;
@@ -82,26 +85,27 @@
 
 <div class="game-container">
     <div id="login-screen" class="screen active">
-        <h1>Hệ Thống Trực Tuyến</h1>
-        <p>Vui lòng đăng nhập để bắt đầu trải nghiệm bài học.</p>
-        <button class="btn-main login-google" onclick="handleLogin()">
-            <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" width="18">
+        <h1>EMAIL CHALLENGE</h1>
+        <p style="color: #636e72;">Đăng nhập để bắt đầu bài học Writing</p>
+        <button id="login-btn" class="google-btn">
+            <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59L2.56 13.22C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path></svg>
             Tiếp tục với Google
         </button>
+        <p id="login-msg" style="color: var(--error); font-size: 0.9rem; font-weight: bold; margin-top: 10px;"></p>
     </div>
 
-    <div id="welcome-screen" class="screen">
+    <div id="start-screen" class="screen">
         <div style="font-size: 60px; margin-bottom: 10px;">📧</div>
-        <h1>Viết Email Chuyên Nghiệp</h1>
+        <h2 id="user-welcome">Chào bạn!</h2>
         <p>Học cách giới thiệu bản thân qua Email với cấu trúc chuẩn quốc tế.</p>
         <br>
-        <button class="btn-main" onclick="startGame()">BẮT ĐẦU NGAY 🚀</button>
+        <button class="btn-main" onclick="window.startGame()">BẮT ĐẦU NGAY 🚀</button>
     </div>
 
     <div id="main-app" class="screen">
-        <button class="music-toggle" onclick="toggleMusic()" id="music-btn">🔊</button>
+        <button class="music-toggle" onclick="window.toggleMusic()" id="music-btn">🔊</button>
         <h2 style="margin-top:0;">Writing an E-mail 📧</h2>
-        <div class="email-box" id="quiz-content">
+        <div class="email-box">
             <div class="quiz-line">
                 <select class="quiz-dropdown" data-answer="Hello"><option value="">...</option><option value="Hello">Hello</option><option value="Good">Good</option></select>
                 <span>everyone.</span>
@@ -127,61 +131,75 @@
         </div>
         <div id="result-display" style="font-weight: bold; margin-bottom: 15px; color: var(--primary); display: none;"></div>
         <div style="display: flex; flex-direction: column; gap: 10px; align-items: center;">
-            <button id="btn-check" class="btn-main" onclick="checkAnswers()">KIỂM TRA ✅</button>
-            <button class="btn-main" style="background: #e9ecef; color: #495057; box-shadow: none;" onclick="toggleTranslation()">DỊCH BÀI 📖</button>
-            <button id="btn-restart" class="btn-main" style="display:none; background:#6c757d;" onclick="resetGame()">CHƠI LẠI 🔄</button>
+            <button id="btn-check" class="btn-main" onclick="window.checkAnswers()">KIỂM TRA ✅</button>
+            <button class="btn-main" style="background: #e9ecef; color: #495057; box-shadow: none;" onclick="window.toggleTranslation()">DỊCH BÀI 📖</button>
+            <button id="btn-restart" class="btn-main" style="display:none; background:#6c757d;" onclick="window.resetGame()">CHƠI LẠI 🔄</button>
         </div>
     </div>
 </div>
 
 <audio id="bg-music" src="https://cdn.pixabay.com/audio/2025/01/31/audio_210b378eb7.mp3" loop></audio>
 
-<script>
-    const bgMusic = document.getElementById('bg-music');
-    let userHasLoggedIn = false; // "Chìa khóa" logic
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+    import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
-    // Hàm chuyển màn hình duy nhất
-    function showScreen(id) {
-        // Chỉ cho phép xem Welcome hoặc Main App nếu đã login
-        if ((id === 'welcome-screen' || id === 'main-app') && !userHasLoggedIn) {
-            console.warn("Truy cập bị chặn: Cần đăng nhập.");
-            id = 'login-screen'; 
+    const firebaseConfig = {
+        apiKey: "AIzaSyCdlTVHwiLOGMnrFe12DE1dQSEHZaJ594I",
+        authDomain: "nguyen-am-tieng-anh.firebaseapp.com",
+        projectId: "nguyen-am-tieng-anh",
+        storageBucket: "nguyen-am-tieng-anh.firebasestorage.app",
+        messagingSenderId: "878440633705",
+        appId: "1:878440633705:web:755de6cb273eb139ebd9f8",
+        measurementId: "G-EM8Y1QW6QH"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth();
+    const db = getFirestore(app);
+    const provider = new GoogleAuthProvider();
+
+    // LOGIN FIREBASE
+    document.getElementById("login-btn").onclick = async () => {
+        try {
+            const res = await signInWithPopup(auth, provider);
+            const q = query(collection(db, "Tienganh_so_cap"), where("email", "==", res.user.email));
+            const snap = await getDocs(q);
+            
+            if (!snap.empty) {
+                document.getElementById("user-welcome").innerText = "Chào " + res.user.displayName + "!";
+                showScreen('start-screen');
+            } else {
+                document.getElementById("login-msg").innerText = "Email không có quyền truy cập.";
+                await signOut(auth);
+            }
+        } catch (e) {
+            document.getElementById("login-msg").innerText = "Lỗi đăng nhập hoặc bị hủy.";
         }
-        
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        const target = document.getElementById(id);
-        if (target) target.classList.add('active');
-    }
+    };
 
-    // Xử lý khi nhấn nút Login
-    function handleLogin() {
-        userHasLoggedIn = true; // Kích hoạt chìa khóa
-        showScreen('welcome-screen');
-    }
+    // GAME FUNCTIONS
+    const bgMusic = document.getElementById('bg-music');
 
-    // Bắt đầu game
-    function startGame() {
-        if (!userHasLoggedIn) return showScreen('login-screen');
+    window.startGame = function() {
         showScreen('main-app');
         bgMusic.play().catch(() => {});
-    }
+    };
 
-    // Các hàm phụ trợ
-    function toggleMusic() {
+    window.toggleMusic = function() {
         const btn = document.getElementById('music-btn');
         if (bgMusic.paused) { bgMusic.play(); btn.innerText = "🔊"; }
         else { bgMusic.pause(); btn.innerText = "🔇"; }
-    }
+    };
 
-    function toggleTranslation() {
-        if (!userHasLoggedIn) return;
+    window.toggleTranslation = function() {
         document.querySelectorAll('.translation').forEach(t => {
             t.style.display = (t.style.display === 'none' || t.style.display === '') ? 'block' : 'none';
         });
-    }
+    };
 
-    function checkAnswers() {
-        if (!userHasLoggedIn) return;
+    window.checkAnswers = function() {
         let score = 0;
         const selects = document.querySelectorAll('.quiz-dropdown');
         selects.forEach(s => {
@@ -193,18 +211,15 @@
                 s.classList.add('wrong');
             }
         });
-
         const res = document.getElementById('result-display');
         res.innerText = `Kết quả: ${score}/${selects.length} câu đúng!`;
         res.style.display = 'block';
         document.getElementById('btn-check').style.display = 'none';
         document.getElementById('btn-restart').style.display = 'inline-block';
-
         if(score === selects.length) createBalloons();
-    }
+    };
 
-    function resetGame() {
-        if (!userHasLoggedIn) return;
+    window.resetGame = function() {
         document.querySelectorAll('.quiz-dropdown').forEach(s => {
             s.value = "";
             s.classList.remove('correct', 'wrong');
@@ -212,7 +227,12 @@
         document.getElementById('result-display').style.display = 'none';
         document.getElementById('btn-check').style.display = 'inline-block';
         document.getElementById('btn-restart').style.display = 'none';
-        showScreen('welcome-screen');
+        showScreen('start-screen');
+    };
+
+    function showScreen(id) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
     }
 
     function createBalloons() {
@@ -222,17 +242,12 @@
             b.className = 'balloon';
             b.style.left = Math.random() * 100 + 'vw';
             b.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-            const duration = 3 + Math.random() * 3;
-            b.style.animationDuration = duration + 's';
+            b.style.animationDuration = (3 + Math.random() * 3) + 's';
             b.style.animationDelay = Math.random() * 2 + 's';
             document.body.appendChild(b);
             setTimeout(() => b.remove(), 6000);
         }
     }
-
-    // Đảm bảo luôn bắt đầu ở màn hình Login khi load trang
-    window.onload = () => showScreen('login-screen');
 </script>
-
 </body>
 </html>
