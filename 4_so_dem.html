@@ -26,7 +26,7 @@
             min-height: 100vh; margin: 0; color: var(--text-main); overflow-x: hidden;
         }
 
-        /* --- LOGIN UI: CLEAN, PURPLE & LONG CARD --- */
+        /* --- LOGIN UI --- */
         #login-screen {
             position: fixed; inset: 0; background: var(--bg);
             display: flex; justify-content: center; align-items: center; z-index: 9999;
@@ -51,12 +51,13 @@
             background: #FFFFFF; color: var(--text-main); border: 1.5px solid #E5E7EB;
             padding: 1rem 3rem; border-radius: 100px; cursor: pointer;
             font-weight: 700; font-size: 1.05rem; font-family: inherit;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
         }
-        .google-btn:hover { border-color: var(--secondary); background: #F8F7FF; transform: translateY(-3px); }
+        .google-btn:hover { border-color: var(--secondary); background: #F8F7FF; transform: translateY(-3px); box-shadow: 0 10px 20px rgba(108, 92, 231, 0.1); }
 
         #login-msg { color: var(--error); font-size: 0.95rem; font-weight: 700; min-height: 1.4rem; }
 
-        /* --- TRANG GIỚI THIỆU (WELCOME) --- */
+        /* --- WELCOME SCREEN --- */
         #welcome-screen { display: none; width: 100%; max-width: 650px; text-align: center; }
         .welcome-card { background: white; padding: 50px; border-radius: 3rem; box-shadow: 0 15px 35px rgba(0,0,0,0.08); }
         .welcome-icon { font-size: 80px; display: block; margin-bottom: 20px; animation: bounce 2s infinite; }
@@ -77,28 +78,36 @@
             width: 80px; height: 80px; border-radius: 50%; background: var(--primary); border: none; cursor: pointer;
             box-shadow: 0 6px 15px rgba(0, 206, 201, 0.3); display: inline-flex; align-items: center; justify-content: center;
         }
-        .btn-play:hover { transform: scale(1.1); }
+        .btn-play:hover { transform: scale(1.1); background: #00b894; }
         .btn-play svg { fill: white; width: 40px; height: 40px; }
 
         .btn-hint { padding: 12px 20px; border-radius: 15px; border: 2px solid var(--hint); background: white; color: #d35400; font-weight: bold; cursor: pointer; font-family: inherit; }
+        .btn-hint:hover { background: var(--hint); color: white; }
 
         .numbers-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; margin: 30px 0; }
-        .num-btn { padding: 15px 0; font-size: 1.4rem; font-weight: bold; border: 2px solid #dfe6e9; border-radius: 12px; background: white; color: #2d3436; cursor: pointer; outline: none; font-family: inherit; }
-        .num-btn.correct { background: var(--success) !important; color: white; border-color: var(--success); }
-        .num-btn.wrong { background: var(--error) !important; color: white; border-color: var(--error); animation: shake 0.4s; }
-        .num-btn.highlight { background: var(--hint) !important; color: white; border-color: var(--hint); transform: scale(1.1); }
+        .num-btn { 
+            padding: 15px 0; font-size: 1.4rem; font-weight: bold; 
+            border: 2px solid #dfe6e9; border-radius: 12px; background: white; 
+            color: #2d3436; cursor: pointer; outline: none; font-family: inherit;
+            box-shadow: 0 4px 0 #dfe6e9;
+        }
+        .num-btn:hover { transform: translateY(-5px); box-shadow: 0 8px 0 #dfe6e9; border-color: var(--secondary); color: var(--secondary); }
+        .num-btn.correct { background: var(--success) !important; color: white !important; border-color: var(--success) !important; box-shadow: 0 4px 0 #27ae60 !important; transform: translateY(0); }
+        .num-btn.wrong { background: var(--error) !important; color: white !important; border-color: var(--error) !important; box-shadow: 0 4px 0 #e74c3c !important; animation: shake 0.4s; }
+        .num-btn.highlight { background: var(--hint) !important; color: white !important; border-color: var(--hint) !important; transform: scale(1.1); box-shadow: 0 0 20px var(--hint); }
 
         @keyframes shake { 0%, 100% {transform: translateX(0);} 25% {transform: translateX(-5px);} 75% {transform: translateX(5px);} }
         @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
 
-        .progress-bar { height: 10px; background: #eee; border-radius: 5px; overflow: hidden; margin-top: 5px; }
-        #progress-fill { height: 100%; background: var(--secondary); width: 0%; transition: 0.4s; }
+        .progress-bar { height: 12px; background: #eee; border-radius: 10px; overflow: hidden; margin-top: 8px; }
+        #progress-fill { height: 100%; background: linear-gradient(90deg, var(--secondary), var(--primary)); width: 0%; transition: 0.6s cubic-bezier(0.22, 1, 0.36, 1); }
 
         #result-screen { display: none; animation: fadeIn 0.5s; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         
         .result-gif { width: 220px; border-radius: 15px; margin-bottom: 15px; }
         .btn-main { padding: 18px 45px; border-radius: 100px; border: none; background: var(--secondary); color: white; font-weight: 800; cursor: pointer; font-size: 1.1rem; margin-top: 20px; font-family: inherit; box-shadow: 0 5px 15px rgba(108, 92, 231, 0.3); }
+        .btn-main:hover { transform: scale(1.05); background: #5649c1; }
 
         .balloon { position: fixed; bottom: -120px; width: 50px; height: 70px; border-radius: 50%; z-index: 999; animation: floatUp 5s linear forwards; pointer-events: none; }
         @keyframes floatUp { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-120vh); opacity: 0; } }
@@ -112,7 +121,15 @@
             <h2>Hệ Thống Trực Tuyến</h2>
             <p>Vui lòng đăng nhập để bắt đầu thử thách luyện nghe con số của bạn.</p>
         </div>
-        <button id="login-btn" class="google-btn">Tiếp tục với Google</button>
+        <button id="login-btn" class="google-btn">
+            <svg width="22" height="22" viewBox="0 0 48 48">
+                <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path>
+                <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path>
+                <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59L2.56 13.22C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path>
+                <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path>
+            </svg>
+            Tiếp tục với Google
+        </button>
         <div id="login-msg"></div>
     </div>
 </div>
@@ -122,7 +139,8 @@
         <span class="welcome-icon">🎧</span>
         <h1 style="font-size: 2.2rem; margin-bottom: 15px;">Chào mừng bạn!</h1>
         <p style="color: #636e72; font-size: 1.1rem; line-height: 1.6; margin-bottom: 30px;">
-            Nghe phát âm và chọn số tương ứng từ 0 đến 20. Sẵn sàng chưa?
+            Trong thử thách này, bạn sẽ được nghe phát âm của các số từ 0 đến 20. <br>
+            Nhiệm vụ của bạn là chọn con số chính xác nhất. Sẵn sàng chưa?
         </p>
         <button class="btn-main" onclick="startGame()">BẮT ĐẦU CHƠI 🚀</button>
     </div>
@@ -212,7 +230,7 @@
         5: ["Five", "/faɪv/"], 6: ["Six", "/sɪks/"], 7: ["Seven", "/ˈsev.ən/"], 8: ["Eight", "/eɪt/"], 9: ["Nine", "/naɪn/"],
         10: ["Ten", "/ten/"], 11: ["Eleven", "/ɪˈlev.ən/"], 12: ["Twelve", "/twelv/"], 13: ["Thirteen", "/ˌθɜːˈtiːn/"],
         14: ["Fourteen", "/ˌfɔːˈtiːn/"], 15: ["Fifteen", "/ˌfɪfˈtiːn/"], 16: ["Sixteen", "/ˌsɪkˈstiːn/"],
-        17: ["Seventeen", "/ˌsev.ənˈtiːn/"], 18: ["Eighteen", "/ˌeɪˈtiːn/"], 19: ["Nineteen", "/ˌnaɪnˈtiːn/"], 20: ["Twenty", "/ˈtwen.ti/"]
+        17: ["Seventeen", "/ˌsev.ənˈtiːn/"], 18: ["Eighteen", "/ˌe/ˈtiːn/"], 19: ["Nineteen", "/ˌnaɪnˈtiːn/"], 20: ["Twenty", "/ˈtwen.ti/"]
     };
 
     let questions = [];
@@ -229,11 +247,16 @@
     }
 
     function initGame() {
-        // Xáo trộn mảng để tránh lặp lại số 8 nhiều lần
-        let keys = Object.keys(numberData);
-        keys.sort(() => Math.random() - 0.5);
-        questions = keys.slice(0, 15);
-
+        // Thuật toán xáo trộn Fisher-Yates để đảm bảo 20 số xuất hiện đa dạng, không bị kẹt ở số 8
+        let allNumbers = Object.keys(numberData);
+        for (let i = allNumbers.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [allNumbers[i], allNumbers[allNumbers.length - 1]] = [allNumbers[allNumbers.length - 1], allNumbers[i]];
+            [allNumbers[i], allNumbers[j]] = [allNumbers[j], allNumbers[i]];
+        }
+        
+        // Lấy 15 câu hỏi từ danh sách đã trộn
+        questions = allNumbers.slice(0, 15);
         currentStep = 0;
         score = 0;
 
@@ -261,7 +284,9 @@
         document.getElementById('progress-text').innerText = `${currentStep + 1} / 15`;
         document.getElementById('progress-fill').style.width = `${(currentStep / 15) * 100}%`;
         
-        document.querySelectorAll('.num-btn').forEach(b => b.className = 'num-btn');
+        document.querySelectorAll('.num-btn').forEach(b => {
+            b.classList.remove('correct', 'wrong', 'highlight');
+        });
         playCurrentNumber();
     }
 
@@ -269,13 +294,15 @@
         if (targetNum === null) return;
         const synth = window.speechSynthesis;
         
-        // Fix lỗi kẹt: Ngắt mọi câu thoại cũ trước khi nói câu mới
+        // Dừng mọi âm thanh đang phát để tránh bị lặp/kẹt
         synth.cancel(); 
 
-        // Fix lỗi đọc số 8: Truyền chữ tiếng Anh (vd: "Eight") thay vì số thô
-        const utter = new SpeechSynthesisUtterance(numberData[targetNum][0]);
+        // Truyền chữ (VD: "Eight") thay vì số thô 8 để trình duyệt nhận diện chuẩn xác
+        const word = numberData[targetNum][0];
+        const utter = new SpeechSynthesisUtterance(word);
         utter.lang = 'en-US';
         utter.rate = 0.85;
+        utter.pitch = 1;
         synth.speak(utter);
     }
 
