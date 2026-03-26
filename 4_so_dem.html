@@ -1,145 +1,6 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Minimal Pairs - Secure Edition</title>
-    <style>
-        :root {
-            --primary: #6c5ce7; --primary-light: #f3f0ff; --success: #2ecc71;
-            --error: #ff7675; --bg: #f0f3f7; --card-bg: #ffffff;
-            --text: #2d3436; --sub-text: #636e72; --shadow-color: #dfe6e9;
-        }
-
-        body { 
-            font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); 
-            display: flex; justify-content: center; align-items: center; 
-            min-height: 100vh; margin: 0; color: var(--text); padding: 15px;
-        }
-
-        .box { 
-            background: var(--card-bg); padding: 2.5rem; border-radius: 2.5rem; 
-            box-shadow: 0 20px 50px rgba(0,0,0,0.1); width: 100%; max-width: 38rem; 
-            text-align: center; position: relative; box-sizing: border-box;
-        }
-
-        h2.main-title { color: var(--primary); text-transform: uppercase; font-weight: 800; margin-bottom: 2rem; font-size: 1.6rem; }
-        
-        /* Màn hình login hiển thị mặc định */
-        #login-screen { display: flex; flex-direction: column; align-items: center; gap: 1.5rem; }
-        
-        .google-btn {
-            background: white; color: #2d3436; border: 1px solid #dfe6e9; padding: 1rem 2rem; border-radius: 50px; 
-            cursor: pointer; display: flex; align-items: center; gap: 12px; font-weight: bold;
-            box-shadow: 0 8px 15px rgba(0,0,0,0.05); transition: 0.3s; font-size: 1rem;
-        }
-        .google-icon { width: 20px; height: 20px; }
-
-        /* Màn hình game luôn ẩn lúc đầu */
-        #main-content { display: none; width: 100%; }
-        
-        .progress-container { width: 100%; height: 10px; background: #eee; border-radius: 5px; margin: 1.5rem 0; overflow: hidden; }
-        #progress-bar { height: 100%; background: var(--primary); width: 8.33%; transition: 0.4s; }
-
-        .row { display: grid; gap: 1.2rem; margin-bottom: 1.5rem; width: 100%; }
-        .col-2 { grid-template-columns: repeat(2, 1fr); }
-        .col-3 { grid-template-columns: repeat(3, 1fr); }
-
-        .btn {
-            position: relative; padding: 1rem 0.5rem; border: 2px solid #dfe6e9; border-radius: 1.2rem;
-            cursor: pointer; background: white; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            display: flex; flex-direction: column; justify-content: center; align-items: center; 
-            font-weight: bold; box-shadow: 0 6px 0 var(--shadow-color); outline: none; min-height: 105px;
-            -webkit-tap-highlight-color: transparent;
-        }
-        
-        @media (hover: hover) {
-            .btn:hover:not(.matched) { transform: translateY(-7px); box-shadow: 0 13px 0 var(--shadow-color); border-color: var(--primary); }
-        }
-
-        .btn:active:not(.matched) { transform: translateY(4px); box-shadow: 0 2px 0 var(--shadow-color); }
-        .btn .spelling { font-size: 1.4rem; }
-        .btn .ipa { font-size: 1rem; color: var(--sub-text); font-weight: normal; margin-top: 4px; }
-        
-        .btn-num {
-            position: absolute; top: -8px; left: -8px; background: #2d3436; color: #ffffff;
-            font-size: 0.8rem; width: 26px; height: 26px; display: flex; justify-content: center;
-            align-items: center; border-radius: 50%; border: 2px solid white; z-index: 5;
-        }
-
-        .selected { border-color: var(--primary) !important; background: var(--primary-light) !important; box-shadow: 0 6px 0 var(--primary) !important; transform: scale(1.05) translateY(-5px); }
-        .matched { color: white !important; transform: none !important; cursor: default; }
-        .match-0 { background: var(--success) !important; border-color: var(--success) !important; box-shadow: 0 4px 0 #27ae60 !important; }
-        .match-1 { background: #9b59b6 !important; border-color: #9b59b6 !important; box-shadow: 0 4px 0 #8e44ad !important; }
-        .match-2 { background: #e67e22 !important; border-color: #e67e22 !important; box-shadow: 0 4px 0 #d35400 !important; }
-
-        .shake { animation: shake 0.4s; }
-        @keyframes shake { 0%, 100% {transform: translateX(0);} 25% {transform: translateX(-6px);} 75% {transform: translateX(6px);} }
-
-        .nav-container { display: flex; justify-content: space-between; gap: 1rem; margin-top: 1.5rem; }
-        .nav-btn { background: #2d3436; color: white; padding: 1rem; border: none; border-radius: 15px; cursor: pointer; flex: 1; font-weight: bold; box-shadow: 0 5px 0 #000; transition: 0.2s; }
-        .nav-btn:disabled { opacity: 0.2; box-shadow: none; transform: none; }
-        
-        #ans-toggle-btn { width: 100%; border: none; background: #f1f5f9; padding: 12px; border-radius: 12px; cursor: pointer; font-weight: bold; color: #64748b; margin-top: 10px; }
-        #finish-ui { display: none; }
-        .score-box { background: var(--primary-light); color: var(--primary); padding: 1rem; border-radius: 15px; font-size: 1.2rem; font-weight: 800; margin: 15px 0; border: 2px dashed var(--primary); }
-        .btn-restart { background: var(--success); color: white; border: none; padding: 1.2rem 3rem; border-radius: 50px; cursor: pointer; font-weight: bold; margin-top: 1rem; box-shadow: 0 8px 15px rgba(46, 204, 113, 0.3); transition: 0.3s; width: 100%; }
-
-        @media (max-width: 480px) {
-            .box { padding: 1.5rem; border-radius: 2rem; }
-            .btn { min-height: 95px; }
-            .btn .spelling { font-size: 1.1rem; }
-            h2.main-title { font-size: 1.3rem; }
-        }
-    </style>
-</head>
-<body>
-
-<div class="box">
-    <div id="login-screen">
-        <h2 class="main-title">THỬ THÁCH TỪ VỰNG<br>CẶP PHỤ ÂM</h2>
-        <button id="login-btn" class="google-btn">
-            <svg class="google-icon" viewBox="0 0 48 48">
-                <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path>
-                <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path>
-                <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24s.92 7.54 2.56 10.78l7.97-6.19z"></path>
-                <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path>
-            </svg>
-            Tiếp tục với Google
-        </button>
-        <p id="login-msg" style="color: var(--error); font-weight: bold; font-size: 0.9rem;"></p>
-    </div>
-
-    <div id="main-content">
-        <h3 id="title" style="margin: 0; font-size: 1.1rem; color: var(--primary);">Luyện tập (1/12)</h3>
-        <div class="progress-container"><div id="progress-bar"></div></div>
-        
-        <div id="game-ui">
-            <div id="audio-row" class="row"></div>
-            <div id="text-row" class="row"></div>
-            <button id="ans-toggle-btn" onclick="toggleAnswer()">Hiện đáp án</button>
-        </div>
-
-        <div id="finish-ui">
-            <h2 style="color: var(--success); margin: 0; font-size: 1.5rem;">HOÀN THÀNH XUẤT SẮC! 🎉</h2>
-            <div class="score-box" id="final-score"></div>
-            <img src="https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExMG91OTNhZnZseXVlMWw4eGNlc3ZnMTBob3V6dDNtYnF1ZmtrcjNvcCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/MhHXeM4SpKrpC/giphy.gif" style="width: 100%; max-width: 250px; border-radius: 1.5rem; border: 5px solid var(--primary); margin-bottom: 10px;">
-            <br>
-            <button class="btn-restart" onclick="restartGame()">LÀM LẠI THỬ THÁCH</button>
-        </div>
-
-        <div class="nav-container">
-            <button class="nav-btn" id="prev" onclick="changePage(-1)">← Trước</button>
-            <button class="nav-btn" id="next" onclick="changePage(1)">Sau →</button>
-        </div>
-    </div>
-</div>
-
-<audio id="snd-win" src="chúc mừng.mp3"></audio>
-
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
-    import { getAuth, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
     import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -156,170 +17,46 @@
     const db = getFirestore(app);
     const provider = new GoogleAuthProvider();
 
-    let isAuthorized = false; // BIẾN CHẶN TRUY CẬP TRÁI PHÉP
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-
-    async function handleAuth() {
-        // 1. Kiểm tra session cũ
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                await checkUserPermission(user);
+    // --- TÍNH NĂNG TỰ ĐỘNG KIỂM TRA ĐĂNG NHẬP ---
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            // Nếu đã có user, kiểm tra quyền trong Firestore
+            const allowed = await checkAccess(user.email);
+            if (allowed) {
+                showWelcomeScreen();
+            } else {
+                await signOut(auth);
             }
-        });
-
-        // 2. Nếu mobile, bắt kết quả Redirect
-        if (isMobile) {
-            try {
-                const result = await getRedirectResult(auth);
-                if (result?.user) await checkUserPermission(result.user);
-            } catch (e) { console.error(e); }
         }
-    }
+    });
 
-    async function checkUserPermission(user) {
-        document.getElementById("login-msg").innerText = "Đang xác thực...";
-        const q = query(collection(db, "Tienganh_so_cap"), where("email", "==", user.email));
+    async function checkAccess(email) {
+        const q = query(collection(db, "Tienganh_so_cap"), where("email", "==", email));
         const snap = await getDocs(q);
-        
-        if (!snap.empty) {
-            isAuthorized = true; // Cho phép init game
-            document.getElementById("login-screen").style.display = "none";
-            document.getElementById("main-content").style.display = "block";
-            window.init();
-        } else {
-            isAuthorized = false;
-            document.getElementById("login-msg").innerText = "Email không có quyền truy cập.";
-            await signOut(auth);
-        }
+        return !snap.empty;
     }
 
+    function showWelcomeScreen() {
+        document.getElementById("login-screen").style.display = "none";
+        document.getElementById("welcome-screen").style.display = "block";
+    }
+
+    // --- XỬ LÝ KHI BẤM NÚT ĐĂNG NHẬP ---
     document.getElementById("login-btn").onclick = async () => {
-        document.getElementById("login-msg").innerText = "Vui lòng đợi...";
-        if (isMobile) {
-            signInWithRedirect(auth, provider);
-        } else {
-            try {
-                const res = await signInWithPopup(auth, provider);
-                if (res.user) await checkUserPermission(res.user);
-            } catch (e) {
-                document.getElementById("login-msg").innerText = "Lỗi popup. Thử lại nhé!";
+        const msg = document.getElementById("login-msg");
+        msg.innerText = "Đang kết nối với Google...";
+        try {
+            const res = await signInWithPopup(auth, provider);
+            const allowed = await checkAccess(res.user.email);
+
+            if (allowed) {
+                showWelcomeScreen();
+            } else {
+                msg.innerText = "Tài khoản không được phép truy cập!";
+                await signOut(auth);
             }
+        } catch (e) {
+            msg.innerText = "Lỗi đăng nhập hoặc cửa sổ bị đóng.";
         }
-    };
-
-    handleAuth();
-
-    // DỮ LIỆU GAME
-    window.data = [
-        { title: "/p/ vs /b/", pair: [{id: 'pig', t: 'Pig', p: '/pɪɡ/'}, {id: 'big', t: 'Big', p: '/bɪɡ/'}] },
-        { title: "/t/ vs /d/", pair: [{id: 'ten', t: 'Ten', p: '/ten/'}, {id: 'den', t: 'Den', p: '/den/'}] },
-        { title: "/k/ vs /g/", pair: [{id: 'coat', t: 'Coat', p: '/kəʊt/'}, {id: 'goat', t: 'Goat', p: '/ɡəʊt/'}] },
-        { title: "/f/ vs /v/", pair: [{id: 'fan', t: 'Fan', p: '/fæn/'}, {id: 'van', t: 'Van', p: '/væn/'}] },
-        { title: "/θ/ vs /ð/", pair: [{id: 'thin', t: 'Thin', p: '/θɪn/'}, {id: 'then', t: 'Then', p: '/ðen/'}] },
-        { title: "/s/ vs /z/", pair: [{id: 'sue', t: 'Sue', p: '/suː/'}, {id: 'zoo', t: 'Zoo', p: '/zuː/'}] },
-        { title: "/ʃ/ vs /ʒ/", pair: [{id: 'ship', t: 'Ship', p: '/ʃɪp/'}, {id: 'zip', t: 'Zip', p: '/zɪp/'}] },
-        { title: "/tʃ/ vs /dʒ/", pair: [{id: 'cheap', t: 'Cheap', p: '/tʃiːp/'}, {id: 'jeep', t: 'Jeep', p: '/dʒiːp/'}] },
-        { title: "/m/ - /n/ - /ŋ/", pair: [{id: 'sum', t: 'Sum', p: '/sʌm/'}, {id: 'sun', t: 'Sun', p: '/sʌn/'}, {id: 'sung', t: 'Sung', p: '/sʌŋ/'}] },
-        { title: "/l/ vs /r/", pair: [{id: 'light', t: 'Light', p: '/laɪt/'}, {id: 'right', t: 'Right', p: '/raɪt/'}] },
-        { title: "/w/ vs /j/", pair: [{id: 'wet', t: 'Wet', p: '/wet/'}, {id: 'yet', t: 'Yet', p: '/jet/'}] },
-        { title: "/h/", pair: [{id: 'hat', t: 'Hat', p: '/hæt/'}, {id: 'hi', t: 'Hi', p: '/haɪ/'}] }
-    ];
-
-    let audioCtx, cur = 0, sel = null, completed = [], showingAns = false, cachedOrder = { audio: [], text: [] };
-    let firstTryCount = 0, currentErrors = []; 
-
-    function playBeep(type) {
-        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        if (audioCtx.state === 'suspended') audioCtx.resume();
-        const osc = audioCtx.createOscillator(); 
-        const gain = audioCtx.createGain();
-        osc.connect(gain); gain.connect(audioCtx.destination);
-        osc.frequency.setValueAtTime(type === 'correct' ? 880 : 150, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
-        osc.start(); osc.stop(audioCtx.currentTime + 0.1);
-    }
-
-    // HÀM INIT CÓ KHÓA BẢO VỆ
-    window.init = function() {
-        if (!isAuthorized) return; // CHẶN KHÔNG CHO VẼ GAME NẾU CHƯA LOGIN
-
-        const gameUi = document.getElementById('game-ui'), finishUi = document.getElementById('finish-ui'),
-              prog = document.getElementById('progress-bar'), title = document.getElementById('title');
-        
-        if (cur >= window.data.length) {
-            gameUi.style.display = 'none'; finishUi.style.display = 'block';
-            title.innerText = "KẾT THÚC THỬ THÁCH"; prog.style.width = '100%';
-            document.getElementById('final-score').innerText = `BẠN ĐÃ CHỌN ĐÚNG ${firstTryCount}/25 CÂU Ở LẦN ĐẦU TIÊN!`;
-            document.getElementById('snd-win').play().catch(()=>{});
-            document.getElementById('next').style.visibility = 'hidden';
-            return;
-        }
-
-        gameUi.style.display = 'block'; finishUi.style.display = 'none';
-        title.innerText = `LUYỆN TẬP: ${window.data[cur].title} (${cur + 1}/12)`;
-        prog.style.width = ((cur + 1) / 12 * 100) + '%';
-        document.getElementById('prev').disabled = (cur === 0);
-        document.getElementById('next').style.visibility = 'visible';
-
-        const ar = document.getElementById('audio-row'), tr = document.getElementById('text-row');
-        const p = window.data[cur].pair;
-        ar.className = tr.className = `row ${p.length === 3 ? 'col-3' : 'col-2'}`;
-
-        if (!cachedOrder.audio.length) {
-            cachedOrder.audio = p.map((_, i) => i).sort(() => Math.random() - 0.5);
-            cachedOrder.text = p.map((_, i) => i).sort(() => Math.random() - 0.5);
-        }
-
-        let textDisplayOrder = showingAns ? [...cachedOrder.audio] : [...cachedOrder.text];
-        ar.innerHTML = ''; tr.innerHTML = '';
-
-        cachedOrder.audio.forEach((origIdx, dispIdx) => {
-            const item = p[origIdx]; const isMatched = completed.includes(item.id) || showingAns;
-            const btn = document.createElement('div');
-            btn.className = `btn${isMatched ? ' matched match-'+origIdx : ''}${sel === item.id ? ' selected' : ''}`;
-            btn.innerHTML = `<span class="btn-num">${dispIdx + 1}</span><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M14,3.23V5.29C16.89,6.15 19,8.83 19,12C19,15.17 16.89,17.85 14,18.71V20.77C18.01,19.86 21,16.28 21,12C21,7.72 18.01,4.14 14,3.23M16.5,12C16.5,10.23 15.5,8.71 14,7.97V16.02C15.5,15.29 16.5,13.77 16.5,12M3,9V15H7L12,20V4L7,9H3Z" /></svg>`;
-            btn.onclick = () => { 
-                new Audio(`${item.id.toLowerCase()}.mp3`).play().catch(()=>{}); 
-                if (!isMatched) { sel = item.id; window.init(); }
-            };
-            ar.appendChild(btn);
-        });
-
-        textDisplayOrder.forEach((origIdx) => {
-            const item = p[origIdx]; const isMatched = completed.includes(item.id) || showingAns;
-            const btn = document.createElement('div');
-            btn.className = `btn${isMatched ? ' matched match-'+origIdx : ''}`;
-            btn.innerHTML = `<span class="spelling">${item.t}</span><span class="ipa">${item.p}</span>`;
-            btn.onclick = () => {
-                if (isMatched) return;
-                if (sel === item.id) { 
-                    if (!currentErrors.includes(item.id)) firstTryCount++;
-                    completed.push(item.id); playBeep('correct'); sel = null; window.init(); 
-                } else if (sel) { 
-                    if (!currentErrors.includes(sel)) currentErrors.push(sel);
-                    btn.classList.add('shake'); setTimeout(()=>btn.classList.remove('shake'), 400); playBeep('wrong'); 
-                }
-            };
-            tr.appendChild(btn);
-        });
-    };
-
-    window.toggleAnswer = () => { if(isAuthorized) { showingAns = !showingAns; window.init(); } };
-    window.changePage = (s) => { 
-        if(!isAuthorized) return;
-        cur = Math.max(0, Math.min(window.data.length, cur + s)); 
-        completed = []; sel = null; showingAns = false; cachedOrder = { audio: [], text: [] }; 
-        currentErrors = []; window.init(); 
-    };
-    
-    window.restartGame = () => { 
-        if(!isAuthorized) return;
-        cur = 0; completed = []; sel = null; showingAns = false; firstTryCount = 0; currentErrors = []; 
-        cachedOrder = { audio: [], text: [] }; 
-        document.getElementById("main-content").style.display = "block";
-        document.getElementById("finish-ui").style.display = "none";
-        window.init(); 
     };
 </script>
-</body>
-</html>
