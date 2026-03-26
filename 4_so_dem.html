@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Minimal Pairs - Dual Mode</title>
+    <title>Minimal Pairs - Secure Edition</title>
     <style>
         :root {
             --primary: #6c5ce7; --primary-light: #f3f0ff; --success: #2ecc71;
@@ -24,6 +24,8 @@
         }
 
         h2.main-title { color: var(--primary); text-transform: uppercase; font-weight: 800; margin-bottom: 2rem; font-size: 1.6rem; }
+        
+        /* Màn hình login hiển thị mặc định */
         #login-screen { display: flex; flex-direction: column; align-items: center; gap: 1.5rem; }
         
         .google-btn {
@@ -33,7 +35,9 @@
         }
         .google-icon { width: 20px; height: 20px; }
 
+        /* Màn hình game luôn ẩn lúc đầu */
         #main-content { display: none; width: 100%; }
+        
         .progress-container { width: 100%; height: 10px; background: #eee; border-radius: 5px; margin: 1.5rem 0; overflow: hidden; }
         #progress-bar { height: 100%; background: var(--primary); width: 8.33%; transition: 0.4s; }
 
@@ -152,16 +156,18 @@
     const db = getFirestore(app);
     const provider = new GoogleAuthProvider();
 
-    // KIỂM TRA THIẾT BỊ
+    let isAuthorized = false; // BIẾN CHẶN TRUY CẬP TRÁI PHÉP
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
     async function handleAuth() {
-        // Luôn kiểm tra session cũ trước
+        // 1. Kiểm tra session cũ
         onAuthStateChanged(auth, async (user) => {
-            if (user) await checkUserPermission(user);
+            if (user) {
+                await checkUserPermission(user);
+            }
         });
 
-        // Nếu là Mobile, kiểm tra kết quả Redirect
+        // 2. Nếu mobile, bắt kết quả Redirect
         if (isMobile) {
             try {
                 const result = await getRedirectResult(auth);
@@ -171,49 +177,39 @@
     }
 
     async function checkUserPermission(user) {
+        document.getElementById("login-msg").innerText = "Đang xác thực...";
         const q = query(collection(db, "Tienganh_so_cap"), where("email", "==", user.email));
         const snap = await getDocs(q);
+        
         if (!snap.empty) {
+            isAuthorized = true; // Cho phép init game
             document.getElementById("login-screen").style.display = "none";
             document.getElementById("main-content").style.display = "block";
             window.init();
         } else {
-            document.getElementById("login-msg").innerText = "Email không có quyền.";
+            isAuthorized = false;
+            document.getElementById("login-msg").innerText = "Email không có quyền truy cập.";
             await signOut(auth);
         }
     }
 
     document.getElementById("login-btn").onclick = async () => {
-        document.getElementById("login-msg").innerText = "Đang xử lý đăng nhập...";
+        document.getElementById("login-msg").innerText = "Vui lòng đợi...";
         if (isMobile) {
-            // PHONE: Dùng Redirect
             signInWithRedirect(auth, provider);
         } else {
-            // DESKTOP: Dùng Popup
             try {
                 const res = await signInWithPopup(auth, provider);
                 if (res.user) await checkUserPermission(res.user);
             } catch (e) {
-                document.getElementById("login-msg").innerText = "Lỗi popup. Hãy thử lại.";
+                document.getElementById("login-msg").innerText = "Lỗi popup. Thử lại nhé!";
             }
         }
     };
 
     handleAuth();
 
-    // LOGIC GAME GIỮ NGUYÊN
-    let audioCtx;
-    function playBeep(type) {
-        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        if (audioCtx.state === 'suspended') audioCtx.resume();
-        const osc = audioCtx.createOscillator(); 
-        const gain = audioCtx.createGain();
-        osc.connect(gain); gain.connect(audioCtx.destination);
-        osc.frequency.setValueAtTime(type === 'correct' ? 880 : 150, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
-        osc.start(); osc.stop(audioCtx.currentTime + 0.1);
-    }
-
+    // DỮ LIỆU GAME
     window.data = [
         { title: "/p/ vs /b/", pair: [{id: 'pig', t: 'Pig', p: '/pɪɡ/'}, {id: 'big', t: 'Big', p: '/bɪɡ/'}] },
         { title: "/t/ vs /d/", pair: [{id: 'ten', t: 'Ten', p: '/ten/'}, {id: 'den', t: 'Den', p: '/den/'}] },
@@ -229,10 +225,24 @@
         { title: "/h/", pair: [{id: 'hat', t: 'Hat', p: '/hæt/'}, {id: 'hi', t: 'Hi', p: '/haɪ/'}] }
     ];
 
-    let cur = 0, sel = null, completed = [], showingAns = false, cachedOrder = { audio: [], text: [] };
+    let audioCtx, cur = 0, sel = null, completed = [], showingAns = false, cachedOrder = { audio: [], text: [] };
     let firstTryCount = 0, currentErrors = []; 
 
+    function playBeep(type) {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator(); 
+        const gain = audioCtx.createGain();
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.frequency.setValueAtTime(type === 'correct' ? 880 : 150, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+        osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+    }
+
+    // HÀM INIT CÓ KHÓA BẢO VỆ
     window.init = function() {
+        if (!isAuthorized) return; // CHẶN KHÔNG CHO VẼ GAME NẾU CHƯA LOGIN
+
         const gameUi = document.getElementById('game-ui'), finishUi = document.getElementById('finish-ui'),
               prog = document.getElementById('progress-bar'), title = document.getElementById('title');
         
@@ -294,14 +304,16 @@
         });
     };
 
-    window.toggleAnswer = () => { showingAns = !showingAns; window.init(); };
+    window.toggleAnswer = () => { if(isAuthorized) { showingAns = !showingAns; window.init(); } };
     window.changePage = (s) => { 
+        if(!isAuthorized) return;
         cur = Math.max(0, Math.min(window.data.length, cur + s)); 
         completed = []; sel = null; showingAns = false; cachedOrder = { audio: [], text: [] }; 
         currentErrors = []; window.init(); 
     };
     
     window.restartGame = () => { 
+        if(!isAuthorized) return;
         cur = 0; completed = []; sel = null; showingAns = false; firstTryCount = 0; currentErrors = []; 
         cachedOrder = { audio: [], text: [] }; 
         document.getElementById("main-content").style.display = "block";
