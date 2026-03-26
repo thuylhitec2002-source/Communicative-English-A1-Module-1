@@ -3,108 +3,201 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Thử thách Nghe Số 0-20 - Mobile Pro</title>
+    <title>Thử thách Nghe Số 0-20 - Pro Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #00cec9; --secondary: #6c5ce7; --success: #2ecc71;
-            --error: #ff7675; --hint: #fdcb6e; --bg: #f8f9fa;
-            --text-main: #2d3436; --text-sub: #636E72;
+            --primary: #00cec9;
+            --secondary: #6c5ce7;
+            --success: #2ecc71;
+            --error: #ff7675;
+            --hint: #fdcb6e;
+            --bg: #f8f9fa;
+            --text-main: #2d3436;
+            --text-sub: #636E72;
         }
 
-        * { box-sizing: border-box; transition: all 0.2s ease; -webkit-tap-highlight-color: transparent; }
+        * { box-sizing: border-box; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); -webkit-tap-highlight-color: transparent; }
+
         body { 
-            font-family: 'Quicksand', sans-serif; background: var(--bg); 
-            margin: 0; color: var(--text-main); display: flex; flex-direction: column; min-height: 100vh;
+            font-family: 'Quicksand', sans-serif; 
+            background: var(--bg); 
+            display: flex; justify-content: center; align-items: center;
+            min-height: 100vh; margin: 0; color: var(--text-main); overflow-x: hidden;
         }
 
-        /* MÀN HÌNH CHỜ LOADING */
+        /* --- LOADING OVERLAY --- */
         #loading-overlay {
             position: fixed; inset: 0; background: var(--bg);
             display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 10000;
         }
-        .loader { border: 5px solid #f3f3f3; border-top: 5px solid var(--secondary); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+        .spinner { border: 5px solid #f3f3f3; border-top: 5px solid var(--secondary); border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        .container { width: 100%; max-width: 500px; margin: auto; padding: 15px; }
-        #login-screen, #welcome-screen, #main-game { display: none; width: 100%; animation: fadeIn 0.4s ease-out; }
-
-        .card { background: #FFFFFF; padding: 30px 20px; border-radius: 2rem; box-shadow: 0 15px 35px rgba(0,0,0,0.05); text-align: center; width: 100%; }
-        .google-btn {
-            display: inline-flex; align-items: center; justify-content: center; gap: 10px;
-            background: #FFFFFF; color: var(--text-main); border: 2px solid #E5E7EB;
-            padding: 14px 20px; border-radius: 100px; cursor: pointer; font-weight: 700; width: 100%; font-family: inherit;
+        /* --- LOGIN UI --- */
+        #login-screen {
+            display: none; width: 100%; justify-content: center; align-items: center;
         }
 
-        /* GAME UI */
-        .display-word { background: #f0f7ff; border-radius: 15px; border: 2px solid #e1f0ff; padding: 20px; margin-bottom: 20px; min-height: 100px; display: flex; flex-direction: column; justify-content: center; }
-        #word-text { font-size: 1.8rem; font-weight: 700; color: var(--secondary); }
-        .numbers-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 20px 0; }
-        .num-btn { aspect-ratio: 1/1; font-size: 1.2rem; font-weight: 700; border: 2px solid #dfe6e9; border-radius: 12px; background: white; box-shadow: 0 4px 0 #dfe6e9; font-family: inherit; }
-        .num-btn.correct { background: var(--success)!important; color: white; border-color: var(--success)!important; box-shadow: 0 4px 0 #27ae60!important; }
-        .num-btn.wrong { background: var(--error)!important; color: white; border-color: var(--error)!important; box-shadow: 0 4px 0 #e74c3c!important; }
-        .progress-bar { height: 10px; background: #eee; border-radius: 5px; overflow: hidden; }
-        #progress-fill { height: 100%; background: var(--secondary); width: 0%; transition: 0.4s; }
-        .btn-main { padding: 15px 30px; border-radius: 100px; border: none; background: var(--secondary); color: white; font-weight: 700; width: 100%; margin-top: 15px; font-family: inherit; }
+        .login-card {
+            background: #FFFFFF;
+            padding: 3.5rem 2rem;
+            border-radius: 3rem;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.05);
+            text-align: center;
+            max-width: 500px; width: 90%;
+            display: flex; flex-direction: column; gap: 2.5rem; 
+        }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .login-header h2 { font-size: 2rem; font-weight: 700; color: var(--secondary); margin: 0; line-height: 1.2; }
+        .login-header p { color: var(--text-sub); font-size: 1.1rem; margin-top: 10px; font-weight: 500; }
+
+        .google-btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 14px;
+            background: #FFFFFF; color: var(--text-main); border: 1.5px solid #E5E7EB;
+            padding: 1rem 2rem; border-radius: 100px; cursor: pointer;
+            font-weight: 700; font-size: 1.05rem; font-family: inherit;
+        }
+        .google-btn:active { transform: scale(0.98); background: #F8F7FF; }
+
+        #login-msg { color: var(--error); font-size: 0.95rem; font-weight: 700; min-height: 1.4rem; }
+
+        /* --- WELCOME SCREEN --- */
+        #welcome-screen { display: none; width: 100%; max-width: 600px; text-align: center; padding: 20px; }
+        .welcome-card { background: white; padding: 40px 30px; border-radius: 3rem; box-shadow: 0 15px 35px rgba(0,0,0,0.08); }
+        .welcome-icon { font-size: 60px; display: block; margin-bottom: 20px; animation: bounce 2s infinite; }
+        
+        /* --- GAME UI --- */
+        #main-game { display: none; width: 100%; max-width: 700px; padding: 15px; }
+        .game-card { background: white; width: 100%; border-radius: 25px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); padding: 30px 20px; text-align: center; position: relative; }
+        
+        h1 { color: var(--secondary); margin-bottom: 5px; font-size: 1.6rem; font-weight: 700; }
+        .instruction { color: #636e72; font-style: italic; margin-bottom: 20px; font-size: 0.9rem; }
+
+        .display-word { min-height: 80px; margin-bottom: 20px; padding: 15px; background: #f0f7ff; border-radius: 15px; border: 2px solid #e1f0ff; }
+        #word-text { font-size: 2rem; font-weight: bold; color: var(--secondary); display: block; text-transform: capitalize; }
+        #phonetic-text { font-size: 1.2rem; color: #0984e3; font-style: italic; display: block; margin-top: 5px; }
+
+        .audio-controls { display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 20px; }
+        .btn-play { 
+            width: 70px; height: 70px; border-radius: 50%; background: var(--primary); border: none; cursor: pointer;
+            box-shadow: 0 6px 15px rgba(0, 206, 201, 0.3); display: inline-flex; align-items: center; justify-content: center;
+        }
+        .btn-play svg { fill: white; width: 35px; height: 35px; }
+
+        .btn-hint { padding: 12px 20px; border-radius: 15px; border: 2px solid var(--hint); background: white; color: #d35400; font-weight: bold; cursor: pointer; font-family: inherit; }
+
+        .numbers-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 20px 0; }
+        @media (min-width: 600px) { .numbers-grid { grid-template-columns: repeat(7, 1fr); } }
+
+        .num-btn { 
+            aspect-ratio: 1/1; font-size: 1.3rem; font-weight: bold; 
+            border: 2px solid #dfe6e9; border-radius: 12px; background: white; 
+            color: #2d3436; cursor: pointer; outline: none; font-family: inherit;
+            box-shadow: 0 4px 0 #dfe6e9; display: flex; align-items: center; justify-content: center;
+        }
+        .num-btn.correct { background: var(--success) !important; color: white !important; border-color: var(--success) !important; box-shadow: 0 4px 0 #27ae60 !important; }
+        .num-btn.wrong { background: var(--error) !important; color: white !important; border-color: var(--error) !important; box-shadow: 0 4px 0 #e74c3c !important; animation: shake 0.4s; }
+        .num-btn.highlight { background: var(--hint) !important; color: white !important; border-color: var(--hint) !important; transform: scale(1.1); }
+
+        @keyframes shake { 0%, 100% {transform: translateX(0);} 25% {transform: translateX(-5px);} 75% {transform: translateX(5px);} }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+
+        .progress-bar { height: 10px; background: #eee; border-radius: 10px; overflow: hidden; margin-top: 8px; }
+        #progress-fill { height: 100%; background: linear-gradient(90deg, var(--secondary), var(--primary)); width: 0%; transition: 0.5s; }
+
+        #result-screen { display: none; animation: fadeIn 0.5s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .result-gif { width: 180px; border-radius: 15px; margin-bottom: 15px; }
+        .btn-main { padding: 15px 35px; border-radius: 100px; border: none; background: var(--secondary); color: white; font-weight: 800; cursor: pointer; font-size: 1.1rem; margin-top: 15px; font-family: inherit; }
+
+        .balloon { position: fixed; bottom: -120px; width: 40px; height: 60px; border-radius: 50%; z-index: 999; animation: floatUp 5s linear forwards; pointer-events: none; }
+        @keyframes floatUp { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-120vh); opacity: 0; } }
     </style>
 </head>
 <body>
 
 <div id="loading-overlay">
-    <div class="loader"></div>
-    <p style="margin-top: 15px; color: var(--text-sub); font-weight: 600;">Đang kiểm tra dữ liệu...</p>
+    <div class="spinner"></div>
+    <p style="margin-top: 15px; font-weight: 600; color: var(--text-sub);">Đang khởi động...</p>
 </div>
 
 <div id="login-screen">
-    <div class="container">
-        <div class="card">
-            <h2 style="color: var(--secondary);">Xin chào! 👋</h2>
-            <p style="color: var(--text-sub); margin-bottom: 30px;">Đăng nhập một lần duy nhất để bắt đầu.</p>
-            <button id="login-btn" class="google-btn">
-                <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59L2.56 13.22C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path></svg>
-                Tiếp tục với Google
-            </button>
-            <div id="login-msg" style="margin-top: 20px; color: var(--error); font-weight: 700;"></div>
+    <div class="login-card">
+        <div class="login-header">
+            <h2>Hệ Thống Trực Tuyến</h2>
+            <p>Đăng nhập một lần để bắt đầu thử thách của bạn.</p>
         </div>
+        <button id="login-btn" class="google-btn">
+            <svg width="22" height="22" viewBox="0 0 48 48">
+                <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path>
+                <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path>
+                <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59L2.56 13.22C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path>
+                <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path>
+            </svg>
+            Tiếp tục với Google
+        </button>
+        <div id="login-msg"></div>
     </div>
 </div>
 
 <div id="welcome-screen">
-    <div class="container">
-        <div class="card">
-            <span style="font-size: 50px;">🎧</span>
-            <h1 id="user-welcome">Chào bạn!</h1>
-            <p style="color: var(--text-sub);">Hệ thống đã ghi nhớ tài khoản của bạn.</p>
+    <div class="welcome-card">
+        <span class="welcome-icon">🎧</span>
+        <h1>Chào mừng bạn!</h1>
+        <p id="user-welcome" style="color: var(--secondary); font-weight: 700; font-size: 1.2rem; margin-bottom: 10px;"></p>
+        <p style="color: #636e72; line-height: 1.6; margin-bottom: 30px;">
+            Nghe kỹ các số từ 0 đến 20 và chọn đáp án chính xác. <br>
+            Tiến trình của bạn đã được ghi nhớ.
+        </p>
+        <div style="display: flex; flex-direction: column; gap: 10px;">
             <button class="btn-main" onclick="startGame()">BẮT ĐẦU CHƠI 🚀</button>
-            <button id="logout-btn" style="background:none; border:none; color:#b2bec3; margin-top:15px; text-decoration:underline;">Đăng xuất</button>
+            <button id="logout-btn" style="background: none; color: #b2bec3; border:none; text-decoration: underline; font-family: inherit; cursor: pointer; margin-top: 10px;">Đăng xuất tài khoản</button>
         </div>
     </div>
 </div>
 
 <div id="main-game">
-    <div class="container">
-        <div class="card" id="game-content">
+    <div class="game-card">
+        <div id="game-content">
+            <h1>Thử thách Nghe Số 0-20 🎧</h1>
+            <p class="instruction">Chọn số tương ứng với âm thanh bạn nghe thấy.</p>
+
             <div class="display-word">
                 <span id="word-text">...</span>
-                <span id="phonetic-text" style="color:#0984e3; font-style:italic;">...</span>
+                <span id="phonetic-text">...</span>
             </div>
-            <div style="display:flex; justify-content:center; gap:15px; margin-bottom:20px;">
-                <button class="btn-main" style="width:70px; height:70px; margin:0; border-radius:50%;" onclick="playCurrentNumber()">🔊</button>
-                <button style="background:white; border:2px solid var(--hint); border-radius:12px; padding:0 20px; font-weight:700; color:#d35400;" onclick="showHint()">💡 Gợi ý</button>
+
+            <div class="audio-controls">
+                <button class="btn-play" onclick="playCurrentNumber()">
+                    <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+                </button>
+                <button class="btn-hint" onclick="showHint()">💡 Gợi ý</button>
             </div>
+
             <div class="numbers-grid" id="grid"></div>
+
+            <div style="display: flex; justify-content: space-between; font-weight: bold; color: #888; font-size: 0.85rem;">
+                <span>TIẾN ĐỘ</span>
+                <span id="progress-text">1 / 21</span>
+            </div>
             <div class="progress-bar"><div id="progress-fill"></div></div>
         </div>
 
-        <div class="card" id="result-screen" style="display: none;">
-            <h2>Kết quả</h2>
-            <h3 id="res-score" style="font-size: 2.5rem; color: var(--secondary);">0 / 21</h3>
-            <button class="btn-main" onclick="resetGameToWelcome()">Chơi lại</button>
+        <div id="result-screen">
+            <img src="https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExamhuOW92OWVlYzcyajB4Z2hlNDZ3aDZqNTRjYzMxbnVhd2Vjbnp0ayZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3o6fIUZTTDl0IDjbZS/giphy.gif" class="result-gif">
+            <h2 id="res-title">Kết quả</h2>
+            <h3 id="res-score" style="font-size: 2.2rem; color: var(--secondary); margin: 10px 0; font-weight: 800;">Đúng 0 / 21</h3>
+            <p id="res-msg" style="color: #636e72; margin-bottom: 20px;"></p>
+            <button class="btn-main" onclick="resetGameToWelcome()">Chơi lại từ đầu</button>
         </div>
     </div>
 </div>
+
+<audio id="snd-correct" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3"></audio>
+<audio id="snd-wrong" src="https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3"></audio>
+<audio id="snd-win" src="https://tiengdong.com/wp-content/uploads/Am-thanh-chuc-mung-chien-thang-www_tiengdong_com.mp3?_=1"></audio>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
@@ -125,30 +218,31 @@
     const db = getFirestore(app);
     const provider = new GoogleAuthProvider();
 
-    // 1. ÉP BUỘC GHI NHỚ ĐĂNG NHẬP (LOCAL)
-    setPersistence(auth, browserLocalPersistence).then(() => {
-        // Sau khi cấu hình xong thì kiểm tra kết quả Redirect (nếu có)
-        return getRedirectResult(auth);
-    }).catch(e => console.error(e));
+    // 1. Cấu hình ghi nhớ đăng nhập và xử lý kết quả Redirect
+    setPersistence(auth, browserLocalPersistence)
+        .then(() => {
+            return getRedirectResult(auth);
+        })
+        .catch(e => console.error(e));
 
-    // 2. THEO DÕI TRẠNG THÁI (TRÁNH BẮT ĐĂNG NHẬP LẠI)
+    // 2. Tự động kiểm tra trạng thái đăng nhập
     onAuthStateChanged(auth, async (user) => {
         const loading = document.getElementById("loading-overlay");
         if (user) {
             const allowed = await checkAccess(user.email);
             if (allowed) {
-                document.getElementById("user-welcome").innerText = "Chào, " + user.displayName;
-                document.getElementById("login-screen").style.display = "none";
-                document.getElementById("welcome-screen").style.display = "block";
+                showWelcomeScreen(user.displayName);
             } else {
                 await signOut(auth);
-                alert("Bạn không có quyền truy cập!");
+                document.getElementById("login-msg").innerText = "Tài khoản không có quyền truy cập!";
+                document.getElementById("login-screen").style.display = "flex";
             }
         } else {
             document.getElementById("login-screen").style.display = "flex";
             document.getElementById("welcome-screen").style.display = "none";
+            document.getElementById("main-game").style.display = "none";
         }
-        loading.style.display = "none"; // Ẩn màn hình chờ sau khi kiểm tra xong
+        loading.style.display = "none";
     });
 
     async function checkAccess(email) {
@@ -157,70 +251,153 @@
         return !snap.empty;
     }
 
-    document.getElementById("login-btn").onclick = () => signInWithRedirect(auth, provider);
-    document.getElementById("logout-btn").onclick = () => signOut(auth).then(() => location.reload());
+    function showWelcomeScreen(name) {
+        document.getElementById("login-screen").style.display = "none";
+        document.getElementById("welcome-screen").style.display = "block";
+        document.getElementById("user-welcome").innerText = "Xin chào, " + (name || "bạn") + "!";
+    }
+
+    // Sự kiện nút đăng nhập
+    document.getElementById("login-btn").onclick = () => {
+        signInWithRedirect(auth, provider);
+    };
+
+    // Sự kiện nút đăng xuất
+    document.getElementById("logout-btn").onclick = () => {
+        signOut(auth).then(() => location.reload());
+    };
 </script>
 
 <script>
-    // GIỮ NGUYÊN LOGIC GAME Ở ĐÂY (Data và các hàm startGame, loadQuestion, checkAnswer...)
-    const numberData = { 0: ["Zero", "/ˈzɪərəʊ/"], 1: ["One", "/wʌn/"], 2: ["Two", "/tuː/"], 3: ["Three", "/θriː/"], 4: ["Four", "/fɔː/"], 5: ["Five", "/faɪv/"], 6: ["Six", "/sɪks/"], 7: ["Seven", "/ˈsev.ən/"], 8: ["Eight", "/eɪt/"], 9: ["Nine", "/naɪn/"], 10: ["Ten", "/ten/"], 11: ["Eleven", "/ɪˈlev.ən/"], 12: ["Twelve", "/twelv/"], 13: ["Thirteen", "/ˌθɜːˈtiːn/"], 14: ["Fourteen", "/ˌfɔːˈtiːn/"], 15: ["Fifteen", "/ˌfɪfˈtiːn/"], 16: ["Sixteen", "/ˌsɪkˈstiːn/"], 17: ["Seventeen", "/ˌsev.ənˈtiːn/"], 18: ["Eighteen", "/ˌeɪˈtiːn/"], 19: ["Nineteen", "/ˌnaɪnˈtiːn/"], 20: ["Twenty", "/ˈtwen.ti/"] };
-    let questions = [], currentStep = 0, score = 0, targetNum = null, canClick = true, hintUsed = false;
+    const numberData = {
+        0: ["Zero", "/ˈzɪərəʊ/"], 1: ["One", "/wʌn/"], 2: ["Two", "/tuː/"], 3: ["Three", "/θriː/"], 4: ["Four", "/fɔː/"],
+        5: ["Five", "/faɪv/"], 6: ["Six", "/sɪks/"], 7: ["Seven", "/ˈsev.ən/"], 8: ["Eight", "/eɪt/"], 9: ["Nine", "/naɪn/"],
+        10: ["Ten", "/ten/"], 11: ["Eleven", "/ɪˈlev.ən/"], 12: ["Twelve", "/twelv/"], 13: ["Thirteen", "/ˌθɜːˈtiːn/"],
+        14: ["Fourteen", "/ˌfɔːˈtiːn/"], 15: ["Fifteen", "/ˌfɪfˈtiːn/"], 16: ["Sixteen", "/ˌsɪkˈstiːn/"],
+        17: ["Seventeen", "/ˌsev.ənˈtiːn/"], 18: ["Eighteen", "/ˌeɪˈtiːn/"], 19: ["Nineteen", "/ˌnaɪnˈtiːn/"], 20: ["Twenty", "/ˈtwen.ti/"]
+    };
+
+    let questions = [];
+    let currentStep = 0;
+    let score = 0;
+    let targetNum = null;
+    let canClick = true;
+    let hintUsed = false;
+    const TOTAL_STEPS = 21; 
 
     function startGame() {
         document.getElementById('welcome-screen').style.display = 'none';
         document.getElementById('main-game').style.display = 'block';
         initGame();
     }
+
+    function resetGameToWelcome() {
+        document.getElementById('result-screen').style.display = 'none';
+        document.getElementById('main-game').style.display = 'none';
+        document.getElementById('welcome-screen').style.display = 'block';
+        document.getElementById('game-content').style.display = 'block';
+    }
+
     function initGame() {
         questions = Object.keys(numberData).sort(() => Math.random() - 0.5);
-        currentStep = 0; score = 0;
-        const grid = document.getElementById('grid'); grid.innerHTML = '';
+        currentStep = 0;
+        score = 0;
+
+        const grid = document.getElementById('grid');
+        grid.innerHTML = '';
         for (let i = 0; i <= 20; i++) {
-            const btn = document.createElement('button'); btn.className = 'num-btn'; btn.id = 'btn-' + i; btn.innerText = i;
-            btn.onclick = () => checkAnswer(i, btn); grid.appendChild(btn);
+            const btn = document.createElement('button');
+            btn.className = 'num-btn';
+            btn.id = 'btn-' + i;
+            btn.innerText = i;
+            btn.onclick = () => checkAnswer(i, btn);
+            grid.appendChild(btn);
         }
         loadQuestion();
     }
+
     function loadQuestion() {
-        if (currentStep >= 21) { finishGame(); return; }
-        canClick = true; hintUsed = false; targetNum = questions[currentStep];
+        if (currentStep >= TOTAL_STEPS) { finishGame(); return; }
+        canClick = true;
+        hintUsed = false;
+        targetNum = questions[currentStep];
+        
         document.getElementById('word-text').innerText = numberData[targetNum][0];
         document.getElementById('phonetic-text').innerText = numberData[targetNum][1];
-        document.getElementById('progress-fill').style.width = `${(currentStep / 21) * 100}%`;
-        document.querySelectorAll('.num-btn').forEach(b => b.classList.remove('correct', 'wrong', 'highlight'));
+        document.getElementById('progress-text').innerText = `${currentStep + 1} / ${TOTAL_STEPS}`;
+        document.getElementById('progress-fill').style.width = `${(currentStep / TOTAL_STEPS) * 100}%`;
+        
+        document.querySelectorAll('.num-btn').forEach(b => {
+            b.classList.remove('correct', 'wrong', 'highlight');
+        });
         setTimeout(playCurrentNumber, 500);
     }
+
     function playCurrentNumber() {
+        if (targetNum === null) return;
         window.speechSynthesis.cancel();
         const utter = new SpeechSynthesisUtterance(numberData[targetNum][0]);
-        utter.lang = 'en-US'; utter.rate = 0.8; window.speechSynthesis.speak(utter);
+        utter.lang = 'en-US';
+        utter.rate = 0.8;
+        window.speechSynthesis.speak(utter);
     }
+
+    function showHint() {
+        if (!canClick) return;
+        hintUsed = true;
+        const btn = document.getElementById('btn-' + targetNum);
+        btn.classList.add('highlight');
+        setTimeout(() => btn.classList.remove('highlight'), 1200);
+    }
+
     function checkAnswer(num, btn) {
         if (!canClick) return;
         if (num == targetNum) {
-            canClick = false; if(!hintUsed) score++;
+            canClick = false;
+            if (!hintUsed) score++;
             btn.classList.add('correct');
-            setTimeout(() => { currentStep++; loadQuestion(); }, 800);
+            document.getElementById('snd-correct').play().catch(()=>{});
+            setTimeout(() => { currentStep++; loadQuestion(); }, 1000);
         } else {
-            btn.classList.add('wrong'); setTimeout(() => btn.classList.remove('wrong'), 500);
+            btn.classList.add('wrong');
+            document.getElementById('snd-wrong').play().catch(()=>{});
+            setTimeout(() => btn.classList.remove('wrong'), 500);
         }
     }
-    function showHint() {
-        if (!canClick) return;
-        const btn = document.getElementById('btn-' + targetNum);
-        btn.classList.add('highlight'); setTimeout(() => btn.classList.remove('highlight'), 1200);
-        hintUsed = true;
-    }
+
     function finishGame() {
         document.getElementById('game-content').style.display = 'none';
         document.getElementById('result-screen').style.display = 'block';
-        document.getElementById('res-score').innerText = `Đúng ${score} / 21`;
+        document.getElementById('res-score').innerText = `Đúng ${score} / ${TOTAL_STEPS} câu`;
+        
+        const title = document.getElementById('res-title');
+        const msg = document.getElementById('res-msg');
+
+        if (score === TOTAL_STEPS) {
+            title.innerText = "Tuyệt vời! 🌟";
+            msg.innerHTML = "Bạn đã chinh phục trọn vẹn 21 con số.";
+            createBalloons();
+        } else if (score >= 11) {
+            title.innerText = "Làm tốt lắm! ✌️";
+            msg.innerHTML = "Kết quả rất ấn tượng! Hãy thử lại để đạt điểm tuyệt đối.";
+        } else {
+            title.innerText = "Cố gắng lên! 💪";
+            msg.innerHTML = "Luyện tập thêm một lần nữa để ghi nhớ tốt hơn nhé.";
+        }
+        document.getElementById('snd-win').play().catch(()=>{});
     }
-    function resetGameToWelcome() {
-        document.getElementById('result-screen').style.display = 'none';
-        document.getElementById('game-content').style.display = 'block';
-        document.getElementById('main-game').style.display = 'none';
-        document.getElementById('welcome-screen').style.display = 'block';
+
+    function createBalloons() {
+        const colors = ['#ff7675', '#74b9ff', '#55efc4', '#ffeaa7', '#a29bfe'];
+        for (let i = 0; i < 40; i++) {
+            const b = document.createElement('div');
+            b.className = 'balloon';
+            b.style.left = Math.random() * 100 + 'vw';
+            b.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            b.style.animationDelay = Math.random() * 2 + 's';
+            document.body.appendChild(b);
+            setTimeout(() => b.remove(), 5000);
+        }
     }
 </script>
 
