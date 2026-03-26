@@ -30,7 +30,7 @@
             overflow: hidden;
         }
 
-        /* --- LOGIN UI: CLEAN, PURPLE & EVEN SPACING --- */
+        /* --- LOGIN UI --- */
         #login-screen {
             position: fixed; inset: 0;
             background: var(--bg);
@@ -40,7 +40,7 @@
 
         .login-card {
             background: #FFFFFF;
-            padding: 5.5rem 3.5rem; /* Bảng dài thanh thoát */
+            padding: 5.5rem 3.5rem;
             border-radius: 3rem;
             box-shadow: 0 25px 50px rgba(0,0,0,0.05);
             text-align: center;
@@ -48,14 +48,12 @@
             width: 90%;
             display: flex;
             flex-direction: column;
-            /* Căn chỉnh khoảng cách EVEN giữa các nhóm lớn */
             gap: 3.5rem; 
         }
 
         .login-header {
             display: flex;
             flex-direction: column;
-            /* Căn chỉnh khoảng cách EVEN giữa tiêu đề và mô tả */
             gap: 1.2rem;
         }
 
@@ -85,7 +83,7 @@
             color: var(--text-main);
             border: 1.5px solid #E5E7EB;
             padding: 1rem 3rem;
-            border-radius: 100px; /* Nút viên thuốc */
+            border-radius: 100px;
             cursor: pointer;
             font-weight: 700;
             font-size: 1.05rem;
@@ -104,7 +102,6 @@
             font-size: 0.95rem;
             font-weight: 700;
             min-height: 1.4rem;
-            margin-top: -1.5rem; /* Kéo lên gần nút bấm hơn một chút */
         }
 
         /* --- MAIN GAME UI --- */
@@ -164,7 +161,6 @@
             <h2>Hệ Thống Trực Tuyến</h2>
             <p>Vui lòng đăng nhập để bắt đầu thử thách Spelling Master của bạn.</p>
         </div>
-        
         <button id="login-btn" class="google-btn">
             <svg width="22" height="22" viewBox="0 0 48 48">
                 <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path>
@@ -174,7 +170,6 @@
             </svg>
             Tiếp tục với Google
         </button>
-        
         <div id="login-msg"></div>
     </div>
 </div>
@@ -208,6 +203,7 @@
     </div>
 </div>
 
+<audio id="bg-music" src="https://cdn.pixabay.com/audio/2025/01/31/audio_210b378eb7.mp3" loop></audio>
 <audio id="snd-correct" src="https://tiengdong.com/wp-content/uploads/am-thanh-cau-tra-loi-dung-right-answer-capcut-www_tiengdong_com.mp3?_=1"></audio>
 <audio id="snd-wrong" src="https://cdn.pixabay.com/audio/2022/03/10/audio_8b0fae46ef.mp3"></audio>
 <audio id="snd-congrats" src="https://tiengdong.com/wp-content/uploads/Am-thanh-chuc-mung-chien-thang-www_tiengdong_com.mp3?_=1"></audio>
@@ -242,6 +238,8 @@
             if (!snap.empty) {
                 document.getElementById("login-screen").style.display = "none";
                 document.getElementById("main-content").style.display = "flex";
+                // Phát nhạc nền khi vào game
+                document.getElementById('bg-music').play().catch(()=>{});
                 window.initQuiz();
             } else {
                 msg.innerText = "Email của bạn không được cấp quyền!";
@@ -320,7 +318,11 @@
             const index = inputs.indexOf(e.target);
             if (index > 0) inputs[index - 1].focus();
         } else if (e.key === "Enter") {
-            finalCheck();
+            if (document.getElementById('btn-next').style.display === 'inline-block') {
+                goNext();
+            } else {
+                finalCheck();
+            }
         }
     }
 
@@ -340,13 +342,15 @@
         });
 
         if (allCorrect) {
-            document.getElementById('snd-correct').play().catch(()=>{});
-            if (!wasHintUsed) {
-                score++;
-                document.getElementById('score-text').innerText = score;
+            if (document.getElementById('btn-next').style.display !== 'inline-block') {
+                document.getElementById('snd-correct').play().catch(()=>{});
+                if (!wasHintUsed) {
+                    score++;
+                    document.getElementById('score-text').innerText = score;
+                }
+                document.getElementById('btn-check').style.display = 'none';
+                document.getElementById('btn-next').style.display = 'inline-block';
             }
-            document.getElementById('btn-check').style.display = 'none';
-            document.getElementById('btn-next').style.display = 'inline-block';
         } else {
             document.getElementById('snd-wrong').play().catch(()=>{});
         }
@@ -373,6 +377,8 @@
     }
 
     function showFinal() {
+        // Tắt nhạc nền khi hiện kết quả
+        document.getElementById('bg-music').pause();
         document.getElementById('game-content').style.display = 'none';
         document.getElementById('result-screen').style.display = 'block';
         document.getElementById('total-score').innerText = `${score} / ${data.length}`;
