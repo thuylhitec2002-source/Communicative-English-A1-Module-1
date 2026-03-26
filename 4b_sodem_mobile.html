@@ -1,96 +1,25 @@
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
-    import { getAuth, signInWithPopup, onAuthStateChanged, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
-    import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
-
-    const firebaseConfig = {
-        apiKey: "AIzaSyCdlTVHwiLOGMnrFe12DE1dQSEHZaJ594I",
-        authDomain: "nguyen-am-tieng-anh.firebaseapp.com",
-        projectId: "nguyen-am-tieng-anh",
-        storageBucket: "nguyen-am-tieng-anh.firebasestorage.app",
-        messagingSenderId: "878440633705",
-        appId: "1:878440633705:web:755de6cb273eb139ebd9f8"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth();
-    const db = getFirestore(app);
-    const provider = new GoogleAuthProvider();
-    provider.setCustomParameters({ prompt: 'select_account' });
-
-    const statusEl = document.getElementById("auth-status");
-    const errorEl = document.getElementById("error-box");
-    const loginBtn = document.getElementById("login-btn");
-
-    onAuthStateChanged(auth, async (user) => {
-        if (user) {
-            await checkAccess(user);
-        } else {
-            document.getElementById("auth-overlay").style.display = "flex";
-            document.getElementById("welcome-screen").style.display = "none";
-            statusEl.innerText = "Vui lòng đăng nhập";
-            statusEl.style.color = "#2d3436";
-            loginBtn.style.display = "inline-flex";
-        }
-    });
-
-    async function checkAccess(user) {
-        statusEl.innerText = "Đang kiểm tra quyền truy cập...";
+loginBtn.onclick = async () => {
+        statusEl.innerText = "Đang mở cửa sổ Google...";
         statusEl.style.color = "var(--secondary)";
         errorEl.innerText = "";
-        
         try {
-            const q = query(collection(db, "Tienganh_so_cap"), where("email", "==", user.email));
-            const snap = await getDocs(q);
-            
-            if (!snap.empty) {
-                // Thành công: Email có trong DB
-                document.getElementById("auth-overlay").style.display = "none";
-                document.getElementById("welcome-screen").style.display = "block";
-            } else {
-                // Thất bại: Giữ màn hình để báo lỗi, không tự văng ra
-                statusEl.innerText = "Tài khoản chưa được cấp quyền!";
-                statusEl.style.color = "var(--error)";
-                errorEl.innerText = `Email (${user.email}) chưa có trên hệ thống Firestore của bạn.`;
-                
-                // Ẩn nút login cũ
-                loginBtn.style.display = "none";
-                
-                // Thêm nút Thử tài khoản khác
-                if (!document.getElementById("retry-btn")) {
-                    const retryBtn = document.createElement("button");
-                    retryBtn.id = "retry-btn";
-                    retryBtn.className = "google-btn";
-                    retryBtn.style.marginTop = "15px";
-                    retryBtn.innerHTML = "Thử tài khoản khác";
-                    retryBtn.onclick = async () => {
-                        await signOut(auth);
-                        location.reload();
-                    };
-                    document.querySelector(".auth-card").appendChild(retryBtn);
-                }
-            }
+            const result = await signInWithPopup(auth, provider);
+            // Nếu thành công, onAuthStateChanged sẽ tự động chạy
+            console.log("Đăng nhập popup thành công với:", result.user.email);
         } catch (err) {
-            statusEl.innerText = "Lỗi kết nối CSDL!";
+            console.error("Lỗi đăng nhập:", err);
+            statusEl.innerText = "Đăng nhập thất bại!";
             statusEl.style.color = "var(--error)";
-            // Lỗi này thường do Security Rules của Firestore chặn
-            errorEl.innerText = "Lỗi: " + err.message; 
-        }
-    }
-
-    loginBtn.onclick = async () => {
-        statusEl.innerText = "Đang mở cửa sổ Google...";
-        errorEl.innerText = "";
-        try {
-            await signInWithPopup(auth, provider);
-        } catch (err) {
-            statusEl.innerText = "Đăng nhập bị hủy hoặc gặp lỗi!";
-            errorEl.innerText = err.message;
+            
+            // In chi tiết mã lỗi để bắt bệnh
+            if (err.code === 'auth/popup-closed-by-user') {
+                errorEl.innerText = "Bạn đã đóng cửa sổ đăng nhập trước khi hoàn tất.";
+            } else if (err.code === 'auth/unauthorized-domain') {
+                errorEl.innerText = "Tên miền này chưa được thêm vào Authorized Domains trên Firebase.";
+            } else if (err.code === 'auth/internal-error') {
+                errorEl.innerText = "Lỗi nội bộ. Có thể do trình duyệt đang chặn Cookie (Third-party cookies).";
+            } else {
+                errorEl.innerText = `Lỗi (${err.code}): ${err.message}`;
+            }
         }
     };
-
-    window.logoutAccount = async function() {
-        await signOut(auth);
-        location.reload();
-    };
-</script>
