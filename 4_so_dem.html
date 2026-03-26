@@ -3,54 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Minimal Pairs Vocabulary - Ultimate Edition</title>
+    <title>Minimal Pairs - Dual Mode</title>
     <style>
         :root {
-            --primary: #6c5ce7;
-            --primary-light: #f3f0ff;
-            --success: #2ecc71;
-            --error: #ff7675;
-            --bg: #f0f3f7;
-            --card-bg: #ffffff;
-            --text: #2d3436;
-            --sub-text: #636e72;
-            --shadow-color: #dfe6e9;
+            --primary: #6c5ce7; --primary-light: #f3f0ff; --success: #2ecc71;
+            --error: #ff7675; --bg: #f0f3f7; --card-bg: #ffffff;
+            --text: #2d3436; --sub-text: #636e72; --shadow-color: #dfe6e9;
         }
 
         body { 
-            font-family: 'Segoe UI', Tahoma, sans-serif; 
-            background: var(--bg); 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            min-height: 100vh; 
-            margin: 0; 
-            color: var(--text);
-            padding: 15px;
+            font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); 
+            display: flex; justify-content: center; align-items: center; 
+            min-height: 100vh; margin: 0; color: var(--text); padding: 15px;
         }
 
         .box { 
-            background: var(--card-bg); 
-            padding: 2.5rem; 
-            border-radius: 2.5rem; 
-            box-shadow: 0 20px 50px rgba(0,0,0,0.1); 
-            width: 100%; 
-            max-width: 38rem; 
-            text-align: center; 
-            position: relative;
-            box-sizing: border-box;
+            background: var(--card-bg); padding: 2.5rem; border-radius: 2.5rem; 
+            box-shadow: 0 20px 50px rgba(0,0,0,0.1); width: 100%; max-width: 38rem; 
+            text-align: center; position: relative; box-sizing: border-box;
         }
 
-        h2.main-title { 
-            color: var(--primary); 
-            text-transform: uppercase; 
-            font-weight: 800; 
-            letter-spacing: 1px; 
-            margin-bottom: 2rem; 
-            line-height: 1.2;
-            font-size: 1.6rem;
-        }
-
+        h2.main-title { color: var(--primary); text-transform: uppercase; font-weight: 800; margin-bottom: 2rem; font-size: 1.6rem; }
         #login-screen { display: flex; flex-direction: column; align-items: center; gap: 1.5rem; }
         
         .google-btn {
@@ -58,7 +31,6 @@
             cursor: pointer; display: flex; align-items: center; gap: 12px; font-weight: bold;
             box-shadow: 0 8px 15px rgba(0,0,0,0.05); transition: 0.3s; font-size: 1rem;
         }
-        .google-btn:hover { transform: translateY(-3px); box-shadow: 0 12px 20px rgba(0,0,0,0.1); border-color: var(--primary); }
         .google-icon { width: 20px; height: 20px; }
 
         #main-content { display: none; width: 100%; }
@@ -69,40 +41,19 @@
         .col-2 { grid-template-columns: repeat(2, 1fr); }
         .col-3 { grid-template-columns: repeat(3, 1fr); }
 
-        /* HIỆU ỨNG NÚT KHỐI 3D */
         .btn {
-            position: relative; 
-            padding: 1rem 0.5rem; 
-            border: 2px solid #dfe6e9; 
-            border-radius: 1.2rem;
-            cursor: pointer; 
-            background: white; 
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            display: flex; 
-            flex-direction: column; 
-            justify-content: center; 
-            align-items: center; 
-            font-weight: bold; 
-            box-shadow: 0 6px 0 var(--shadow-color); 
-            outline: none; 
-            min-height: 105px;
+            position: relative; padding: 1rem 0.5rem; border: 2px solid #dfe6e9; border-radius: 1.2rem;
+            cursor: pointer; background: white; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex; flex-direction: column; justify-content: center; align-items: center; 
+            font-weight: bold; box-shadow: 0 6px 0 var(--shadow-color); outline: none; min-height: 105px;
             -webkit-tap-highlight-color: transparent;
         }
         
-        /* Chỉ hiện hiệu ứng nâng lên trên thiết bị có chuột */
         @media (hover: hover) {
-            .btn:hover:not(.matched) { 
-                transform: translateY(-7px); 
-                box-shadow: 0 13px 0 var(--shadow-color); 
-                border-color: var(--primary); 
-            }
+            .btn:hover:not(.matched) { transform: translateY(-7px); box-shadow: 0 13px 0 var(--shadow-color); border-color: var(--primary); }
         }
 
-        .btn:active:not(.matched) { 
-            transform: translateY(4px); 
-            box-shadow: 0 2px 0 var(--shadow-color); 
-        }
-
+        .btn:active:not(.matched) { transform: translateY(4px); box-shadow: 0 2px 0 var(--shadow-color); }
         .btn .spelling { font-size: 1.4rem; }
         .btn .ipa { font-size: 1rem; color: var(--sub-text); font-weight: normal; margin-top: 4px; }
         
@@ -112,16 +63,8 @@
             align-items: center; border-radius: 50%; border: 2px solid white; z-index: 5;
         }
 
-        .selected { 
-            border-color: var(--primary) !important; 
-            background: var(--primary-light) !important; 
-            box-shadow: 0 6px 0 var(--primary) !important; 
-            transform: scale(1.05) translateY(-5px); 
-        }
-        
+        .selected { border-color: var(--primary) !important; background: var(--primary-light) !important; box-shadow: 0 6px 0 var(--primary) !important; transform: scale(1.05) translateY(-5px); }
         .matched { color: white !important; transform: none !important; cursor: default; }
-        .matched .ipa { color: white !important; opacity: 0.8; }
-        
         .match-0 { background: var(--success) !important; border-color: var(--success) !important; box-shadow: 0 4px 0 #27ae60 !important; }
         .match-1 { background: #9b59b6 !important; border-color: #9b59b6 !important; box-shadow: 0 4px 0 #8e44ad !important; }
         .match-2 { background: #e67e22 !important; border-color: #e67e22 !important; box-shadow: 0 4px 0 #d35400 !important; }
@@ -130,11 +73,7 @@
         @keyframes shake { 0%, 100% {transform: translateX(0);} 25% {transform: translateX(-6px);} 75% {transform: translateX(6px);} }
 
         .nav-container { display: flex; justify-content: space-between; gap: 1rem; margin-top: 1.5rem; }
-        .nav-btn { 
-            background: #2d3436; color: white; padding: 1rem; border: none; border-radius: 15px; 
-            cursor: pointer; flex: 1; font-weight: bold; box-shadow: 0 5px 0 #000; transition: 0.2s; 
-        }
-        .nav-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 #000; }
+        .nav-btn { background: #2d3436; color: white; padding: 1rem; border: none; border-radius: 15px; cursor: pointer; flex: 1; font-weight: bold; box-shadow: 0 5px 0 #000; transition: 0.2s; }
         .nav-btn:disabled { opacity: 0.2; box-shadow: none; transform: none; }
         
         #ans-toggle-btn { width: 100%; border: none; background: #f1f5f9; padding: 12px; border-radius: 12px; cursor: pointer; font-weight: bold; color: #64748b; margin-top: 10px; }
@@ -144,9 +83,8 @@
 
         @media (max-width: 480px) {
             .box { padding: 1.5rem; border-radius: 2rem; }
-            .btn { min-height: 95px; gap: 2px; }
+            .btn { min-height: 95px; }
             .btn .spelling { font-size: 1.1rem; }
-            .btn .ipa { font-size: 0.85rem; }
             h2.main-title { font-size: 1.3rem; }
         }
     </style>
@@ -197,7 +135,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
-    import { getAuth, signInWithRedirect, getRedirectResult, onAuthStateChanged, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+    import { getAuth, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
     import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -214,27 +152,25 @@
     const db = getFirestore(app);
     const provider = new GoogleAuthProvider();
 
-    // KIỂM TRA TRẠNG THÁI ĐĂNG NHẬP
+    // KIỂM TRA THIẾT BỊ
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
     async function handleAuth() {
-        try {
-            const result = await getRedirectResult(auth);
-            if (result?.user) {
-                await checkUserPermission(result.user);
-                return;
-            }
-            onAuthStateChanged(auth, async (user) => {
-                if (user) await checkUserPermission(user);
-            });
-        } catch (error) {
-            document.getElementById("login-msg").innerText = "Lỗi xác thực.";
+        // Luôn kiểm tra session cũ trước
+        onAuthStateChanged(auth, async (user) => {
+            if (user) await checkUserPermission(user);
+        });
+
+        // Nếu là Mobile, kiểm tra kết quả Redirect
+        if (isMobile) {
+            try {
+                const result = await getRedirectResult(auth);
+                if (result?.user) await checkUserPermission(result.user);
+            } catch (e) { console.error(e); }
         }
     }
 
     async function checkUserPermission(user) {
-        const msgEl = document.getElementById("login-msg");
-        msgEl.style.color = "var(--primary)";
-        msgEl.innerText = "Đang kiểm tra quyền...";
-        
         const q = query(collection(db, "Tienganh_so_cap"), where("email", "==", user.email));
         const snap = await getDocs(q);
         if (!snap.empty) {
@@ -242,20 +178,30 @@
             document.getElementById("main-content").style.display = "block";
             window.init();
         } else {
-            msgEl.style.color = "var(--error)";
-            msgEl.innerText = "Email không có quyền truy cập.";
+            document.getElementById("login-msg").innerText = "Email không có quyền.";
             await signOut(auth);
         }
     }
 
-    document.getElementById("login-btn").onclick = () => {
-        document.getElementById("login-msg").innerText = "Đang chuyển hướng...";
-        signInWithRedirect(auth, provider);
+    document.getElementById("login-btn").onclick = async () => {
+        document.getElementById("login-msg").innerText = "Đang xử lý đăng nhập...";
+        if (isMobile) {
+            // PHONE: Dùng Redirect
+            signInWithRedirect(auth, provider);
+        } else {
+            // DESKTOP: Dùng Popup
+            try {
+                const res = await signInWithPopup(auth, provider);
+                if (res.user) await checkUserPermission(res.user);
+            } catch (e) {
+                document.getElementById("login-msg").innerText = "Lỗi popup. Hãy thử lại.";
+            }
+        }
     };
 
     handleAuth();
 
-    // LOGIC GAME
+    // LOGIC GAME GIỮ NGUYÊN
     let audioCtx;
     function playBeep(type) {
         if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
