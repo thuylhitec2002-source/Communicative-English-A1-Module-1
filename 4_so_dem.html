@@ -1,18 +1,241 @@
-function playCurrentNumber() {
-        if (targetNum === null) return;
-        
-        const synth = window.speechSynthesis;
-        
-        // Dừng mọi âm thanh đang phát để tránh bị lặp/kẹt số cũ
-        synth.cancel(); 
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thử thách Nghe Số 0-20 - Fixed Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #00cec9;
+            --secondary: #6c5ce7;
+            --success: #2ecc71;
+            --error: #ff7675;
+            --hint: #fdcb6e;
+            --bg: #f8f9fa;
+            --text-main: #2d3436;
+            --text-sub: #636E72;
+        }
 
-        // Lấy chữ tiếng Anh (ví dụ: "Eight") thay vì chỉ truyền số 8
-        const textToRead = numberData[targetNum][0]; 
+        * { box-sizing: border-box; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+
+        body { 
+            font-family: 'Quicksand', sans-serif; 
+            background: var(--bg); 
+            display: flex; justify-content: center; align-items: center;
+            min-height: 100vh; margin: 0; color: var(--text-main); overflow-x: hidden;
+        }
+
+        #login-screen {
+            position: fixed; inset: 0; background: var(--bg);
+            display: flex; justify-content: center; align-items: center; z-index: 9999;
+        }
+
+        .login-card {
+            background: #FFFFFF;
+            padding: 5.5rem 3.5rem;
+            border-radius: 3rem;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.05);
+            text-align: center;
+            max-width: 540px; width: 90%;
+            display: flex; flex-direction: column; gap: 3.5rem; 
+        }
+
+        .login-header h2 { font-size: 2.2rem; font-weight: 700; color: var(--secondary); margin: 0; }
+        .google-btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 14px;
+            background: #FFFFFF; color: var(--text-main); border: 1.5px solid #E5E7EB;
+            padding: 1rem 3rem; border-radius: 100px; cursor: pointer;
+            font-weight: 700; font-size: 1.05rem;
+        }
+
+        #welcome-screen { display: none; width: 100%; max-width: 650px; text-align: center; }
+        .welcome-card { background: white; padding: 50px; border-radius: 3rem; box-shadow: 0 15px 35px rgba(0,0,0,0.08); }
         
-        const utter = new SpeechSynthesisUtterance(textToRead);
+        #main-game { display: none; width: 100%; max-width: 750px; }
+        .game-card { background: white; width: 100%; border-radius: 25px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); padding: 40px; text-align: center; position: relative; }
+        
+        .display-word { min-height: 80px; margin-bottom: 25px; padding: 15px; background: #f0f7ff; border-radius: 15px; border: 2px solid #e1f0ff; }
+        #word-text { font-size: 2.2rem; font-weight: bold; color: var(--secondary); display: block; }
+        #phonetic-text { font-size: 1.3rem; color: #0984e3; font-style: italic; display: block; }
+
+        .audio-controls { display: flex; align-items: center; justify-content: center; gap: 20px; margin-bottom: 20px; }
+        .btn-play { 
+            width: 80px; height: 80px; border-radius: 50%; background: var(--primary); border: none; cursor: pointer;
+            display: inline-flex; align-items: center; justify-content: center;
+        }
+        .btn-play svg { fill: white; width: 40px; height: 40px; }
+
+        .numbers-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; margin: 30px 0; }
+        .num-btn { padding: 15px 0; font-size: 1.4rem; font-weight: bold; border: 2px solid #dfe6e9; border-radius: 12px; background: white; cursor: pointer; }
+        .num-btn.correct { background: var(--success) !important; color: white; }
+        .num-btn.wrong { background: var(--error) !important; color: white; animation: shake 0.4s; }
+        .num-btn.highlight { background: var(--hint) !important; color: white; transform: scale(1.1); }
+
+        @keyframes shake { 0%, 100% {transform: translateX(0);} 25% {transform: translateX(-5px);} 75% {transform: translateX(5px);} }
+
+        .progress-bar { height: 10px; background: #eee; border-radius: 5px; overflow: hidden; margin-top: 5px; }
+        #progress-fill { height: 100%; background: var(--secondary); width: 0%; transition: 0.4s; }
+
+        #result-screen { display: none; }
+        .btn-main { padding: 18px 45px; border-radius: 100px; border: none; background: var(--secondary); color: white; font-weight: 800; cursor: pointer; }
+        .balloon { position: fixed; bottom: -120px; width: 50px; height: 70px; border-radius: 50%; z-index: 999; animation: floatUp 5s linear forwards; }
+        @keyframes floatUp { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-120vh); opacity: 0; } }
+    </style>
+</head>
+<body>
+
+<div id="login-screen">
+    <div class="login-card">
+        <div class="login-header">
+            <h2>Hệ Thống Trực Tuyến</h2>
+            <p>Vui lòng đăng nhập để bắt đầu thử thách.</p>
+        </div>
+        <button id="login-btn" class="google-btn">Tiếp tục với Google</button>
+        <div id="login-msg"></div>
+    </div>
+</div>
+
+<div id="welcome-screen">
+    <div class="welcome-card">
+        <h1>Chào mừng bạn! 🎧</h1>
+        <p>Nghe phát âm và chọn số từ 0 đến 20.</p>
+        <button class="btn-main" onclick="startGame()">BẮT ĐẦU CHƠI 🚀</button>
+    </div>
+</div>
+
+<div id="main-game">
+    <div class="game-card">
+        <div id="game-content">
+            <h1>Thử thách Nghe Số 🎧</h1>
+            <div class="display-word">
+                <span id="word-text">...</span>
+                <span id="phonetic-text">...</span>
+            </div>
+            <div class="audio-controls">
+                <button class="btn-play" onclick="playCurrentNumber()">
+                    <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+                </button>
+                <button style="padding: 10px 20px; border-radius: 10px; cursor: pointer;" onclick="showHint()">💡 Gợi ý</button>
+            </div>
+            <div class="numbers-grid" id="grid"></div>
+            <div style="text-align: left; font-weight: bold;">TIẾN ĐỘ: <span id="progress-text">1 / 15</span></div>
+            <div class="progress-bar"><div id="progress-fill"></div></div>
+        </div>
+
+        <div id="result-screen">
+            <h2 id="res-title">Kết quả</h2>
+            <h3 id="res-score" style="font-size: 2.5rem; color: var(--secondary);">Đúng 0 / 15</h3>
+            <button class="btn-main" onclick="location.reload()">Chơi lại</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const numberData = {
+        0: ["Zero", "/ˈzɪərəʊ/"], 1: ["One", "/wʌn/"], 2: ["Two", "/tuː/"], 3: ["Three", "/θriː/"], 4: ["Four", "/fɔː/"],
+        5: ["Five", "/faɪv/"], 6: ["Six", "/sɪks/"], 7: ["Seven", "/ˈsev.ən/"], 8: ["Eight", "/eɪt/"], 9: ["Nine", "/naɪn/"],
+        10: ["Ten", "/ten/"], 11: ["Eleven", "/ɪˈlev.ən/"], 12: ["Twelve", "/twelv/"], 13: ["Thirteen", "/ˌθɜːˈtiːn/"],
+        14: ["Fourteen", "/ˌfɔːˈtiːn/"], 15: ["Fifteen", "/ˌfɪfˈtiːn/"], 16: ["Sixteen", "/ˌsɪkˈstiːn/"],
+        17: ["Seventeen", "/ˌsev.ənˈtiːn/"], 18: ["Eighteen", "/ˌeɪˈtiːn/"], 19: ["Nineteen", "/ˌnaɪnˈtiːn/"], 20: ["Twenty", "/ˈtwen.ti/"]
+    };
+
+    let questions = [];
+    let currentStep = 0;
+    let score = 0;
+    let targetNum = null;
+    let canClick = true;
+    let hintUsed = false;
+
+    // Giả lập login nhanh để bạn test
+    document.getElementById("login-btn").onclick = () => {
+        document.getElementById("login-screen").style.display = "none";
+        document.getElementById("welcome-screen").style.display = "block";
+    };
+
+    function startGame() {
+        document.getElementById('welcome-screen').style.display = 'none';
+        document.getElementById('main-game').style.display = 'block';
+        initGame();
+    }
+
+    function initGame() {
+        // Xáo trộn danh sách số để không bị trùng lặp số 8 liên tục
+        let keys = Object.keys(numberData);
+        keys.sort(() => Math.random() - 0.5);
+        questions = keys.slice(0, 15); 
+        
+        currentStep = 0;
+        score = 0;
+
+        const grid = document.getElementById('grid');
+        grid.innerHTML = '';
+        for (let i = 0; i <= 20; i++) {
+            const btn = document.createElement('button');
+            btn.className = 'num-btn';
+            btn.id = 'btn-' + i;
+            btn.innerText = i;
+            btn.onclick = () => checkAnswer(i, btn);
+            grid.appendChild(btn);
+        }
+        loadQuestion();
+    }
+
+    function loadQuestion() {
+        if (currentStep >= 15) { finishGame(); return; }
+        canClick = true;
+        hintUsed = false;
+        targetNum = questions[currentStep];
+        
+        document.getElementById('word-text').innerText = numberData[targetNum][0];
+        document.getElementById('phonetic-text').innerText = numberData[targetNum][1];
+        document.getElementById('progress-text').innerText = `${currentStep + 1} / 15`;
+        document.getElementById('progress-fill').style.width = `${((currentStep) / 15) * 100}%`;
+        
+        document.querySelectorAll('.num-btn').forEach(b => b.className = 'num-btn');
+        playCurrentNumber();
+    }
+
+    function playCurrentNumber() {
+        if (targetNum === null) return;
+        const synth = window.speechSynthesis;
+        synth.cancel(); // QUAN TRỌNG: Ngắt giọng cũ để không bị kẹt
+
+        // Lấy chữ tiếng Anh tương ứng (VD: "Eight" thay vì số 8)
+        const wordToSpeak = numberData[targetNum][0];
+        const utter = new SpeechSynthesisUtterance(wordToSpeak);
         utter.lang = 'en-US';
-        utter.rate = 0.8; // Giảm tốc độ một chút để nghe rõ hơn
-        utter.pitch = 1;
-        
+        utter.rate = 0.85;
         synth.speak(utter);
     }
+
+    function checkAnswer(num, btn) {
+        if (!canClick) return;
+        if (num == targetNum) {
+            canClick = false;
+            if (!hintUsed) score++;
+            btn.classList.add('correct');
+            setTimeout(() => { currentStep++; loadQuestion(); }, 800);
+        } else {
+            btn.classList.add('wrong');
+            setTimeout(() => btn.classList.remove('wrong'), 500);
+        }
+    }
+
+    function showHint() {
+        if (!canClick) return;
+        hintUsed = true;
+        const btn = document.getElementById('btn-' + targetNum);
+        btn.classList.add('highlight');
+        setTimeout(() => btn.classList.remove('highlight'), 1000);
+    }
+
+    function finishGame() {
+        document.getElementById('game-content').style.display = 'none';
+        document.getElementById('result-screen').style.display = 'block';
+        document.getElementById('res-score').innerText = `Đúng ${score} / 15 câu`;
+    }
+</script>
+
+</body>
+</html>
