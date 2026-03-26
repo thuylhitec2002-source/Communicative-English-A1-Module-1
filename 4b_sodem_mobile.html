@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Nghe Số 0-20 - Mobile Audio Fixed</title>
+    <title>Nghe Số 0-20 - Final with Logout</title>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -60,6 +60,7 @@
         }
         @keyframes shake { 0%, 100% {transform: translateX(0);} 25% {transform: translateX(-5px);} 75% {transform: translateX(5px);} }
         #error-box { color: var(--error); font-size: 0.85rem; margin-top: 10px; font-weight: 600; word-break: break-word; }
+        .btn-logout { background: none; border: none; color: #a4b0be; font-weight: bold; cursor: pointer; text-decoration: underline; font-size: 1rem; margin-top: 20px; font-family: inherit;}
     </style>
 </head>
 <body>
@@ -81,6 +82,7 @@
     <h1>Sẵn sàng chưa?</h1>
     <p>Bắt đầu thử thách nghe số 0-20.</p>
     <button class="btn-main" onclick="startGame()">BẮT ĐẦU 🚀</button>
+    <button class="btn-logout" onclick="logoutAccount()">Đăng xuất tài khoản</button>
 </div>
 
 <div id="main-game" class="card">
@@ -133,7 +135,15 @@
     const errorEl = document.getElementById("error-box");
 
     onAuthStateChanged(auth, async (user) => {
-        if (user) await checkAccess(user);
+        if (user) {
+            await checkAccess(user);
+        } else {
+            // Nếu không có user, hiển thị lại màn hình đăng nhập
+            document.getElementById("auth-overlay").style.display = "flex";
+            document.getElementById("welcome-screen").style.display = "none";
+            statusEl.innerText = "Vui lòng đăng nhập";
+            statusEl.style.color = "#2d3436";
+        }
     });
 
     async function checkAccess(user) {
@@ -171,6 +181,12 @@
             errorEl.innerText = `Lỗi: ${err.message}`;
         }
     };
+
+    // Hàm đăng xuất
+    window.logoutAccount = async function() {
+        await signOut(auth);
+        location.reload(); // Tải lại trang sau khi đăng xuất
+    };
 </script>
 
 <script>
@@ -185,11 +201,9 @@
     let questions = [], currentIdx = 0, score = 0, targetNum = null, canClick = true, hintUsed = false;
 
     window.startGame = function() {
-        // MỞ KHÓA ÂM THANH NGAY KHI NGƯỜI DÙNG BẤM "BẮT ĐẦU"
         const unlockUtterance = new SpeechSynthesisUtterance('');
         window.speechSynthesis.speak(unlockUtterance);
         
-        // Mở khóa các file Audio
         document.getElementById('snd-correct').play().then(() => {
             document.getElementById('snd-correct').pause();
             document.getElementById('snd-correct').currentTime = 0;
@@ -200,7 +214,6 @@
             document.getElementById('snd-wrong').currentTime = 0;
         }).catch(()=>{});
 
-        // Chuyển màn hình và tải câu hỏi
         document.getElementById('welcome-screen').style.display = 'none';
         document.getElementById('main-game').style.display = 'block';
         questions = Object.keys(numberData).sort(() => Math.random() - 0.5);
@@ -225,19 +238,17 @@
         document.getElementById('progress-fill').style.width = `${(currentIdx / 21) * 100}%`;
         document.querySelectorAll('.num-btn').forEach(b => b.classList.remove('correct', 'wrong', 'highlight'));
         
-        // Tự động đọc câu hỏi mới (cần delay nhỏ để tránh lỗi kẹt giọng trên iOS)
         setTimeout(() => playCurrent(), 100);
     }
 
     window.playCurrent = function() {
-        // Sửa lỗi kẹt giọng đọc (bug cancel) trên Safari/iOS
         if (window.speechSynthesis.speaking) {
             window.speechSynthesis.cancel();
         }
         setTimeout(() => {
             const utter = new SpeechSynthesisUtterance(numberData[targetNum][0]);
             utter.lang = 'en-US'; 
-            utter.rate = 0.85; // Tốc độ chuẩn cho mobile
+            utter.rate = 0.85; 
             window.speechSynthesis.speak(utter);
         }, 50);
     }
