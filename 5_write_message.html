@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Email Writing Challenge - Bright Edition</title>
+    <title>Email Writing Challenge - Secured Edition</title>
     <style>
-        /* LAYOUT & COLORS TỪ CODE 2 */
         :root { 
             --primary: #007bff; 
             --secondary: #6610f2; 
@@ -20,33 +19,20 @@
 
         body { 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            background: var(--bg); 
-            color: var(--text); 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            min-height: 100vh; 
-            margin: 0; 
-            overflow-x: hidden; 
+            background: var(--bg); color: var(--text); 
+            display: flex; justify-content: center; align-items: center; 
+            min-height: 100vh; margin: 0; overflow-x: hidden; 
         }
 
-        /* CONTAINER PHONG CÁCH CODE 2 */
         .game-container { 
-            background: var(--card); 
-            border-radius: 30px; 
-            width: 90%;
-            max-width: 600px; 
-            padding: 40px; 
-            text-align: center; 
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            background: var(--card); border-radius: 30px; 
+            width: 90%; max-width: 600px; padding: 40px; 
+            text-align: center; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
             border: 1px solid rgba(0,0,0,0.05);
             animation: floating 4s ease-in-out infinite;
         }
 
-        @keyframes floating {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
+        @keyframes floating { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
 
         .screen { display: none; }
         .active { display: block; animation: zoomIn 0.4s; }
@@ -55,77 +41,44 @@
         h1, h2 { color: var(--primary); font-weight: 800; letter-spacing: -0.5px; }
         p { color: #666; line-height: 1.6; }
 
-        /* BUTTONS PHONG CÁCH GRADIENT */
         .btn-main { 
             background: linear-gradient(135deg, var(--primary), var(--secondary)); 
             color: white; border: none; padding: 15px 35px; border-radius: 15px; 
             font-weight: bold; cursor: pointer; font-size: 16px;
             box-shadow: 0 8px 20px rgba(0, 123, 255, 0.3);
-            margin: 5px;
-            font-family: inherit;
+            margin: 5px; font-family: inherit;
         }
         .btn-main:hover { transform: translateY(-3px); box-shadow: 0 12px 25px rgba(0, 123, 255, 0.4); }
 
-        /* EMAIL BOX & INPUTS */
+        /* Style cho nút đăng nhập riêng biệt */
+        .login-google {
+            background: #fff; color: #444; border: 1.5px solid #eee;
+            display: inline-flex; align-items: center; gap: 10px;
+        }
+        .login-google:hover { background: #f8f9fa; border-color: var(--primary); }
+
         .email-box {
-            background: #fcfcfc;
-            border: 2px dashed #e0e0e0;
-            border-radius: 20px;
-            padding: 30px 20px;
-            margin: 25px 0;
-            text-align: left;
+            background: #fcfcfc; border: 2px dashed #e0e0e0;
+            border-radius: 20px; padding: 30px 20px; margin: 25px 0; text-align: left;
         }
 
-        .quiz-line {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 20px;
-            font-size: 1.1rem;
-            line-height: 1.5;
-        }
+        .quiz-line { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 20px; font-size: 1.1rem; }
 
         .quiz-dropdown {
-            appearance: none;
-            background: #fff;
-            border: 2px solid #eee;
-            border-radius: 10px;
-            padding: 5px 25px 5px 10px;
-            font-weight: 700;
-            color: var(--secondary);
-            cursor: pointer;
-            font-family: inherit;
+            appearance: none; background: #fff; border: 2px solid #eee;
+            border-radius: 10px; padding: 5px 25px 5px 10px; font-weight: 700;
+            color: var(--secondary); cursor: pointer; font-family: inherit;
             background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%236610f2%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%0-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
             background-repeat: no-repeat; background-position: right 8px center; background-size: 8px auto;
         }
 
-        .quiz-dropdown:focus { border-color: var(--primary); outline: none; }
-
         .correct { background-color: var(--success) !important; color: white !important; border-color: var(--success) !important; }
         .wrong { background-color: var(--error) !important; color: white !important; border-color: var(--error) !important; animation: shake 0.3s; }
-
         @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
 
-        .translation {
-            width: 100%;
-            color: #888;
-            font-size: 0.9rem;
-            font-style: italic;
-            display: none;
-            margin-top: 5px;
-            padding-left: 10px;
-            border-left: 2px solid #eee;
-        }
-
-        /* MUSIC TOGGLE */
-        .music-toggle {
-            position: fixed; top: 20px; left: 20px;
-            background: white; border: 1px solid #ddd;
-            width: 45px; height: 45px; border-radius: 50%; cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-
+        .translation { width: 100%; color: #888; font-size: 0.9rem; font-style: italic; display: none; margin-top: 5px; padding-left: 10px; border-left: 2px solid #eee; }
+        
+        .music-toggle { position: fixed; top: 20px; left: 20px; background: white; border: 1px solid #ddd; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         .balloon { position: fixed; bottom: -100px; width: 40px; height: 60px; border-radius: 50%; z-index: 999; animation: floatUp linear forwards; }
         @keyframes floatUp { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-120vh); opacity: 0; } }
     </style>
@@ -136,8 +89,8 @@
     <div id="login-screen" class="screen active">
         <h1>Hệ Thống Trực Tuyến</h1>
         <p>Vui lòng đăng nhập để bắt đầu trải nghiệm bài học.</p>
-        <button id="login-btn" class="btn-main" style="background: #fff; color: #444; border: 1px solid #ddd;">
-            <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" width="18" style="vertical-align:middle; margin-right:8px;">
+        <button id="login-btn" class="btn-main login-google" onclick="handleLogin()">
+            <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" width="18">
             Tiếp tục với Google
         </button>
     </div>
@@ -148,6 +101,7 @@
         <p>Học cách giới thiệu bản thân qua Email với cấu trúc chuẩn quốc tế.</p>
         <br>
         <button class="btn-main" onclick="startGame()">BẮT ĐẦU NGAY 🚀</button>
+        <p id="auth-error" style="color: var(--error); font-size: 14px; font-weight: bold; margin-top: 10px; display: none;">⚠️ Bạn cần đăng nhập trước!</p>
     </div>
 
     <div id="main-app" class="screen">
@@ -180,11 +134,6 @@
                 <span>28 years old.</span>
                 <div class="translation">Dịch: và tôi 28 tuổi.</div>
             </div>
-
-            <div class="quiz-line">
-                <span>I look forward to meeting you at the office!</span>
-                <div class="translation">Dịch: Tôi mong được gặp bạn tại văn phòng.</div>
-            </div>
         </div>
 
         <div id="result-display" style="font-weight: bold; margin-bottom: 15px; color: var(--primary); display: none;"></div>
@@ -201,15 +150,32 @@
 
 <script>
     const bgMusic = document.getElementById('bg-music');
-    
+    let isLoggedIn = false; // QUAN TRỌNG: Trạng thái đăng nhập
+
     function showScreen(id) {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
         document.getElementById(id).classList.add('active');
     }
 
-    document.getElementById('login-btn').onclick = () => showScreen('welcome-screen');
+    // Xử lý đăng nhập
+    function handleLogin() {
+        isLoggedIn = true; // Đánh dấu đã đăng nhập
+        showScreen('welcome-screen');
+    }
 
+    // Bắt đầu game - Kiểm tra nghiêm ngặt
     function startGame() {
+        if (!isLoggedIn) {
+            // Nếu chưa đăng nhập mà nhấn Bắt đầu (do can thiệp code hoặc lỗi hiển thị)
+            const errorMsg = document.getElementById('auth-error');
+            errorMsg.style.display = 'block';
+            document.querySelector('.game-container').style.animation = 'shake 0.4s';
+            setTimeout(() => {
+                document.querySelector('.game-container').style.animation = 'floating 4s ease-in-out infinite';
+                showScreen('login-screen');
+            }, 1000);
+            return;
+        }
         showScreen('main-app');
         bgMusic.play().catch(() => {});
     }
@@ -242,7 +208,6 @@
         const res = document.getElementById('result-display');
         res.innerText = `Kết quả: ${score}/${selects.length} câu đúng!`;
         res.style.display = 'block';
-        
         document.getElementById('btn-check').style.display = 'none';
         document.getElementById('btn-restart').style.display = 'inline-block';
 
