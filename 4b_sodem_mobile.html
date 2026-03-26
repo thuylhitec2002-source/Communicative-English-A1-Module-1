@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Nghe Số 0-20 - Final Perfected</title>
+    <title>Nghe Số 0-20 - Final with Logout</title>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -138,6 +138,7 @@
         if (user) {
             await checkAccess(user);
         } else {
+            // Nếu không có user, hiển thị lại màn hình đăng nhập
             document.getElementById("auth-overlay").style.display = "flex";
             document.getElementById("welcome-screen").style.display = "none";
             statusEl.innerText = "Vui lòng đăng nhập";
@@ -181,9 +182,10 @@
         }
     };
 
+    // Hàm đăng xuất
     window.logoutAccount = async function() {
         await signOut(auth);
-        location.reload(); 
+        location.reload(); // Tải lại trang sau khi đăng xuất
     };
 </script>
 
@@ -198,13 +200,13 @@
 
     let questions = [], currentIdx = 0, score = 0, targetNum = null, canClick = true, hintUsed = false;
 
-    // Hàm cưỡng chế phát âm thanh
+    // HÀM MỚI: Cưỡng chế tua lại và phát âm thanh để tránh bị kẹt
     function forcePlayAudio(id) {
         const audio = document.getElementById(id);
-        if(audio) {
+        if (audio) {
             audio.pause();
             audio.currentTime = 0;
-            audio.play().catch(e => console.log("Lỗi âm thanh:", e));
+            audio.play().catch(e => console.log("Audio block by browser:", e));
         }
     }
 
@@ -212,6 +214,7 @@
         const unlockUtterance = new SpeechSynthesisUtterance('');
         window.speechSynthesis.speak(unlockUtterance);
         
+        // Phát ngầm để xin quyền âm thanh từ trình duyệt
         forcePlayAudio('snd-correct');
         forcePlayAudio('snd-wrong');
 
@@ -267,11 +270,11 @@
         if(n == targetNum) {
             canClick = false; if(!hintUsed) score++;
             b.classList.add('correct');
-            forcePlayAudio('snd-correct'); // Sử dụng hàm cưỡng chế phát
+            forcePlayAudio('snd-correct'); // Dùng hàm mới
             setTimeout(() => { currentIdx++; load(); }, 800);
         } else {
             b.classList.add('wrong');
-            forcePlayAudio('snd-wrong'); // Sử dụng hàm cưỡng chế phát
+            forcePlayAudio('snd-wrong'); // Dùng hàm mới
             setTimeout(() => b.classList.remove('wrong'), 400);
         }
     }
