@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Email Master - Professional Edition</title>
+    <title>Email Writing Challenge - Balanced & Dynamic</title>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -16,7 +16,8 @@
             --text-sub: #636E72;
         }
 
-        * { box-sizing: border-box; }
+        * { box-sizing: border-box; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+
         body { 
             font-family: 'Quicksand', sans-serif; 
             background-color: var(--bg); margin: 0; 
@@ -24,33 +25,43 @@
             min-height: 100vh; overflow-x: hidden;
         }
 
-        /* --- LOGIN & WELCOME --- */
+        /* --- LOGIN & WELCOME UI: CLEAN & DYNAMIC --- */
         #login-screen, #welcome-screen {
             position: fixed; inset: 0; background: var(--bg);
             display: flex; justify-content: center; align-items: center; z-index: 9999;
         }
+
         .card-long {
             background: #FFFFFF; padding: 5rem 3.5rem; border-radius: 3rem;
             box-shadow: 0 25px 50px rgba(0,0,0,0.05); text-align: center;
             max-width: 540px; width: 90%; display: flex; flex-direction: column; gap: 3.5rem;
-        }
-        .header-content h2 { font-size: 2.2rem; font-weight: 700; color: var(--primary); margin: 0; }
-        .google-btn {
-            display: inline-flex; align-items: center; justify-content: center; gap: 14px;
-            background: #FFFFFF; border: 1.5px solid #E5E7EB; padding: 1rem 3rem;
-            border-radius: 100px; cursor: pointer; font-weight: 700; font-family: inherit;
+            /* KHÔI PHỤC HIỆU ỨNG ĐỘNG KHI HIỂN THỊ */
+            animation: slideUp 0.8s ease-out;
         }
 
-        /* --- NÚT NHẠC --- */
+        .header-content { display: flex; flex-direction: column; gap: 1.2rem; }
+        .header-content h2 { font-size: 2.2rem; font-weight: 700; color: var(--primary); margin: 0; letter-spacing: -1px; }
+        .header-content p { color: var(--text-sub); font-size: 1.1rem; margin: 0; line-height: 1.6; }
+
+        .google-btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 14px;
+            background: #FFFFFF; color: var(--text-main); border: 1.5px solid #E5E7EB;
+            padding: 1rem 3rem; border-radius: 100px; cursor: pointer;
+            font-weight: 700; font-size: 1.05rem; font-family: inherit;
+        }
+        .google-btn:hover { border-color: var(--primary); background: var(--primary-hover); transform: translateY(-3px); }
+
+        /* --- NÚT LOA (MUSIC CONTROL) --- */
         .music-toggle {
             position: fixed; top: 25px; left: 25px; z-index: 1000;
             background: white; border: 2px solid var(--primary); color: var(--primary);
             width: 45px; height: 45px; border-radius: 50%; cursor: pointer;
             display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem; box-shadow: 0 4px 12px rgba(108, 92, 231, 0.15);
         }
 
-        /* --- GAME UI CẢI TIẾN --- */
-        #main-app { display: none; width: 100%; max-width: 800px; padding: 20px; }
+        /* --- GAME UI CẢI TIẾN: CÂN BẰNG & THẲNG HÀNG --- */
+        #main-app { display: none; width: 100%; max-width: 800px; padding: 20px; animation: fadeIn 0.6s ease; }
         .game-card { background: white; border-radius: 2.5rem; box-shadow: 0 15px 40px rgba(0,0,0,0.06); padding: 40px; }
         
         .email-box {
@@ -63,18 +74,29 @@
             border-radius: 10px; font-size: 0.75rem; font-weight: 800; letter-spacing: 1px;
         }
 
+        /* FIX: SỬ DỤNG GRID ĐỂ CĂN THẲNG HÀNG HOÀN HẢO */
         .quiz-line {
-            margin-bottom: 2.2rem; /* KHOẢNG CÁCH THOÁNG HƠN */
-            display: flex; flex-wrap: wrap; align-items: center; gap: 12px;
-            font-size: 1.15rem; line-height: 1.5;
+            display: grid;
+            grid-template-columns: auto min-content auto; /* Chữ -> Dropdown -> Chữ */
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 2.2rem; /* Giữ nguyên khoảng cách thoáng */
+            font-size: 1.15rem;
+            line-height: 1; /* Căn giữa dọc tốt hơn */
+            color: var(--text-main);
+        }
+
+        /* Căn chỉnh lại cho các câu không có chữ phía sau dropdown */
+        .quiz-line.no-suffix {
+            grid-template-columns: auto min-content;
         }
 
         .quiz-dropdown {
             appearance: none; background: #f8fafc; border: 2px solid #e2e8f0;
-            border-radius: 12px; padding: 6px 30px 6px 15px; font-size: 1rem;
+            border-radius: 12px; padding: 10px 30px 10px 15px; font-size: 1.05rem;
             font-weight: 700; color: var(--primary); cursor: pointer;
             transition: all 0.3s ease; outline: none; font-family: inherit;
-            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%236c5ce7%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%236c5ce7%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%0-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
             background-repeat: no-repeat; background-position: right 12px top 50%; background-size: 10px auto;
         }
 
@@ -84,10 +106,11 @@
         }
 
         .correct { border-color: var(--success) !important; background-color: #f0fdf4 !important; color: var(--success) !important; }
-        .wrong { border-color: var(--error) !important; background-color: #fef2f2 !important; color: var(--error) !important; animation: shake 0.4s; }
+        .wrong { border-color: var(--error) !important; background-color: #fff2f2 !important; color: var(--error) !important; animation: shake 0.4s; }
 
         .translation {
-            width: 100%; color: var(--text-sub); font-size: 0.95rem; font-style: italic;
+            grid-column: 1 / -1; /* Chiếm hết chiều rộng grid */
+            color: var(--text-sub); font-size: 0.95rem; font-style: italic;
             display: none; margin-top: 10px; border-left: 4px solid #e2e8f0;
             padding: 8px 15px; background: #f8fafc; border-radius: 0 10px 10px 0;
         }
@@ -96,11 +119,18 @@
             padding: 18px 45px; border-radius: 100px; border: none;
             background: var(--primary); color: white; font-weight: 800;
             cursor: pointer; font-size: 1.1rem; font-family: inherit;
-            box-shadow: 0 8px 20px rgba(108, 92, 231, 0.2);
+            width: 280px; box-shadow: 0 8px 20px rgba(108, 92, 231, 0.2);
         }
         .btn-main:hover { transform: translateY(-3px); box-shadow: 0 12px 25px rgba(108, 92, 231, 0.3); }
 
+        /* Animations */
+        @keyframes slideUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes shake { 0%, 100% {transform: translateX(0);} 25% {transform: translateX(-5px);} 75% {transform: translateX(5px);} }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+
+        .balloon { position: fixed; bottom: -120px; width: 50px; height: 70px; border-radius: 50%; z-index: 999; animation: floatUp linear forwards; pointer-events: none; }
+        @keyframes floatUp { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-120vh); opacity: 0; } }
     </style>
 </head>
 <body>
@@ -118,7 +148,7 @@
 
 <div id="welcome-screen" style="display: none;">
     <div class="card-long">
-        <span style="font-size: 80px;">📧</span>
+        <span style="font-size: 80px; animation: bounce 2s infinite;">📧</span>
         <h2>Viết Email chuyên nghiệp</h2>
         <p>Học cách giới thiệu bản thân qua Email với cấu trúc chuẩn quốc tế.</p>
         <button class="btn-main" onclick="startGame()">BẮT ĐẦU NGAY 🚀</button>
@@ -128,26 +158,34 @@
 <div id="main-app">
     <button class="music-toggle" onclick="toggleMusic()" id="music-btn">🔊</button>
     <div class="game-card">
-        <h1>Writing an E-mail 📧</h1>
+        <h1 style="color:var(--primary); font-weight:800;">Writing an E-mail 📧</h1>
         <div class="email-box">
-            <div class="quiz-line">
-                <select class="quiz-dropdown" data-answer="Hello"><option value="">...</option><option value="Hello">Hello</option><option value="Good">Good</option></select> everyone.
+            <div class="quiz-line no-suffix">
+                <div></div> <select class="quiz-dropdown" data-answer="Hello"><option value="">...</option><option value="Hello">Hello</option><option value="Good">Good</option></select>
+                <div>everyone.</div>
                 <div class="translation">Dịch: Xin chào mọi người.</div>
             </div>
             <div class="quiz-line">
-                My name <select class="quiz-dropdown" data-answer="is"><option value="">...</option><option value="am">am</option><option value="is">is</option></select> Anna.
+                <div>My name</div>
+                <select class="quiz-dropdown" data-answer="is"><option value="">...</option><option value="am">am</option><option value="is">is</option></select>
+                <div>Anna.</div>
                 <div class="translation">Dịch: Tên tôi là Anna.</div>
             </div>
             <div class="quiz-line">
-                I am from <select class="quiz-dropdown" data-answer="Germany"><option value="">...</option><option value="German">German</option><option value="Germany">Germany</option></select>
-                <div class="translation">Dịch: Tôi đến từ nước Đức.</div>
+                <div>I am from</div>
+                <select class="quiz-dropdown" data-answer="Germany"><option value="">...</option><option value="German">German</option><option value="Germany">Germany</option></select>
+                <div></div> <div class="translation">Dịch: Tôi đến từ nước Đức.</div>
             </div>
             <div class="quiz-line">
-                and I <select class="quiz-dropdown" data-answer="am"><option value="">...</option><option value="am">am</option><option value="is">is</option></select> 28 years old.
+                <div>and I</div>
+                <select class="quiz-dropdown" data-answer="am"><option value="">...</option><option value="am">am</option><option value="is">is</option></select>
+                <div>28 years old.</div>
                 <div class="translation">Dịch: và tôi 28 tuổi.</div>
             </div>
-            <div class="quiz-line">
-                I look forward to meeting you at the office!
+            <div class="quiz-line no-suffix">
+                <div>I look forward to meeting you at the office!</div>
+                <div></div> 
+                <div class="translation">Dịch: Tôi mong được gặp bạn tại văn phòng.</div>
             </div>
         </div>
         <div style="margin-top: 30px; text-align: center; display: flex; flex-direction: column; gap: 15px; align-items: center;">
@@ -191,6 +229,8 @@
         res.style.display = 'block';
         document.getElementById('btn-check').style.display = 'none';
         document.getElementById('btn-restart').style.display = 'block';
+        // Thắng cuộc thì bay bong bóng
+        if(score === selects.length) createBalloons();
     }
     function resetGame() {
         document.getElementById('main-app').style.display = 'none';
@@ -205,6 +245,21 @@
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('welcome-screen').style.display = 'flex';
     };
+
+    function createBalloons() {
+        const colors = ['#6c5ce7', '#10b981', '#ff7675', '#74b9ff', '#ffeaa7'];
+        for (let i = 0; i < 40; i++) {
+            const b = document.createElement('div');
+            b.className = 'balloon';
+            b.style.left = Math.random() * 100 + 'vw';
+            b.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            const duration = 3 + Math.random() * 2;
+            b.style.animationDuration = duration + 's';
+            b.style.animationDelay = Math.random() * 2 + 's';
+            document.body.appendChild(b);
+            setTimeout(() => b.remove(), 6000);
+        }
+    }
 </script>
 </body>
 </html>
