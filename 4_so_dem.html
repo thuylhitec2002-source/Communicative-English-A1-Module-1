@@ -166,16 +166,16 @@
 
             <div class="numbers-grid" id="grid"></div>
 
-            <div style="text-align: left; font-weight: bold; color: #888; font-size: 0.9rem;">TIẾN ĐỘ: <span id="progress-text">1 / 15</span></div>
+            <div style="text-align: left; font-weight: bold; color: #888; font-size: 0.9rem;">TIẾN ĐỘ: <span id="progress-text">1 / 20</span></div>
             <div class="progress-bar"><div id="progress-fill"></div></div>
         </div>
 
         <div id="result-screen">
             <img src="https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExamhuOW92OWVlYzcyajB4Z2hlNDZ3aDZqNTRjYzMxbnVhd2Vjbnp0ayZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3o6fIUZTTDl0IDjbZS/giphy.gif" class="result-gif">
             <h2 id="res-title">Kết quả</h2>
-            <h3 id="res-score" style="font-size: 2.5rem; color: var(--secondary); margin: 10px 0; font-weight: 800;">Đúng 0 / 15 câu</h3>
+            <h3 id="res-score" style="font-size: 2.5rem; color: var(--secondary); margin: 10px 0; font-weight: 800;">Đúng 0 / 21 câu</h3>
             <p id="res-msg" style="color: #636e72; margin: 15px 0 25px; line-height: 1.6; font-weight: 500;"></p>
-            <button class="btn-main" onclick="location.reload()">Chơi lại từ đầu</button>
+            <button class="btn-main" onclick="resetGameToWelcome()">Chơi lại từ đầu</button>
         </div>
     </div>
 </div>
@@ -230,7 +230,7 @@
         5: ["Five", "/faɪv/"], 6: ["Six", "/sɪks/"], 7: ["Seven", "/ˈsev.ən/"], 8: ["Eight", "/eɪt/"], 9: ["Nine", "/naɪn/"],
         10: ["Ten", "/ten/"], 11: ["Eleven", "/ɪˈlev.ən/"], 12: ["Twelve", "/twelv/"], 13: ["Thirteen", "/ˌθɜːˈtiːn/"],
         14: ["Fourteen", "/ˌfɔːˈtiːn/"], 15: ["Fifteen", "/ˌfɪfˈtiːn/"], 16: ["Sixteen", "/ˌsɪkˈstiːn/"],
-        17: ["Seventeen", "/ˌsev.ənˈtiːn/"], 18: ["Eighteen", "/ˌe/ˈtiːn/"], 19: ["Nineteen", "/ˌnaɪnˈtiːn/"], 20: ["Twenty", "/ˈtwen.ti/"]
+        17: ["Seventeen", "/ˌsev.ənˈtiːn/"], 18: ["Eighteen", "/ˌeɪˈtiːn/"], 19: ["Nineteen", "/ˌnaɪnˈtiːn/"], 20: ["Twenty", "/ˈtwen.ti/"]
     };
 
     let questions = [];
@@ -239,6 +239,7 @@
     let targetNum = null;
     let canClick = true;
     let hintUsed = false;
+    const TOTAL_STEPS = 21; // Tổng số vòng chơi cho các số từ 0-20
 
     function startGame() {
         document.getElementById('welcome-screen').style.display = 'none';
@@ -246,17 +247,24 @@
         initGame();
     }
 
+    // Hàm chơi lại quay về màn hình giới thiệu
+    function resetGameToWelcome() {
+        document.getElementById('result-screen').style.display = 'none';
+        document.getElementById('main-game').style.display = 'none';
+        document.getElementById('welcome-screen').style.display = 'block';
+        document.getElementById('game-content').style.display = 'block';
+    }
+
     function initGame() {
-        // Thuật toán xáo trộn Fisher-Yates để đảm bảo 20 số xuất hiện đa dạng, không bị kẹt ở số 8
+        // Thuật toán xáo trộn Fisher-Yates để đảm bảo chơi đủ các số không bị trùng
         let allNumbers = Object.keys(numberData);
         for (let i = allNumbers.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
-            [allNumbers[i], allNumbers[allNumbers.length - 1]] = [allNumbers[allNumbers.length - 1], allNumbers[i]];
             [allNumbers[i], allNumbers[j]] = [allNumbers[j], allNumbers[i]];
         }
         
-        // Lấy 15 câu hỏi từ danh sách đã trộn
-        questions = allNumbers.slice(0, 15);
+        // Chơi đủ 21 số (0 đến 20)
+        questions = allNumbers; 
         currentStep = 0;
         score = 0;
 
@@ -274,15 +282,15 @@
     }
 
     function loadQuestion() {
-        if (currentStep >= 15) { finishGame(); return; }
+        if (currentStep >= TOTAL_STEPS) { finishGame(); return; }
         canClick = true;
         hintUsed = false;
         targetNum = questions[currentStep];
         
         document.getElementById('word-text').innerText = numberData[targetNum][0];
         document.getElementById('phonetic-text').innerText = numberData[targetNum][1];
-        document.getElementById('progress-text').innerText = `${currentStep + 1} / 15`;
-        document.getElementById('progress-fill').style.width = `${(currentStep / 15) * 100}%`;
+        document.getElementById('progress-text').innerText = `${currentStep + 1} / ${TOTAL_STEPS}`;
+        document.getElementById('progress-fill').style.width = `${(currentStep / TOTAL_STEPS) * 100}%`;
         
         document.querySelectorAll('.num-btn').forEach(b => {
             b.classList.remove('correct', 'wrong', 'highlight');
@@ -293,16 +301,12 @@
     function playCurrentNumber() {
         if (targetNum === null) return;
         const synth = window.speechSynthesis;
-        
-        // Dừng mọi âm thanh đang phát để tránh bị lặp/kẹt
-        synth.cancel(); 
+        synth.cancel(); // Dừng âm thanh cũ
 
-        // Truyền chữ (VD: "Eight") thay vì số thô 8 để trình duyệt nhận diện chuẩn xác
         const word = numberData[targetNum][0];
         const utter = new SpeechSynthesisUtterance(word);
         utter.lang = 'en-US';
         utter.rate = 0.85;
-        utter.pitch = 1;
         synth.speak(utter);
     }
 
@@ -332,21 +336,21 @@
     function finishGame() {
         document.getElementById('game-content').style.display = 'none';
         document.getElementById('result-screen').style.display = 'block';
-        document.getElementById('res-score').innerText = `Đúng ${score} / 15 câu`;
+        document.getElementById('res-score').innerText = `Đúng ${score} / ${TOTAL_STEPS} câu`;
         
         const title = document.getElementById('res-title');
         const msg = document.getElementById('res-msg');
 
-        if (score === 15) {
+        if (score === TOTAL_STEPS) {
             title.innerText = "Tuyệt vời! 🌟";
-            msg.innerHTML = "Bạn là thiên tài số học! Không có con số nào làm khó được bạn cả.";
+            msg.innerHTML = "Bạn là thiên tài số học! Bạn đã chinh phục trọn vẹn 21 con số.";
             createBalloons();
-        } else if (score >= 8) {
+        } else if (score >= 10) {
             title.innerText = "Làm tốt lắm! ✌️";
-            msg.innerHTML = "Bạn đã nắm khá vững rồi. Luyện tập thêm để đạt điểm tuyệt đối nhé!";
+            msg.innerHTML = "Kết quả rất ấn tượng! Luyện tập thêm chút nữa để đạt điểm tuyệt đối nhé.";
         } else {
             title.innerText = "Cố gắng lên! 💪";
-            msg.innerHTML = "Đừng nản chí, hãy làm lại để ghi nhớ tốt hơn nhé!";
+            msg.innerHTML = "Đừng nản chí, hãy thử lại một lần nữa để ghi nhớ tốt hơn.";
         }
         document.getElementById('snd-win').play().catch(()=>{});
     }
