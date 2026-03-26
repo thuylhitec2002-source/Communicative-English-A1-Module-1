@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Possessive Challenge - Professional Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root { 
+            --primary: #6c5ce7; 
+            --primary-hover: #F8F7FF;
+            --success: #2ecc71; 
+            --error: #e74c3c; 
+            --bg: #f0f2f5; 
+            --text-main: #2d3436;
+            --text-sub: #636E72;
+        }
+        
+        * { box-sizing: border-box; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
+
+        body { 
+            font-family: 'Quicksand', sans-serif; 
+            background: var(--bg); margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px;
+            overflow-x: hidden;
+        }
+
+        /* --- LOGIN UI: LONG CARD & EVEN SPACING --- */
+        #login-screen {
+            position: fixed; inset: 0; background: var(--bg);
+            display: flex; justify-content: center; align-items: center; z-index: 9999;
+        }
+
+        .login-card {
+            background: #FFFFFF;
+            padding: 5.5rem 3.5rem;
+            border-radius: 3rem;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.05);
+            text-align: center;
+            max-width: 540px; 
+            width: 90%;
+            display: flex;
+            flex-direction: column;
+            gap: 3.5rem; 
+        }
+
+        .login-header { display: flex; flex-direction: column; gap: 1.2rem; }
+        .login-header h2 { font-size: 2.2rem; font-weight: 700; color: var(--primary); margin: 0; letter-spacing: -1px; line-height: 1.2; }
+        .login-header p { color: var(--text-sub); font-size: 1.15rem; margin: 0; font-weight: 500; line-height: 1.6; }
+
+        .google-btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 14px;
+            background: #FFFFFF; color: var(--text-main); border: 1.5px solid #E5E7EB;
+            padding: 1rem 3rem; border-radius: 100px; cursor: pointer;
+            font-weight: 700; font-size: 1.05rem; font-family: inherit;
+        }
+
+        .google-btn:hover { border-color: var(--primary); background: var(--primary-hover); transform: translateY(-3px); }
+
+        #login-msg { color: var(--error); font-size: 0.95rem; font-weight: 700; min-height: 1.4rem; }
+
+        /* --- GAME CONTENT UI --- */
+        #main-app { display: none; width: 100%; max-width: 650px; flex-direction: column; align-items: center; }
+        
+        .card { 
+            background: white; width: 100%; padding: 40px; border-radius: 2.5rem; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.08); text-align: center; position: relative; 
+        }
+        
+        .hidden { display: none !important; }
+
+        .icon-header { font-size: 70px; margin-bottom: 15px; display: block; animation: bounce 2s infinite; }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+
+        .quiz-content { text-align: left; line-height: 2; }
+        .quiz-line { margin-bottom: 20px; padding: 20px; background: #f8fafc; border-radius: 1.5rem; border: 2px solid transparent; }
+        
+        select {
+            appearance: none; background: #fff; border: 2px solid #dfe6e9; border-radius: 10px;
+            padding: 6px 30px 6px 15px; font-size: 1.1rem; font-weight: 700; color: var(--primary);
+            cursor: pointer; outline: none; vertical-align: middle; font-family: inherit;
+        }
+        select.correct { border-color: var(--success); background: #eafff2; color: var(--success); }
+        select.wrong { border-color: var(--error); background: #fff2f2; color: var(--error); animation: shake 0.4s; }
+        
+        @keyframes shake { 0%, 100% {transform: translateX(0);} 25% {transform: translateX(-5px);} 75% {transform: translateX(5px);} }
+
+        .translation { color: #636e72; font-size: 1rem; font-style: italic; display: none; margin-top: 12px; border-left: 4px solid var(--primary); padding: 10px 15px; background: var(--primary-hover); border-radius: 0 12px 12px 0; }
+        .trans-key { font-weight: 800; text-transform: uppercase; }
+        .text-correct { color: var(--success) !important; text-decoration: underline; }
+        .text-error { color: var(--error) !important; }
+
+        .explanation { font-size: 0.9rem; color: #475569; background: #fffbeb; padding: 12px; border-radius: 12px; margin-top: 12px; display: none; border: 1px solid #fde68a; font-weight: 500; }
+        .show-info { display: block; animation: fadeIn 0.5s; }
+
+        .btn-main { width: 100%; padding: 18px; background: var(--primary); color: white; border: none; border-radius: 1rem; font-size: 1.1rem; font-weight: 700; cursor: pointer; margin-top: 15px; font-family: inherit; box-shadow: 0 8px 20px rgba(108, 92, 231, 0.2); }
+        .btn-main:hover { transform: translateY(-3px); box-shadow: 0 12px 25px rgba(108, 92, 231, 0.3); }
+
+        .balloon { position: fixed; bottom: -100px; width: 45px; height: 60px; border-radius: 50%; z-index: 9999; animation: floatUp forwards linear; }
+        @keyframes floatUp { to { transform: translateY(-125vh) rotate(20deg); opacity: 0; } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+    <div id="login-screen">
+        <div class="login-card">
+            <div class="login-header">
+                <h2>Hệ Thống Trực Tuyến</h2>
+                <p>Vui lòng đăng nhập để bắt đầu thử thách Possessive Challenge của bạn.</p>
+            </div>
+            
+            <button id="login-btn" class="google-btn">
+                <svg width="22" height="22" viewBox="0 0 48 48">
+                    <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path>
+                    <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path>
+                    <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59L2.56 13.22C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path>
+                    <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path>
+                </svg>
+                Tiếp tục với Google
+            </button>
+            <div id="login-msg"></div>
+        </div>
+    </div>
+
+    <div id="main-app">
+        <div id="welcome" class="card">
+            <span class="icon-header">🎒</span>
+            <h1 style="color: var(--primary); margin: 0; font-size: 2rem; font-weight: 800;">POSSESSIVE CHALLENGE</h1>
+            <p style="color: var(--text-sub); margin: 15px 0 30px; font-weight: 500;">Chinh phục tính từ sở hữu và đổi màu từ khóa ngay!</p>
+            <button class="btn-main" onclick="startGame()">BẮT ĐẦU CHƠI 🚀</button>
+        </div>
+
+        <div id="game" class="card hidden">
+            <div class="quiz-content">
+                <div class="quiz-line">
+                    1. Ami and Masi are 
+                    <select class="quiz-dropdown" data-id="1" data-answer="my" data-exp="Dùng 'my' trước danh từ 'best friends' để chỉ sở hữu của tôi.">
+                        <option value="">...</option><option value="me">me</option><option value="my">my</option><option value="I">I</option>
+                    </select> best friends.
+                    <div class="translation">Dịch: Ami và Masi là bạn thân nhất <span class="trans-key" data-id="1">CỦA TÔI</span>.</div>
+                    <div class="explanation"></div>
+                </div>
+
+                <div class="quiz-line">
+                    2. <select class="quiz-dropdown" data-id="2" data-answer="They" data-exp="'They' làm chủ ngữ thay cho Ami và Masi.">
+                        <option value="">...</option><option value="They">They</option><option value="Their">Their</option><option value="Them">Them</option>
+                    </select> are lovely people.
+                    <div class="translation">Dịch: <span class="trans-key" data-id="2">HỌ</span> là những người rất dễ mến.</div>
+                    <div class="explanation"></div>
+                </div>
+
+                <div class="quiz-line">
+                    3. <select class="quiz-dropdown" data-id="3" data-answer="We" data-exp="'We' làm chủ ngữ thay cho 'Ami, Masi and I'.">
+                        <option value="">...</option><option value="Us">Us</option><option value="Our">Our</option><option value="We">We</option>
+                    </select> are in the same class.
+                    <div class="translation">Dịch: <span class="trans-key" data-id="3">CHÚNG TÔI</span> học cùng lớp.</div>
+                    <div class="explanation"></div>
+                </div>
+
+                <div class="quiz-line">
+                    4. <select class="quiz-dropdown" data-id="4" data-answer="Our" data-exp="'Our' là tính từ sở hữu đứng trước danh từ 'professor'.">
+                        <option value="">...</option><option value="We">We</option><option value="Our">Our</option>
+                    </select> professor is nice.
+                    <div class="translation">Dịch: Giáo sư <span class="trans-key" data-id="4">CỦA CHÚNG TÔI</span> rất tốt bụng.</div>
+                    <div class="explanation"></div>
+                </div>
+
+                <div class="quiz-line">
+                    5. Masi is Greek. <select class="quiz-dropdown" data-id="5" data-answer="Her" data-exp="Dùng 'Her' vì chủ ngữ đang nói về Masi (nữ).">
+                        <option value="">...</option><option value="She">She</option><option value="His">His</option><option value="Her">Her</option>
+                    </select> hometown is Thessaloniki.
+                    <div class="translation">Dịch: Quê hương <span class="trans-key" data-id="5">CỦA CÔ ẤY</span> là Thessaloniki.</div>
+                    <div class="explanation"></div>
+                </div>
+            </div>
+
+            <div id="result-msg" style="font-weight: 800; font-size: 1.2rem; margin: 20px 0;"></div>
+            <button id="btn-submit" class="btn-main" onclick="checkAnswers()">KIỂM TRA ✅</button>
+            <button id="btn-restart" class="btn-main hidden" onclick="location.reload()">LÀM LẠI 🔄</button>
+        </div>
+    </div>
+
+    <audio id="bg-music" src="https://tiengdong.com/wp-content/uploads/Nhac-nen-boc-tham-trung-thuong-www_tiengdong_com.mp3?_=1" loop></audio>
+    <audio id="snd-correct" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3"></audio>
+    <audio id="snd-wrong" src="https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3"></audio>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+        import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCdlTVHwiLOGMnrFe12DE1dQSEHZaJ594I",
+            authDomain: "nguyen-am-tieng-anh.firebaseapp.com",
+            projectId: "nguyen-am-tieng-anh",
+            storageBucket: "nguyen-am-tieng-anh.firebasestorage.app",
+            messagingSenderId: "878440633705",
+            appId: "1:878440633705:web:755de6cb273eb139ebd9f8"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth();
+        const db = getFirestore(app);
+        const provider = new GoogleAuthProvider();
+
+        document.getElementById("login-btn").onclick = async () => {
+            const msg = document.getElementById("login-msg");
+            msg.innerText = "Đang kiểm tra quyền truy cập...";
+            try {
+                const res = await signInWithPopup(auth, provider);
+                const q = query(collection(db, "Tienganh_so_cap"), where("email", "==", res.user.email));
+                const snap = await getDocs(q);
+
+                if (!snap.empty) {
+                    document.getElementById("login-screen").style.display = "none";
+                    document.getElementById("main-app").style.display = "flex";
+                } else {
+                    msg.innerText = "Email này không có trong danh sách được phép!";
+                    await signOut(auth);
+                }
+            } catch (e) {
+                msg.innerText = "Lỗi đăng nhập hoặc bị hủy.";
+            }
+        };
+    </script>
+
+    <script>
+        const bgMusic = document.getElementById('bg-music');
+
+        function startGame() {
+            document.getElementById('welcome').classList.add('hidden');
+            document.getElementById('game').classList.remove('hidden');
+            bgMusic.play().catch(() => {});
+        }
+
+        function checkAnswers() {
+            const dropdowns = document.querySelectorAll('.quiz-dropdown');
+            let score = 0;
+            let allFilled = true;
+
+            dropdowns.forEach(d => { if(d.value === "") allFilled = false; });
+            if(!allFilled) { alert("Bạn vui lòng chọn đầy đủ các ô trống nhé!"); return; }
+
+            dropdowns.forEach(select => {
+                const correct = select.getAttribute('data-answer');
+                const parent = select.closest('.quiz-line');
+                const trans = parent.querySelector('.translation');
+                const exp = parent.querySelector('.explanation');
+                const transKey = parent.querySelector('.trans-key');
+
+                trans.classList.add('show-info');
+                exp.innerText = select.getAttribute('data-exp');
+                exp.classList.add('show-info');
+
+                if(select.value === correct) {
+                    select.classList.add('correct');
+                    if(transKey) {
+                        transKey.classList.add('text-correct');
+                        transKey.classList.remove('text-error');
+                    }
+                    score++;
+                } else {
+                    select.classList.add('wrong');
+                    if(transKey) {
+                        transKey.classList.add('text-error');
+                        transKey.classList.remove('text-correct');
+                    }
+                }
+            });
+
+            const resMsg = document.getElementById('result-msg');
+            if(score === dropdowns.length) {
+                resMsg.innerText = "🌟 QUÁ TUYỆT VỜI! LÀM TỐT LẮM BẠN NHÉ!";
+                resMsg.style.color = "#10b981";
+                document.getElementById('snd-correct').play();
+                createBalloons();
+            } else {
+                resMsg.innerText = `KẾT QUẢ: ${score}/${dropdowns.length}. CỐ LÊN BẠN NHÉ!`;
+                resMsg.style.color = "#ef4444";
+                document.getElementById('snd-wrong').play();
+            }
+
+            document.getElementById('btn-submit').classList.add('hidden');
+            document.getElementById('btn-restart').classList.remove('hidden');
+            bgMusic.pause();
+        }
+
+        function createBalloons() {
+            const colors = ['#ff7675', '#74b9ff', '#55efc4', '#ffeaa7', '#a29bfe'];
+            for(let i=0; i<45; i++) {
+                const b = document.createElement('div');
+                b.className = 'balloon';
+                b.style.left = Math.random() * 100 + 'vw';
+                b.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                b.style.animationDuration = (3 + Math.random() * 3) + 's';
+                b.style.animationDelay = (Math.random() * 1.5) + 's';
+                document.body.appendChild(b);
+                setTimeout(() => b.remove(), 7000);
+            }
+        }
+    </script>
+</body>
+</html>
