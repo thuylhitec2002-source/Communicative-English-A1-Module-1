@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spelling Master: Country & Nationality</title>
+    <title>Spelling Master: Pro Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -38,6 +38,7 @@
         .login-header { display: flex; flex-direction: column; gap: 1.2rem; }
         .login-header h2 { font-size: 2.2rem; font-weight: 700; color: var(--primary); margin: 0; letter-spacing: -1px; }
         .login-header p { color: var(--text-sub); font-size: 1.15rem; margin: 0; font-weight: 500; }
+        
         .google-btn {
             display: inline-flex; align-items: center; justify-content: center; gap: 14px;
             background: #FFFFFF; color: var(--text-main); border: 1.5px solid #E5E7EB;
@@ -45,7 +46,7 @@
         }
         .google-btn:hover { border-color: var(--primary); background: var(--primary-hover); transform: translateY(-3px); }
 
-        /* --- NÚT LOA (MUSIC CONTROL) --- */
+        /* --- MUSIC CONTROL --- */
         .music-toggle {
             position: fixed; top: 25px; left: 25px; z-index: 1000;
             background: white; border: 2px solid var(--primary); color: var(--primary);
@@ -53,13 +54,12 @@
             display: flex; align-items: center; justify-content: center;
             font-size: 1.2rem; box-shadow: 0 4px 12px rgba(108, 92, 231, 0.15);
         }
-        .music-toggle:hover { transform: scale(1.1); background: var(--primary-hover); }
 
         /* --- MAIN GAME UI --- */
         #main-content { display: none; width: 100%; height: 100vh; justify-content: center; align-items: center; }
         .game-card { 
             background: white; width: 95%; max-width: 650px; border-radius: 2.5rem; 
-            box-shadow: 0 15px 40px rgba(0,0,0,0.06); padding: 40px; text-align: center; position: relative; 
+            box-shadow: 0 15px 40px rgba(0,0,0,0.06); padding: 45px; text-align: center; position: relative; 
         }
         .btn-show { 
             position: absolute; top: 25px; right: 25px; background: var(--primary-hover); color: var(--primary); 
@@ -67,14 +67,25 @@
         }
         .header h1 { color: var(--primary); font-size: 1.6rem; margin: 0 0 20px 0; font-weight: 700; }
         .progress-bar-bg { height: 10px; background: #F3F4F6; border-radius: 10px; overflow: hidden; margin-bottom: 25px; }
-        #progress-fill { height: 100%; background: var(--primary); width: 0%; }
-        .word-container { display: flex; justify-content: center; align-items: flex-end; gap: 4px; flex-wrap: wrap; margin: 30px 0; font-size: 2.5rem; font-weight: 700; }
-        .letter-input { width: 35px; border: none; border-bottom: 4px solid #E5E7EB; background: transparent; text-align: center; font-family: inherit; color: var(--primary); outline: none; }
+        #progress-fill { height: 100%; background: var(--primary); width: 0%; transition: 0.5s; }
+
+        /* FIX: CHỮ TRONG Ô NHẬP TO VÀ RÕ */
+        .word-container { display: flex; justify-content: center; align-items: flex-end; gap: 6px; flex-wrap: wrap; margin: 40px 0; min-height: 80px; font-size: 2.8rem; font-weight: 700; }
+        .letter-input { 
+            width: 45px; border: none; border-bottom: 4px solid #E5E7EB; 
+            background: transparent; text-align: center; font-family: inherit; 
+            font-size: 2.8rem; font-weight: 700; color: var(--primary); outline: none; 
+            padding-bottom: 2px;
+        }
+        .letter-fixed { color: var(--text-main); padding-bottom: 6px; }
+        
         .input-correct { border-bottom-color: var(--success) !important; color: var(--success) !important; }
         .input-error { border-bottom-color: var(--error) !important; color: var(--error) !important; animation: shake 0.3s; }
-        .btn-main { padding: 18px 45px; border: none; border-radius: 100px; cursor: pointer; font-weight: 700; width: 260px; font-family: inherit; }
-        .btn-check { background: var(--primary); color: white; }
+
+        .btn-main { padding: 18px 45px; border: none; border-radius: 100px; cursor: pointer; font-weight: 700; width: 260px; font-family: inherit; font-size: 1.1rem; }
+        .btn-check { background: var(--primary); color: white; box-shadow: 0 8px 20px rgba(108, 92, 231, 0.2); }
         #btn-next { background: var(--success); color: white; display: none; }
+
         @keyframes shake { 0%, 100% {transform: translateX(0);} 25% {transform: translateX(-5px);} 75% {transform: translateX(5px);} }
         #result-screen { display: none; }
     </style>
@@ -87,7 +98,16 @@
             <h2>Hệ Thống Trực Tuyến</h2>
             <p>Vui lòng đăng nhập để bắt đầu thử thách Spelling Master của bạn.</p>
         </div>
-        <button id="login-btn" class="google-btn">Tiếp tục với Google</button>
+        
+        <button id="login-btn" class="google-btn">
+            <svg width="22" height="22" viewBox="0 0 48 48">
+                <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path>
+                <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path>
+                <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59L2.56 13.22C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path>
+                <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path>
+            </svg>
+            Tiếp tục với Google
+        </button>
         <div id="login-msg"></div>
     </div>
 </div>
@@ -104,7 +124,7 @@
                 <span style="color: var(--success)">Đúng: <span id="score-text">0</span></span>
             </div>
             <div class="progress-bar-bg"><div id="progress-fill"></div></div>
-            <div id="type-tag" style="background:#0984e3; padding:5px 15px; border-radius:50px; color:white; font-size:0.75rem; font-weight:700; display:inline-block;">COUNTRY</div>
+            <div id="type-tag" style="background:#0984e3; padding:5px 15px; border-radius:50px; color:white; font-size:0.75rem; font-weight:700; display:inline-block; text-transform: uppercase;">COUNTRY</div>
             <h2 id="viet-hint" style="margin: 10px 0; font-size: 2.2rem; font-weight: 700;">Việt Nam</h2>
             <div class="word-container" id="word-area"></div>
             <div style="margin-top: 35px;">
@@ -116,7 +136,7 @@
             <div style="font-size: 5rem; margin-bottom: 20px;">🎉</div>
             <h2 style="font-size: 2rem; color: var(--primary);">Hoàn thành!</h2>
             <div id="total-score" style="font-size: 3.5rem; font-weight: 800; margin: 20px 0;">0 / 15</div>
-            <button class="btn-main btn-check" onclick="location.reload()">Làm lại từ đầu</button>
+            <button class="btn-main btn-check" onclick="location.reload()">Làm lại bài tập</button>
         </div>
     </div>
 </div>
@@ -185,16 +205,10 @@
     let currentIdx = 0; let score = 0; let wasHintUsed = false;
     const bgMusic = document.getElementById('bg-music');
 
-    // HÀM BẬT/TẮT NHẠC
     function toggleMusic() {
         const btn = document.getElementById('music-btn');
-        if (bgMusic.paused) {
-            bgMusic.play();
-            btn.innerText = "🔊";
-        } else {
-            bgMusic.pause();
-            btn.innerText = "🔇";
-        }
+        if (bgMusic.paused) { bgMusic.play(); btn.innerText = "🔊"; }
+        else { bgMusic.pause(); btn.innerText = "🔇"; }
     }
 
     window.initQuiz = function() {
@@ -205,15 +219,18 @@
         const area = document.getElementById('word-area');
         area.innerHTML = '';
         document.getElementById('viet-hint').innerText = item.vn;
+        document.getElementById('type-tag').innerText = item.type;
+        document.getElementById('type-tag').className = `tag tag-${item.type}`;
         document.getElementById('progress-text').innerText = `Câu: ${currentIdx + 1} / ${data.length}`;
         document.getElementById('progress-fill').style.width = `${((currentIdx + 1) / data.length) * 100}%`;
+        
         item.en.split('').forEach((char, i) => {
             const isBlank = (i % 3 === 1 && char !== ' ');
             const box = document.createElement( isBlank ? 'input' : 'span' );
             if (isBlank) {
                 box.className = 'letter-input'; box.maxLength = 1; box.dataset.answer = char.toLowerCase();
                 box.oninput = function() { if(this.value) moveNext(this); }; box.onkeydown = handleKey;
-            } else { box.innerText = char; }
+            } else { box.innerText = char; box.className = 'letter-fixed'; }
             area.appendChild(box);
         });
         const firstInput = area.querySelector('input'); if(firstInput) firstInput.focus();
@@ -237,9 +254,9 @@
         const inputs = document.querySelectorAll('.letter-input'); let allCorrect = true;
         inputs.forEach(input => {
             if (input.value.toLowerCase() === input.dataset.answer) {
-                input.classList.add('input-correct');
+                input.classList.add('input-correct'); input.classList.remove('input-error');
             } else {
-                input.classList.add('input-error'); allCorrect = false;
+                input.classList.add('input-error'); input.classList.remove('input-correct'); allCorrect = false;
             }
         });
         if (allCorrect) {
