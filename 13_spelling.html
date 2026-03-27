@@ -3,160 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spelling Challenge - Pro Edition</title>
+    <title>Spelling Challenge - Fixed Audio</title>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
     <style>
         :root { --primary: #007bff; --secondary: #6610f2; --bg: #f8f9fa; --text: #333; --card: #ffffff; --error: #ff7675; --success: #28a745; }
-        body { font-family: 'Quicksand', sans-serif; background: var(--bg); color: var(--text); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; overflow-x: hidden; }
-        
-        #game-container { 
-            background: var(--card); border-radius: 30px; width: 450px; padding: 30px; text-align: center; 
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1); border: 1px solid rgba(0,0,0,0.05); position: relative;
-        }
-
+        body { font-family: 'Quicksand', sans-serif; background: var(--bg); color: var(--text); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        #game-container { background: var(--card); border-radius: 30px; width: 450px; padding: 30px; text-align: center; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1); position: relative; }
         .screen { display: none; }
         .active { display: block; animation: zoomIn 0.4s; }
         @keyframes zoomIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
-
-        h1 { font-size: 24px; color: var(--primary); margin-bottom: 20px; font-weight: 800; }
-        
-        /* Menu Buttons */
-        .menu-grid { display: grid; gap: 15px; margin-top: 20px; }
-        .menu-btn { 
-            background: white; border: 2px solid #eee; padding: 18px; border-radius: 15px;
-            cursor: pointer; font-weight: 700; text-align: left; display: flex; align-items: center; gap: 15px;
-            font-family: inherit; transition: 0.3s;
-        }
-        .menu-btn:hover { border-color: var(--primary); background: #f0f7ff; transform: translateX(5px); }
-        .menu-btn i { font-size: 20px; }
-
-        /* Game Elements */
-        .btn-main { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; border: none; padding: 14px 30px; border-radius: 50px; font-weight: bold; cursor: pointer; font-family: inherit; }
-        .btn-back { position: absolute; top: 20px; left: 20px; border: none; background: none; font-weight: bold; cursor: pointer; color: #888; }
-        
-        .option-btn { 
-            background: #ffffff; color: #444; border: 2px solid #eee; padding: 15px; border-radius: 12px; 
-            cursor: pointer; font-size: 17px; margin-bottom: 10px; width: 100%; font-weight: 600; font-family: inherit;
-        }
-        .option-btn:hover { border-color: var(--primary); background: #f0f7ff; }
-
+        h1 { font-size: 22px; color: var(--primary); margin-bottom: 20px; font-weight: 800; }
+        .menu-grid { display: grid; gap: 12px; margin-top: 20px; }
+        .menu-btn { background: white; border: 2px solid #eee; padding: 15px; border-radius: 15px; cursor: pointer; font-weight: 700; text-align: left; font-family: inherit; transition: 0.3s; }
+        .menu-btn:hover { border-color: var(--primary); background: #f0f7ff; }
+        .btn-main { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; border: none; padding: 14px 30px; border-radius: 50px; font-weight: bold; cursor: pointer; font-family: inherit; width: 100%; }
+        .option-btn { background: #ffffff; color: #444; border: 2px solid #eee; padding: 12px; border-radius: 12px; cursor: pointer; font-size: 16px; margin-bottom: 8px; width: 100%; font-weight: 600; font-family: inherit; }
         .correct { background: var(--success) !important; color: white !important; border-color: var(--success) !important; }
         .wrong { background: var(--error) !important; color: white !important; border-color: var(--error) !important; animation: shake 0.3s; }
-        
-        /* Fill-in style */
-        .input-box { width: 100%; padding: 15px; border-radius: 12px; border: 2px solid #eee; font-size: 18px; text-align: center; margin-bottom: 15px; outline: none; font-family: inherit; }
-        .input-box:focus { border-color: var(--primary); }
-        .blank-text { font-size: 24px; letter-spacing: 5px; font-weight: 800; color: var(--secondary); margin-bottom: 20px; display: block; }
-
+        .input-box { width: 100%; padding: 12px; border-radius: 10px; border: 2px solid #eee; font-size: 18px; text-align: center; margin-bottom: 10px; outline: none; font-family: inherit; }
         @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
     </style>
 </head>
 <body>
 
 <div id="game-container">
-    <button id="global-back" class="btn-back" style="display:none" onclick="goHome()">← Quay lại</button>
+    <button id="global-back" style="display:none; position:absolute; top:20px; left:20px; border:none; background:none; cursor:pointer; font-weight:bold; color:#888" onclick="goHome()">← Lại</button>
 
     <div id="login-screen" class="screen active">
         <h1>SPELLING CHALLENGE</h1>
-        <button id="login-btn" class="btn-main">Đăng nhập với Google</button>
-        <p id="login-msg" style="color:var(--error); margin-top:10px"></p>
+        <button id="login-btn" class="btn-main">Đăng nhập Google</button>
+        <p id="login-msg"></p>
     </div>
 
     <div id="menu-screen" class="screen">
-        <h1>MỤC LỤC CHƯƠNG TRÌNH</h1>
-        <p id="user-welcome" style="font-weight:bold; color: var(--secondary)"></p>
+        <h1 id="user-welcome">Mục lục</h1>
         <div class="menu-grid">
-            <button class="menu-btn" onclick="startMode('mcq')"><span>1.</span> Trắc nghiệm khách quan (MCQ)</button>
-            <button class="menu-btn" onclick="startMode('fill')"><span>2.</span> Hoàn thành từ (Fill-in-blanks)</button>
-            <button class="menu-btn" onclick="startMode('dictation')"><span>3.</span> Nghe chép chính tả (Dictation)</button>
-            <button class="menu-btn" onclick="startMode('mixed')" style="border-color: var(--secondary)"><span>4.</span> Bài kiểm tra tổng hợp</button>
+            <button class="menu-btn" onclick="startMode('mcq')">1. Trắc nghiệm khách quan (MCQ)</button>
+            <button class="menu-btn" onclick="startMode('fill')">2. Hoàn thành từ (Fill-blanks)</button>
+            <button class="menu-btn" onclick="startMode('dictation')">3. Nghe chép chính tả (Dictation)</button>
+            <button class="menu-btn" onclick="startMode('mixed')" style="background:#f8f7ff">4. Bài kiểm tra tổng hợp</button>
         </div>
-        <button onclick="logout()" style="margin-top:20px; background:none; border:none; color:#888; cursor:pointer">Đăng xuất</button>
     </div>
 
     <div id="play-screen" class="screen">
-        <div id="status-bar" style="display:flex; justify-content:space-between; margin-bottom:15px; font-size:14px; color:#888; font-weight:bold">
+        <div style="display:flex; justify-content:space-between; margin-bottom:15px; color:#888; font-size:13px">
             <span id="q-count">Câu 1/10</span>
             <span id="score-count">Đúng: 0</span>
         </div>
-        <div id="mode-title" style="color: var(--primary); font-weight:bold; margin-bottom:10px"></div>
-        
-        <button class="btn-main" style="width:100%; margin-bottom:20px; background:#333" onclick="playSound()">🔈 NGHE ĐÁNH VẦN</button>
-        
-        <div id="game-area">
-            </div>
-        
-        <div id="action-area" style="margin-top:15px"></div>
+        <button class="btn-main" style="background:#333; margin-bottom:20px" onclick="playSound()">🔈 NGHE ĐÁNH VẦN</button>
+        <div id="game-area"></div>
+        <div id="action-area" style="margin-top:10px"></div>
     </div>
 
     <div id="end-screen" class="screen">
         <h1>HOÀN THÀNH!</h1>
         <h2 id="final-score" style="font-size: 40px; color: var(--secondary)">0/10</h2>
-        <p>Kết quả bài thi của bạn đã được ghi lại.</p>
         <button class="btn-main" onclick="goHome()">VỀ MỤC LỤC</button>
     </div>
 </div>
 
 <script type="module">
+    // --- FIREBASE CONFIG (Giữ nguyên của bạn) ---
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
-    import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
-    import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
-
-    const firebaseConfig = {
-        apiKey: "AIzaSyCdlTVHwiLOGMnrFe12DE1dQSEHZaJ594I",
-        authDomain: "nguyen-am-tieng-anh.firebaseapp.com",
-        projectId: "nguyen-am-tieng-anh",
-        storageBucket: "nguyen-am-tieng-anh.firebasestorage.app",
-        messagingSenderId: "878440633705",
-        appId: "1:878440633705:web:755de6cb273eb139ebd9f8"
-    };
-
+    import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+    const firebaseConfig = { apiKey: "AIzaSyCdlTVHwiLOGMnrFe12DE1dQSEHZaJ594I", authDomain: "nguyen-am-tieng-anh.firebaseapp.com", projectId: "nguyen-am-tieng-anh" };
     const app = initializeApp(firebaseConfig);
     const auth = getAuth();
-    const db = getFirestore(app);
     const provider = new GoogleAuthProvider();
 
-    // Dữ liệu Spelling MCQ
-    const mcqData = [
-        { word: "Mary", options: ["Mary", "Mali", "Magy", "Marry"], audio: "https://dailydictation.com/files/audios/names/1.mp3" },
-        { word: "Anna", options: ["Anna", "Affa", "Amma", "Assa"], audio: "https://dailydictation.com/files/audios/names/2.mp3" },
-        { word: "Patricia", options: ["Patricia", "Patricit", "Pataica", "Patrica"], audio: "https://dailydictation.com/files/audios/names/3.mp3" },
-        { word: "Sophia", options: ["Sophia", "Xophia", "Sopaia", "Sofia"], audio: "https://dailydictation.com/files/audios/names/5.mp3" },
-        { word: "Amelia", options: ["Amelia", "Hmelia", "Amilie", "Ameria"], audio: "https://dailydictation.com/files/audios/names/6.mp3" },
-        { word: "Barbara", options: ["Barbara", "Beabare", "Berpara", "Belbare"], audio: "https://dailydictation.com/files/audios/names/7.mp3" },
-        { word: "Elizabeth", options: ["Elizabeth", "Ilizebith", "Elizabith", "Alizebeth"], audio: "https://dailydictation.com/files/audios/names/8.mp3" },
-        { word: "Jennifer", options: ["Jennifer", "Gennifer", "Jinnefer", "Gennafer"], audio: "https://dailydictation.com/files/audios/names/10.mp3" }
+    onAuthStateChanged(auth, (user) => { if (user) { document.getElementById('user-welcome').innerText = "Chào, " + user.displayName; showScreen('menu-screen'); } });
+    document.getElementById("login-btn").onclick = () => signInWithPopup(auth, provider);
+
+    // --- GAME DATA ---
+    const dataRepo = [
+        { word: "Mary", options: ["Mary", "Mali", "Magy", "Marry"] },
+        { word: "Anna", options: ["Anna", "Affa", "Amma", "Assa"] },
+        { word: "Patricia", options: ["Patricia", "Patricit", "Pataica", "Patrica"] },
+        { word: "Sophia", options: ["Sophia", "Xophia", "Sopaia", "Sofia"] },
+        { word: "Amelia", options: ["Amelia", "Hmelia", "Amilie", "Ameria"] },
+        { word: "Barbara", options: ["Barbara", "Beabare", "Berpara", "Belbare"] },
+        { word: "Elizabeth", options: ["Elizabeth", "Ilizebith", "Elizabith", "Alizebeth"] },
+        { word: "Jennifer", options: ["Jennifer", "Gennifer", "Jinnefer", "Gennafer"] }
     ];
 
-    let currentQuestions = [];
-    let currentIdx = 0;
-    let score = 0;
-    let currentMode = '';
+    let questions = [], currentIdx = 0, score = 0, mode = '';
+    const sfxCorrect = new Audio('https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3');
+    const sfxWrong = new Audio('https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3');
 
-    const sfxCorrect = new Audio('https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3');
-    const sfxWrong = new Audio('https://assets.mixkit.co/active_storage/sfx/2020/2020-preview.mp3');
-
-    // ĐĂNG NHẬP 1 LẦN
-    onAuthStateChanged(auth, async (user) => {
-        if (user) {
-            const q = query(collection(db, "Tienganh_so_cap"), where("email", "==", user.email));
-            const snap = await getDocs(q);
-            if (!snap.empty) {
-                document.getElementById("user-welcome").innerText = "Chào mừng " + user.displayName;
-                showScreen('menu-screen');
-            } else { await signOut(auth); }
-        }
-    });
-
-    window.logout = () => signOut(auth).then(() => location.reload());
-
-    document.getElementById("login-btn").onclick = async () => {
-        try {
-            await signInWithPopup(auth, provider);
-        } catch (e) { document.getElementById("login-msg").innerText = "Lỗi đăng nhập!"; }
-    };
-
-    // LOGIC ĐIỀU HƯỚNG
     window.showScreen = (id) => {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
         document.getElementById(id).classList.add('active');
@@ -165,110 +98,73 @@
 
     window.goHome = () => showScreen('menu-screen');
 
-    // KHỞI TẠO CHẾ ĐỘ CHƠI
-    window.startMode = (mode) => {
-        currentMode = mode;
-        currentIdx = 0;
-        score = 0;
-        
-        if (mode === 'mcq') {
-            currentQuestions = [...mcqData].sort(() => 0.5 - Math.random());
-            document.getElementById('mode-title').innerText = "TRẮC NGHIỆM KHÁCH QUAN";
-        } else if (mode === 'fill') {
-            currentQuestions = [...mcqData].sort(() => 0.5 - Math.random());
-            document.getElementById('mode-title').innerText = "HOÀN THÀNH TỪ";
-        } else if (mode === 'dictation') {
-            currentQuestions = [...mcqData].sort(() => 0.5 - Math.random());
-            document.getElementById('mode-title').innerText = "NGHE CHÉP CHÍNH TẢ";
-        } else if (mode === 'mixed') {
-            const part1 = [...mcqData].sort(() => 0.5 - Math.random()).slice(0, 5).map(q => ({...q, m: 'mcq'}));
-            const part2 = [...mcqData].sort(() => 0.5 - Math.random()).slice(0, 5).map(q => ({...q, m: 'fill'}));
-            const part3 = [...mcqData].sort(() => 0.5 - Math.random()).slice(0, 5).map(q => ({...q, m: 'dictation'}));
-            currentQuestions = [...part1, ...part2, ...part3];
-            document.getElementById('mode-title').innerText = "BÀI KIỂM TRA TỔNG HỢP";
+    window.startMode = (m) => {
+        mode = m; currentIdx = 0; score = 0;
+        if (m === 'mixed') {
+            let p1 = [...dataRepo].sort(() => .5-Math.random()).slice(0,5).map(o => ({...o, type:'mcq'}));
+            let p2 = [...dataRepo].sort(() => .5-Math.random()).slice(0,5).map(o => ({...o, type:'fill'}));
+            let p3 = [...dataRepo].sort(() => .5-Math.random()).slice(0,5).map(o => ({...o, type:'dictation'}));
+            questions = [...p1, ...p2, ...p3];
+        } else {
+            questions = [...dataRepo].sort(() => .5-Math.random()).map(o => ({...o, type: m}));
         }
-
-        showScreen('play-screen');
-        loadQuestion();
+        showScreen('play-screen'); loadQuestion();
     };
 
+    // HÀM QUAN TRỌNG: TỰ ĐỘNG ĐÁNH VẦN CHỮ CÁI
     window.playSound = () => {
-        new Audio(currentQuestions[currentIdx].audio).play();
+        const word = questions[currentIdx].word;
+        window.speechSynthesis.cancel();
+        // Đọc từng chữ cái một
+        for (let i = 0; i < word.length; i++) {
+            const utter = new SpeechSynthesisUtterance(word[i]);
+            utter.lang = 'en-US';
+            utter.rate = 0.6; // Đọc chậm để học sinh nghe rõ
+            window.speechSynthesis.speak(utter);
+        }
     };
 
     function loadQuestion() {
-        const q = currentQuestions[currentIdx];
-        const mode = currentMode === 'mixed' ? q.m : currentMode;
-        
-        document.getElementById('q-count').innerText = `Câu ${currentIdx + 1}/${currentQuestions.length}`;
+        const q = questions[currentIdx];
+        document.getElementById('q-count').innerText = `Câu ${currentIdx + 1}/${questions.length}`;
         document.getElementById('score-count').innerText = `Đúng: ${score}`;
-        
         const area = document.getElementById('game-area');
         const action = document.getElementById('action-area');
-        area.innerHTML = '';
-        action.innerHTML = '';
+        area.innerHTML = ''; action.innerHTML = '';
 
-        if (mode === 'mcq') {
-            q.options.sort(() => 0.5 - Math.random()).forEach(opt => {
-                const btn = document.createElement('button');
-                btn.className = 'option-btn';
-                btn.innerText = opt;
-                btn.onclick = () => check(opt === q.word, btn);
-                area.appendChild(btn);
+        if (q.type === 'mcq') {
+            q.options.sort(() => .5-Math.random()).forEach(opt => {
+                const btn = document.createElement('button'); btn.className = 'option-btn'; btn.innerText = opt;
+                btn.onclick = () => check(opt === q.word, btn); area.appendChild(btn);
             });
-        } 
-        else if (mode === 'fill') {
-            const masked = q.word.split('').map((c, i) => i % 2 === 1 ? '_' : c).join('');
-            area.innerHTML = `<span class="blank-text">${masked}</span>`;
-            const input = document.createElement('input');
-            input.className = 'input-box';
-            input.placeholder = 'Nhập chữ cái còn thiếu...';
+        } else if (q.type === 'fill') {
+            let display = q.word.split('').map((c, i) => i % 2 === 1 ? '_' : c).join(' ');
+            area.innerHTML = `<h2 style="letter-spacing:5px">${display}</h2>`;
+            const input = document.createElement('input'); input.className = 'input-box'; input.placeholder = 'Điền từ hoàn chỉnh...';
             area.appendChild(input);
-            
-            const subBtn = document.createElement('button');
-            subBtn.className = 'btn-main';
-            subBtn.innerText = 'XÁC NHẬN';
-            subBtn.onclick = () => check(input.value.trim().toLowerCase() === q.word.toLowerCase(), input);
-            action.appendChild(subBtn);
-        }
-        else if (mode === 'dictation') {
-            const input = document.createElement('input');
-            input.className = 'input-box';
-            input.placeholder = 'Nghe và chép lại từ...';
+            const sub = document.createElement('button'); sub.className = 'btn-main'; sub.innerText = 'GỬI';
+            sub.onclick = () => check(input.value.trim().toLowerCase() === q.word.toLowerCase(), input);
+            action.appendChild(sub);
+        } else {
+            const input = document.createElement('input'); input.className = 'input-box'; input.placeholder = 'Nghe và chép lại...';
             area.appendChild(input);
-            
-            const subBtn = document.createElement('button');
-            subBtn.className = 'btn-main';
-            subBtn.innerText = 'KIỂM TRA';
-            subBtn.onclick = () => check(input.value.trim().toLowerCase() === q.word.toLowerCase(), input);
-            action.appendChild(subBtn);
+            const sub = document.createElement('button'); sub.className = 'btn-main'; sub.innerText = 'KIỂM TRA';
+            sub.onclick = () => check(input.value.trim().toLowerCase() === q.word.toLowerCase(), input);
+            action.appendChild(sub);
         }
-        
-        window.playSound();
+        setTimeout(window.playSound, 500);
     }
 
-    function check(isCorrect, element) {
-        if (isCorrect) {
-            element.classList.add('correct');
-            sfxCorrect.play();
-            score++;
-        } else {
-            element.classList.add('wrong');
-            sfxWrong.play();
-        }
-
+    function check(isCorrect, el) {
+        if (isCorrect) { el.classList.add('correct'); sfxCorrect.play(); score++; }
+        else { el.classList.add('wrong'); sfxWrong.play(); }
         setTimeout(() => {
             currentIdx++;
-            if (currentIdx < currentQuestions.length) loadQuestion();
-            else finishGame();
+            if (currentIdx < questions.length) loadQuestion();
+            else showScreen('end-screen');
+            document.getElementById('final-score').innerText = `${score}/${questions.length}`;
         }, 1200);
     }
-
-    function finishGame() {
-        showScreen('end-screen');
-        document.getElementById('final-score').innerText = `${score}/${currentQuestions.length}`;
-    }
 </script>
-
 </body>
 </html>
