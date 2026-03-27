@@ -3,78 +3,196 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spelling Challenge - Fixed Audio</title>
+    <title>Spelling Mastery - Elite Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #007bff; --secondary: #6610f2; --bg: #f8f9fa; --text: #333; --card: #ffffff; --error: #ff7675; --success: #28a745; }
-        body { font-family: 'Quicksand', sans-serif; background: var(--bg); color: var(--text); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        #game-container { background: var(--card); border-radius: 30px; width: 450px; padding: 30px; text-align: center; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1); position: relative; }
+        :root {
+            --primary: #4834d4;
+            --secondary: #686de0;
+            --accent: #ff9f43;
+            --success: #2ecc71;
+            --error: #ff7675;
+            --bg: #f0f3f7;
+            --glass: rgba(255, 255, 255, 0.9);
+        }
+
+        * { box-sizing: border-box; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); }
+
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background: var(--bg);
+            background-image: radial-gradient(#d1d8e0 1px, transparent 1px);
+            background-size: 20px 20px;
+            display: flex; justify-content: center; align-items: center;
+            min-height: 100vh; margin: 0; color: #2d3436;
+        }
+
+        #game-container {
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border-radius: 40px;
+            width: 100%;
+            max-width: 480px;
+            min-height: 600px;
+            padding: 50px 35px;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.5);
+            position: relative;
+            margin: 20px;
+        }
+
+        /* --- HEADER & NAVIGATION --- */
+        .btn-back {
+            position: absolute;
+            top: 25px; left: 25px;
+            background: white; border: 1px solid #eee;
+            padding: 8px 15px; border-radius: 15px;
+            cursor: pointer; font-weight: 700; color: var(--secondary);
+            font-size: 14px; display: flex; align-items: center; gap: 5px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            z-index: 10;
+        }
+        .btn-back:hover { background: var(--secondary); color: white; transform: translateX(-5px); }
+
         .screen { display: none; }
-        .active { display: block; animation: zoomIn 0.4s; }
-        @keyframes zoomIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
-        h1 { font-size: 22px; color: var(--primary); margin-bottom: 20px; font-weight: 800; }
-        .menu-grid { display: grid; gap: 12px; margin-top: 20px; }
-        .menu-btn { background: white; border: 2px solid #eee; padding: 15px; border-radius: 15px; cursor: pointer; font-weight: 700; text-align: left; font-family: inherit; transition: 0.3s; }
-        .menu-btn:hover { border-color: var(--primary); background: #f0f7ff; }
-        .btn-main { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; border: none; padding: 14px 30px; border-radius: 50px; font-weight: bold; cursor: pointer; font-family: inherit; width: 100%; }
-        .option-btn { background: #ffffff; color: #444; border: 2px solid #eee; padding: 12px; border-radius: 12px; cursor: pointer; font-size: 16px; margin-bottom: 8px; width: 100%; font-weight: 600; font-family: inherit; }
-        .correct { background: var(--success) !important; color: white !important; border-color: var(--success) !important; }
-        .wrong { background: var(--error) !important; color: white !important; border-color: var(--error) !important; animation: shake 0.3s; }
-        .input-box { width: 100%; padding: 12px; border-radius: 10px; border: 2px solid #eee; font-size: 18px; text-align: center; margin-bottom: 10px; outline: none; font-family: inherit; }
-        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+        .active { display: block; animation: slideUp 0.5s ease; }
+
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        h1 { font-size: 26px; font-weight: 800; color: var(--primary); margin-bottom: 30px; letter-spacing: -0.5px; }
+
+        /* --- MENU --- */
+        .menu-grid { display: grid; gap: 18px; margin-top: 20px; }
+        .menu-btn {
+            background: white; border: none; padding: 22px; border-radius: 20px;
+            cursor: pointer; font-weight: 700; text-align: left;
+            font-family: inherit; font-size: 16px; color: #444;
+            display: flex; align-items: center; justify-content: space-between;
+            box-shadow: 0 8px 15px rgba(0,0,0,0.04);
+        }
+        .menu-btn:hover { 
+            transform: translateY(-5px); 
+            box-shadow: 0 12px 20px rgba(104, 109, 224, 0.2);
+            color: var(--primary);
+        }
+        .menu-btn::after { content: '→'; font-size: 20px; color: var(--secondary); opacity: 0.5; }
+
+        /* --- PLAYING AREA --- */
+        .btn-play-audio {
+            background: #2d3436; color: white; border: none;
+            width: 90px; height: 90px; border-radius: 50%;
+            cursor: pointer; margin-bottom: 30px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            font-size: 30px;
+        }
+        .btn-play-audio:hover { transform: scale(1.1) rotate(5deg); background: var(--primary); }
+
+        .option-btn {
+            background: white; border: 2px solid #f1f2f6;
+            padding: 16px; border-radius: 18px;
+            cursor: pointer; font-size: 18px; margin-bottom: 12px;
+            width: 100%; font-weight: 700; font-family: inherit;
+            box-shadow: 0 4px 0 #f1f2f6;
+        }
+        .option-btn:hover { border-color: var(--secondary); color: var(--secondary); transform: translateY(-3px); box-shadow: 0 7px 0 #f1f2f6; }
+        .option-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #f1f2f6; }
+
+        .correct { background: var(--success) !important; color: white !important; border-color: var(--success) !important; box-shadow: 0 4px 0 #27ae60 !important; }
+        .wrong { background: var(--error) !important; color: white !important; border-color: var(--error) !important; box-shadow: 0 4px 0 #c0392b !important; animation: shake 0.4s; }
+
+        .input-box {
+            width: 100%; padding: 18px; border-radius: 20px;
+            border: 3px solid #eee; font-size: 22px; text-align: center;
+            margin-bottom: 20px; outline: none; font-family: inherit; font-weight: 700;
+        }
+        .input-box:focus { border-color: var(--secondary); background: #f8faff; }
+
+        .status-header { display: flex; justify-content: space-between; margin-bottom: 25px; font-weight: 700; color: #a5b1c2; font-size: 14px; text-transform: uppercase; }
+
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+
+        /* --- PROGRESS BAR --- */
+        .progress-container { height: 8px; background: #eee; border-radius: 10px; margin-top: 20px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--primary); width: 0%; transition: 0.5s ease; }
+
+        .btn-confirm {
+            background: var(--accent); color: white; border: none;
+            padding: 15px 40px; border-radius: 15px; font-weight: 800;
+            cursor: pointer; width: 100%; font-size: 16px; box-shadow: 0 6px 0 #e67e22;
+        }
+        .btn-confirm:active { transform: translateY(3px); box-shadow: 0 3px 0 #e67e22; }
     </style>
 </head>
 <body>
 
 <div id="game-container">
-    <button id="global-back" style="display:none; position:absolute; top:20px; left:20px; border:none; background:none; cursor:pointer; font-weight:bold; color:#888" onclick="goHome()">← Lại</button>
+    <button id="global-back" class="btn-back" style="display:none" onclick="goHome()">← QUAY LẠI</button>
 
     <div id="login-screen" class="screen active">
-        <h1>SPELLING CHALLENGE</h1>
-        <button id="login-btn" class="btn-main">Đăng nhập Google</button>
-        <p id="login-msg"></p>
+        <div style="font-size: 60px; margin-bottom: 10px;">🎧</div>
+        <h1>SPELLING MASTER</h1>
+        <p style="color: #7f8c8d; margin-bottom: 40px;">Học đánh vần tiếng Anh chuyên nghiệp</p>
+        <button id="login-btn" class="btn-confirm" style="background: var(--primary); box-shadow: 0 6px 0 #2c2cbb;">Đăng nhập Google</button>
+        <p id="login-msg" style="color:var(--error); margin-top:15px; font-weight:700"></p>
     </div>
 
     <div id="menu-screen" class="screen">
-        <h1 id="user-welcome">Mục lục</h1>
+        <h1 id="user-welcome" style="margin-bottom: 10px;">Xin chào!</h1>
+        <p style="color: #7f8c8d; margin-bottom: 30px;">Chọn chế độ luyện tập của bạn</p>
         <div class="menu-grid">
-            <button class="menu-btn" onclick="startMode('mcq')">1. Trắc nghiệm khách quan (MCQ)</button>
-            <button class="menu-btn" onclick="startMode('fill')">2. Hoàn thành từ (Fill-blanks)</button>
-            <button class="menu-btn" onclick="startMode('dictation')">3. Nghe chép chính tả (Dictation)</button>
-            <button class="menu-btn" onclick="startMode('mixed')" style="background:#f8f7ff">4. Bài kiểm tra tổng hợp</button>
+            <button class="menu-btn" onclick="startMode('mcq')">Trắc nghiệm khách quan</button>
+            <button class="menu-btn" onclick="startMode('fill')">Hoàn thành từ đục lỗ</button>
+            <button class="menu-btn" onclick="startMode('dictation')">Nghe chép chính tả</button>
+            <button class="menu-btn" onclick="startMode('mixed')" style="background: #efebff;">Bài kiểm tra tổng hợp</button>
         </div>
     </div>
 
     <div id="play-screen" class="screen">
-        <div style="display:flex; justify-content:space-between; margin-bottom:15px; color:#888; font-size:13px">
+        <div class="status-header">
             <span id="q-count">Câu 1/10</span>
-            <span id="score-count">Đúng: 0</span>
+            <span id="score-count" style="color: var(--success)">Đúng: 0</span>
         </div>
-        <button class="btn-main" style="background:#333; margin-bottom:20px" onclick="playSound()">🔈 NGHE ĐÁNH VẦN</button>
+        
+        <button class="btn-play-audio" onclick="playSound()">🔈</button>
+        
         <div id="game-area"></div>
-        <div id="action-area" style="margin-top:10px"></div>
+        <div id="action-area" style="margin-top: 20px;"></div>
+
+        <div class="progress-container">
+            <div id="progress-fill" class="progress-fill"></div>
+        </div>
     </div>
 
     <div id="end-screen" class="screen">
-        <h1>HOÀN THÀNH!</h1>
-        <h2 id="final-score" style="font-size: 40px; color: var(--secondary)">0/10</h2>
-        <button class="btn-main" onclick="goHome()">VỀ MỤC LỤC</button>
+        <div style="font-size: 80px;">🏆</div>
+        <h1>XUẤT SẮC!</h1>
+        <h2 id="final-score" style="font-size: 48px; color: var(--primary); margin: 0;">0/10</h2>
+        <p style="color: #7f8c8d; margin: 20px 0 40px;">Bạn đã hoàn thành bài thi một cách tuyệt vời.</p>
+        <button class="btn-confirm" onclick="goHome()">VỀ MỤC LỤC</button>
     </div>
 </div>
 
 <script type="module">
-    // --- FIREBASE CONFIG (Giữ nguyên của bạn) ---
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
     import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+    
+    // Giữ nguyên Config của bạn
     const firebaseConfig = { apiKey: "AIzaSyCdlTVHwiLOGMnrFe12DE1dQSEHZaJ594I", authDomain: "nguyen-am-tieng-anh.firebaseapp.com", projectId: "nguyen-am-tieng-anh" };
     const app = initializeApp(firebaseConfig);
     const auth = getAuth();
     const provider = new GoogleAuthProvider();
 
-    onAuthStateChanged(auth, (user) => { if (user) { document.getElementById('user-welcome').innerText = "Chào, " + user.displayName; showScreen('menu-screen'); } });
+    onAuthStateChanged(auth, (user) => { 
+        if (user) { 
+            document.getElementById('user-welcome').innerText = "Chào, " + user.displayName + "!"; 
+            showScreen('menu-screen'); 
+        } 
+    });
+
     document.getElementById("login-btn").onclick = () => signInWithPopup(auth, provider);
 
-    // --- GAME DATA ---
+    // DỮ LIỆU CÂU HỎI
     const dataRepo = [
         { word: "Mary", options: ["Mary", "Mali", "Magy", "Marry"] },
         { word: "Anna", options: ["Anna", "Affa", "Amma", "Assa"] },
@@ -86,9 +204,12 @@
         { word: "Jennifer", options: ["Jennifer", "Gennifer", "Jinnefer", "Gennafer"] }
     ];
 
-    let questions = [], currentIdx = 0, score = 0, mode = '';
-    const sfxCorrect = new Audio('https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3');
-    const sfxWrong = new Audio('https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3');
+    let questions = [], currentIdx = 0, score = 0, currentType = '';
+    
+    // Hệ thống âm thanh (File mp3 trong thư mục)
+    const sfxCorrect = new Audio('correct.mp3');
+    const sfxWrong = new Audio('wrong.mp3');
+    const sfxWin = new Audio('victory.mp3');
 
     window.showScreen = (id) => {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -99,7 +220,7 @@
     window.goHome = () => showScreen('menu-screen');
 
     window.startMode = (m) => {
-        mode = m; currentIdx = 0; score = 0;
+        currentIdx = 0; score = 0;
         if (m === 'mixed') {
             let p1 = [...dataRepo].sort(() => .5-Math.random()).slice(0,5).map(o => ({...o, type:'mcq'}));
             let p2 = [...dataRepo].sort(() => .5-Math.random()).slice(0,5).map(o => ({...o, type:'fill'}));
@@ -111,59 +232,63 @@
         showScreen('play-screen'); loadQuestion();
     };
 
-    // HÀM QUAN TRỌNG: TỰ ĐỘNG ĐÁNH VẦN CHỮ CÁI
     window.playSound = () => {
-        const word = questions[currentIdx].word;
-        window.speechSynthesis.cancel();
-        // Đọc từng chữ cái một
-        for (let i = 0; i < word.length; i++) {
-            const utter = new SpeechSynthesisUtterance(word[i]);
-            utter.lang = 'en-US';
-            utter.rate = 0.6; // Đọc chậm để học sinh nghe rõ
-            window.speechSynthesis.speak(utter);
-        }
+        const q = questions[currentIdx];
+        // Gọi file mp3 theo tên đáp án đúng (Ví dụ: Sophia.mp3)
+        const audio = new Audio(`${q.word}.mp3`);
+        audio.play().catch(e => console.log("Không tìm thấy file: " + q.word + ".mp3"));
     };
 
     function loadQuestion() {
         const q = questions[currentIdx];
         document.getElementById('q-count').innerText = `Câu ${currentIdx + 1}/${questions.length}`;
         document.getElementById('score-count').innerText = `Đúng: ${score}`;
+        document.getElementById('progress-fill').style.width = `${(currentIdx / questions.length) * 100}%`;
+        
         const area = document.getElementById('game-area');
         const action = document.getElementById('action-area');
         area.innerHTML = ''; action.innerHTML = '';
 
         if (q.type === 'mcq') {
-            q.options.sort(() => .5-Math.random()).forEach(opt => {
+            [...q.options].sort(() => .5-Math.random()).forEach(opt => {
                 const btn = document.createElement('button'); btn.className = 'option-btn'; btn.innerText = opt;
                 btn.onclick = () => check(opt === q.word, btn); area.appendChild(btn);
             });
         } else if (q.type === 'fill') {
             let display = q.word.split('').map((c, i) => i % 2 === 1 ? '_' : c).join(' ');
-            area.innerHTML = `<h2 style="letter-spacing:5px">${display}</h2>`;
-            const input = document.createElement('input'); input.className = 'input-box'; input.placeholder = 'Điền từ hoàn chỉnh...';
+            area.innerHTML = `<h2 style="letter-spacing:8px; font-size:35px; margin-bottom:20px">${display}</h2>`;
+            const input = document.createElement('input'); input.className = 'input-box'; input.placeholder = 'Nhập đáp án...';
             area.appendChild(input);
-            const sub = document.createElement('button'); sub.className = 'btn-main'; sub.innerText = 'GỬI';
+            const sub = document.createElement('button'); sub.className = 'btn-confirm'; sub.innerText = 'KIỂM TRA';
             sub.onclick = () => check(input.value.trim().toLowerCase() === q.word.toLowerCase(), input);
             action.appendChild(sub);
         } else {
             const input = document.createElement('input'); input.className = 'input-box'; input.placeholder = 'Nghe và chép lại...';
             area.appendChild(input);
-            const sub = document.createElement('button'); sub.className = 'btn-main'; sub.innerText = 'KIỂM TRA';
+            const sub = document.createElement('button'); sub.className = 'btn-confirm'; sub.innerText = 'GỬI';
             sub.onclick = () => check(input.value.trim().toLowerCase() === q.word.toLowerCase(), input);
             action.appendChild(sub);
         }
-        setTimeout(window.playSound, 500);
+        setTimeout(window.playSound, 600);
     }
 
     function check(isCorrect, el) {
         if (isCorrect) { el.classList.add('correct'); sfxCorrect.play(); score++; }
         else { el.classList.add('wrong'); sfxWrong.play(); }
+        
+        // Vô hiệu hóa nhấn tiếp
+        const btns = document.querySelectorAll('.option-btn, .btn-confirm');
+        btns.forEach(b => b.style.pointerEvents = 'none');
+
         setTimeout(() => {
             currentIdx++;
             if (currentIdx < questions.length) loadQuestion();
-            else showScreen('end-screen');
-            document.getElementById('final-score').innerText = `${score}/${questions.length}`;
-        }, 1200);
+            else {
+                showScreen('end-screen');
+                document.getElementById('final-score').innerText = `${score}/${questions.length}`;
+                sfxWin.play();
+            }
+        }, 1500);
     }
 </script>
 </body>
