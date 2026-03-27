@@ -24,7 +24,7 @@
             overflow-x: hidden;
         }
 
-        /* --- LOGIN UI: LONG CARD --- */
+        /* --- LOGIN UI --- */
         #login-screen {
             position: fixed; inset: 0; background: var(--bg);
             display: flex; justify-content: center; align-items: center; z-index: 9999;
@@ -58,9 +58,9 @@
 
         #login-msg { color: var(--error); font-size: 0.95rem; font-weight: 700; min-height: 1.4rem; }
 
-        /* --- MUSIC CONTROL --- */
-        .music-toggle {
-            position: fixed; top: 25px; left: 25px; z-index: 1000;
+        /* --- MUSIC & LOGOUT CONTROL --- */
+        .top-controls { position: fixed; top: 25px; left: 25px; z-index: 1000; display: flex; gap: 10px; }
+        .icon-btn {
             background: white; border: 2px solid var(--primary); color: var(--primary);
             width: 45px; height: 45px; border-radius: 50%; cursor: pointer;
             display: flex; align-items: center; justify-content: center;
@@ -99,7 +99,6 @@
 
         .balloon { position: fixed; bottom: -120px; width: 45px; height: 60px; border-radius: 50%; z-index: 9999; animation: floatUp forwards linear; }
         @keyframes floatUp { 0% { transform: translateY(0) rotate(0deg); opacity: 1; } 100% { transform: translateY(-130vh) rotate(30deg); opacity: 0; } }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
@@ -124,11 +123,15 @@
     </div>
 
     <div id="main-app">
-        <button class="music-toggle" onclick="toggleMusic()" id="music-btn">🔊</button>
+        <div class="top-controls">
+            <button class="icon-btn" onclick="toggleMusic()" id="music-btn">🔊</button>
+            <button class="icon-btn" id="logout-btn" title="Đăng xuất">🚪</button>
+        </div>
         
         <div id="welcome" class="card">
             <span class="icon-header">📋</span>
             <h1 style="color: var(--primary); margin: 0; font-size: 2rem; font-weight: 800;">CONTACT MASTER</h1>
+            <p id="user-welcome" style="color: var(--primary); font-weight: 700; margin-top: 10px;"></p>
             <p style="color: var(--text-sub); margin: 15px 0 25px; font-weight: 500;">Chinh phục thử thách 7 thông tin liên hệ!</p>
             <button class="btn-main" onclick="startGame()">BẮT ĐẦU CHƠI 🚀</button>
         </div>
@@ -165,7 +168,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
         import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -182,21 +185,50 @@
         const db = getFirestore(app);
         const provider = new GoogleAuthProvider();
 
+        // 1. Kiểm tra trạng thái đăng nhập tự động
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                const allowed = await checkAccess(user.email);
+                if (allowed) {
+                    showGameUI(user.displayName);
+                } else {
+                    await signOut(auth);
+                }
+            }
+        });
+
+        async function checkAccess(email) {
+            const q = query(collection(db, "Tienganh_so_cap"), where("email", "==", email));
+            const snap = await getDocs(q);
+            return !snap.empty;
+        }
+
+        function showGameUI(name) {
+            document.getElementById("login-screen").style.display = "none";
+            document.getElementById("main-app").style.display = "flex";
+            document.getElementById("user-welcome").innerText = "Xin chào, " + (name || "bạn") + "!";
+        }
+
+        // 2. Xử lý nút đăng nhập
         document.getElementById("login-btn").onclick = async () => {
             const msg = document.getElementById("login-msg");
-            msg.innerText = "Đang kiểm tra...";
+            msg.innerText = "Đang kiểm tra quyền truy cập...";
             try {
                 const res = await signInWithPopup(auth, provider);
-                const q = query(collection(db, "Tienganh_so_cap"), where("email", "==", res.user.email));
-                const snap = await getDocs(q);
-                if (!snap.empty) {
-                    document.getElementById("login-screen").style.display = "none";
-                    document.getElementById("main-app").style.display = "flex";
+                const allowed = await checkAccess(res.user.email);
+                if (allowed) {
+                    showGameUI(res.user.displayName);
                 } else {
                     msg.innerText = "Email không có trong danh sách!";
                     await signOut(auth);
                 }
             } catch (e) { msg.innerText = "Lỗi đăng nhập!"; }
+        };
+
+        // 3. Xử lý nút đăng xuất
+        document.getElementById("logout-btn").onclick = async () => {
+            await signOut(auth);
+            location.reload();
         };
     </script>
 
