@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Membership Application Master - Pro Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root { 
+            --primary: #4f46e5; 
+            --success: #10b981; 
+            --error: #ef4444; 
+            --bg: #f3f4f6;
+            --text-main: #1f2937;
+            --text-sub: #6b7280;
+        }
+        
+        * { box-sizing: border-box; transition: all 0.25s ease; font-family: 'Quicksand', sans-serif; }
+
+        body { 
+            background: var(--bg); margin: 0; display: flex; justify-content: center; align-items: center; 
+            min-height: 100vh; padding: 20px;
+        }
+
+        /* --- LOGIN & NAVIGATION --- */
+        #login-screen { position: fixed; inset: 0; background: var(--bg); display: flex; justify-content: center; align-items: center; z-index: 9999; }
+        .card { background: white; padding: 40px; border-radius: 2.5rem; box-shadow: 0 20px 40px rgba(0,0,0,0.08); width: 100%; max-width: 550px; text-align: center; position: relative; }
+        
+        .top-controls { position: absolute; top: 20px; left: 20px; display: flex; gap: 10px; }
+        .icon-btn { background: white; border: 2px solid #eee; padding: 8px 12px; border-radius: 12px; cursor: pointer; font-size: 14px; font-weight: 700; color: #666; }
+        .icon-btn:hover { color: var(--error); border-color: var(--error); }
+
+        /* --- FORM STYLING --- */
+        .header-title { color: var(--primary); font-weight: 800; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; }
+        .sub-instruction { color: var(--text-sub); font-size: 0.9rem; margin-bottom: 25px; font-weight: 600; font-style: italic; }
+
+        .form-section { text-align: left; margin-bottom: 25px; }
+        .section-label { background: #f8fafc; color: var(--primary); padding: 5px 15px; border-radius: 8px; font-weight: 800; font-size: 0.85rem; display: inline-block; margin-bottom: 15px; }
+
+        .input-row { margin-bottom: 12px; }
+        .input-row label { display: block; font-weight: 700; color: #4b5563; font-size: 0.9rem; margin-bottom: 5px; }
+        
+        .input-field { 
+            width: 100%; padding: 12px 15px; border: 2px solid #e5e7eb; border-radius: 12px; 
+            font-size: 1rem; font-weight: 700; outline: none; background: #fafafa;
+        }
+        .input-field:focus { border-color: var(--primary); background: white; }
+        .input-field.correct { border-color: var(--success); background: #f0fdf4; color: #166534; }
+        .input-field.wrong { border-color: var(--error); background: #fef2f2; color: #991b1b; }
+
+        .btn-main { width: 100%; padding: 16px; background: var(--primary); color: white; border: none; border-radius: 15px; font-size: 1.1rem; font-weight: 800; cursor: pointer; margin-top: 20px; box-shadow: 0 8px 20px rgba(79, 70, 229, 0.2); }
+        .btn-main:hover { transform: translateY(-3px); box-shadow: 0 12px 25px rgba(79, 70, 229, 0.3); }
+
+        .hidden { display: none !important; }
+        #result-msg { margin-top: 20px; font-weight: 800; font-size: 1.1rem; }
+
+        /* Gender selector placeholder style */
+        .gender-box { display: flex; gap: 20px; padding: 10px 0; }
+        .gender-item { display: flex; align-items: center; gap: 5px; font-weight: 700; font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+
+    <div id="login-screen">
+        <div class="card" style="max-width: 450px;">
+            <h1 style="color: var(--primary); margin-bottom: 10px;">HỆ THỐNG TRỰC TUYẾN</h1>
+            <p style="color: var(--text-sub); margin-bottom: 30px;">Vui lòng đăng nhập để bắt đầu ứng dụng của bạn.</p>
+            <button id="login-btn" class="btn-main">Tiếp tục với Google</button>
+            <p id="login-msg" style="color: var(--error); margin-top: 15px; font-weight: 700;"></p>
+        </div>
+    </div>
+
+    <div id="main-app" class="hidden">
+        <div class="card">
+            <div class="top-controls">
+                <button class="icon-btn" id="logout-btn">🚪 Đăng xuất</button>
+            </div>
+
+            <div id="welcome-view">
+                <span style="font-size: 60px;">📝</span>
+                <h1 class="header-title">Membership Application</h1>
+                <p id="user-welcome" style="font-weight: 700; color: var(--primary);"></p>
+                <p class="sub-instruction">Vui lòng điền tất cả các ô bằng chữ IN HOA.</p>
+                <button class="btn-main" onclick="startForm()">BẮT ĐẦU ĐIỀN ĐƠN 🚀</button>
+            </div>
+
+            <div id="form-view" class="hidden">
+                <h1 class="header-title" style="font-size: 1.5rem;">Đơn đăng ký thành viên</h1>
+                <p class="sub-instruction">(Please complete all fields in capital letters)</p>
+
+                <div class="form-section">
+                    <span class="section-label">1. PERSONAL INFORMATION</span>
+                    <div class="input-row">
+                        <label>First Name:</label>
+                        <input type="text" class="input-field" data-ans="ENZO">
+                    </div>
+                    <div class="input-row">
+                        <label>Last Name:</label>
+                        <input type="text" class="input-field" data-ans="FERRARI">
+                    </div>
+                    <div class="gender-box">
+                        <div class="gender-item">Male [X]</div>
+                        <div class="gender-item">Female [ ]</div>
+                        <div class="gender-item">Other [ ]</div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <span class="section-label">2. CONTACT DETAILS</span>
+                    <div class="input-row"><label>Address:</label><input type="text" class="input-field" data-ans="123 ITALY STREET"></div>
+                    <div class="input-row"><label>City:</label><input type="text" class="input-field" data-ans="MARANELLO"></div>
+                    <div class="input-row"><label>State / Province:</label><input type="text" class="input-field" data-ans="MODENA"></div>
+                    <div class="input-row"><label>Postal / Zip Code:</label><input type="text" class="input-field" data-ans="41053"></div>
+                    <div class="input-row"><label>Country:</label><input type="text" class="input-field" data-ans="ITALY"></div>
+                </div>
+
+                <div class="form-section">
+                    <span class="section-label">3. DIGITAL & PHONE</span>
+                    <div class="input-row"><label>E-mail Address:</label><input type="text" class="input-field" data-ans="enzo_speed@auto.it"></div>
+                    <div class="input-row"><label>Phone Number:</label><input type="text" class="input-field" data-ans="(039) 455-8812"></div>
+                </div>
+
+                <div id="result-msg"></div>
+                <button class="btn-main" id="submit-btn" onclick="checkForm()">KIỂM TRA ĐƠN ✅</button>
+                <button class="btn-main hidden" id="reset-btn" onclick="resetForm()">LÀM LẠI 🔄</button>
+            </div>
+        </div>
+    </div>
+
+    <audio id="snd-correct" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3"></audio>
+    <audio id="snd-wrong" src="https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3"></audio>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+        import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCdlTVHwiLOGMnrFe12DE1dQSEHZaJ594I",
+            authDomain: "nguyen-am-tieng-anh.firebaseapp.com",
+            projectId: "nguyen-am-tieng-anh",
+            storageBucket: "nguyen-am-tieng-anh.firebasestorage.app",
+            messagingSenderId: "878440633705",
+            appId: "1:878440633705:web:755de6cb273eb139ebd9f8"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth();
+        const db = getFirestore(app);
+        const provider = new GoogleAuthProvider();
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                const q = query(collection(db, "Tienganh_so_cap"), where("email", "==", user.email));
+                const snap = await getDocs(q);
+                if (!snap.empty) {
+                    document.getElementById("login-screen").classList.add('hidden');
+                    document.getElementById("main-app").classList.remove('hidden');
+                    document.getElementById("user-welcome").innerText = "Chào mừng, " + user.displayName + "!";
+                } else { await signOut(auth); }
+            }
+        });
+
+        document.getElementById("login-btn").onclick = async () => {
+            try { await signInWithPopup(auth, provider); } 
+            catch (e) { document.getElementById("login-msg").innerText = "Lỗi đăng nhập!"; }
+        };
+
+        document.getElementById("logout-btn").onclick = async () => {
+            await signOut(auth);
+            location.reload();
+        };
+    </script>
+
+    <script>
+        function startForm() {
+            document.getElementById('welcome-view').classList.add('hidden');
+            document.getElementById('form-view').classList.remove('hidden');
+        }
+
+        function checkForm() {
+            const inputs = document.querySelectorAll('.input-field');
+            let score = 0;
+            let empty = false;
+
+            inputs.forEach(input => {
+                if (input.value.trim() === "") empty = true;
+                const correctAns = input.getAttribute('data-ans').toLowerCase();
+                const userAns = input.value.trim().toLowerCase();
+
+                if (userAns === correctAns) {
+                    input.className = "input-field correct";
+                    score++;
+                } else {
+                    input.className = "input-field wrong";
+                }
+            });
+
+            if (empty) {
+                alert("Bạn ơi, hãy điền đầy đủ các thông tin nhé!");
+                return;
+            }
+
+            const resultMsg = document.getElementById('result-msg');
+            if (score === inputs.length) {
+                resultMsg.innerText = "🌟 XUẤT SẮC! ĐƠN ĐĂNG KÝ HOÀN HẢO!";
+                resultMsg.style.color = "var(--success)";
+                document.getElementById('snd-correct').play();
+            } else {
+                resultMsg.innerText = `CỐ GẮNG LÊN! BẠN ĐÃ ĐÚNG ${score}/${inputs.length} Ô.`;
+                resultMsg.style.color = "var(--error)";
+                document.getElementById('snd-wrong').play();
+            }
+
+            document.getElementById('submit-btn').classList.add('hidden');
+            document.getElementById('reset-btn').classList.remove('hidden');
+        }
+
+        function resetForm() {
+            document.getElementById('welcome-view').classList.remove('hidden');
+            document.getElementById('form-view').classList.add('hidden');
+            document.getElementById('submit-btn').classList.remove('hidden');
+            document.getElementById('reset-btn').classList.add('hidden');
+            document.getElementById('result-msg').innerText = "";
+            document.querySelectorAll('.input-field').forEach(input => {
+                input.value = "";
+                input.className = "input-field";
+            });
+        }
+
+        // Hỗ trợ nhấn Enter để kiểm tra đơn
+        document.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                if (!document.getElementById('form-view').classList.contains('hidden') && 
+                    document.getElementById('reset-btn').classList.contains('hidden')) {
+                    checkForm();
+                }
+            }
+        });
+    </script>
+</body>
+</html>
