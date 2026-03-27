@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Phone Challenge - Login Edition</title>
+    <title>Phone Challenge - Pro Edition</title>
     <style>
         :root { --primary: #007bff; --secondary: #6610f2; --bg: #f8f9fa; --text: #333; --card: #ffffff; --error: #ff7675; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); color: var(--text); display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; overflow: hidden; }
@@ -11,6 +11,7 @@
         #game-container { 
             background: var(--card); border-radius: 30px; width: 420px; padding: 40px; text-align: center; 
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1); border: 1px solid rgba(0,0,0,0.05); animation: floating 4s ease-in-out infinite;
+            position: relative;
         }
 
         @keyframes floating { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
@@ -22,11 +23,10 @@
         h1 { font-size: 26px; color: var(--primary); margin-bottom: 15px; font-weight: 800; }
         #countdown-text { font-size: 90px; font-weight: 900; color: var(--secondary); }
 
-        /* UI Đăng nhập */
         .google-btn {
             background: white; color: #2d3436; border: 1px solid #dfe6e9; padding: 1rem 2rem; border-radius: 50px; 
-            cursor: pointer; display: flex; align-items: center; gap: 12px; font-weight: bold; margin: 20px auto;
-            box-shadow: 0 8px 15px rgba(0,0,0,0.05); transition: 0.3s;
+            cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 12px; font-weight: bold; margin: 20px auto;
+            box-shadow: 0 8px 15px rgba(0,0,0,0.05); transition: 0.3s; width: 100%;
         }
         .google-btn:hover { transform: translateY(-3px); box-shadow: 0 12px 20px rgba(0,0,0,0.1); }
 
@@ -35,13 +35,19 @@
             color: white; border: none; padding: 16px 45px; border-radius: 15px; 
             font-weight: bold; cursor: pointer; font-size: 18px; transition: 0.3s;
         }
+        .btn-logout {
+            background: #eee; color: #666; border: none; padding: 8px 15px; border-radius: 10px;
+            cursor: pointer; font-size: 12px; font-weight: bold; margin-top: 15px;
+        }
+
         .option-btn { 
             background: #ffffff; color: #444; border: 2px solid #eee; padding: 20px; border-radius: 18px; 
             cursor: pointer; font-size: 19px; margin-bottom: 15px; width: 100%; font-weight: 600; transition: 0.25s;
         }
         .option-btn:hover { border-color: var(--primary); color: var(--primary); background: #f0f7ff; transform: scale(1.03); }
-        .correct { background: #28a745 !important; color: white !important; }
-        .wrong { background: #dc3545 !important; color: white !important; animation: shake 0.3s; }
+        .correct { background: #28a745 !important; color: white !important; border-color: #28a745 !important; }
+        .wrong { background: #dc3545 !important; color: white !important; border-color: #dc3545 !important; animation: shake 0.3s; }
+        
         @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
         #result-img { width: 100%; border-radius: 20px; margin: 20px 0; }
     </style>
@@ -61,10 +67,12 @@
 
     <div id="start-screen" class="screen">
         <h1>SẴN SÀNG?</h1>
-        <p id="user-welcome" style="font-weight: bold; color: var(--secondary);"></p>
+        <p id="user-welcome" style="font-weight: bold; color: var(--secondary); margin-bottom: 5px;"></p>
         <p class="msg">Tập trung nghe và chọn số chính xác.</p>
         <br>
         <button class="btn-main" onclick="startCountdown()">BẮT ĐẦU NGAY</button>
+        <br>
+        <button id="logout-btn" class="btn-logout">ĐĂNG XUẤT TÀI KHOẢN</button>
     </div>
 
     <div id="countdown-screen" class="screen">
@@ -91,7 +99,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
-    import { getAuth, signInWithPopup, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
     import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -109,7 +117,52 @@
     const db = getFirestore(app);
     const provider = new GoogleAuthProvider();
 
-    // GAME LOGIC
+    // 1. TỰ ĐỘNG KIỂM TRA ĐĂNG NHẬP (Keep Me Logged In)
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            const allowed = await checkAccess(user.email);
+            if (allowed) {
+                document.getElementById("user-welcome").innerText = "Chào " + user.displayName + "!";
+                showScreen('start-screen');
+            } else {
+                await signOut(auth);
+            }
+        }
+    });
+
+    async function checkAccess(email) {
+        const q = query(collection(db, "Tienganh_so_cap"), where("email", "==", email));
+        const snap = await getDocs(q);
+        return !snap.empty;
+    }
+
+    // 2. XỬ LÝ NÚT ĐĂNG NHẬP
+    document.getElementById("login-btn").onclick = async () => {
+        const msg = document.getElementById("login-msg");
+        msg.innerText = "Đang kiểm tra quyền truy cập...";
+        try {
+            const res = await signInWithPopup(auth, provider);
+            const allowed = await checkAccess(res.user.email);
+            
+            if (allowed) {
+                document.getElementById("user-welcome").innerText = "Chào " + res.user.displayName + "!";
+                showScreen('start-screen');
+            } else {
+                msg.innerText = "Email không có quyền truy cập.";
+                await signOut(auth);
+            }
+        } catch (e) {
+            msg.innerText = "Lỗi đăng nhập hoặc bị hủy.";
+        }
+    };
+
+    // 3. XỬ LÝ NÚT ĐĂNG XUẤT
+    document.getElementById("logout-btn").onclick = async () => {
+        await signOut(auth);
+        location.reload(); 
+    };
+
+    // --- GAME LOGIC ---
     const quizData = [
         { audio: "Phone 1.wav", options: ["328 8553214", "328 82522214"], answer: "328 8553214" },
         { audio: "Phone 2.wav", options: ["349 755556089", "349 7456089"], answer: "349 7456089" },
@@ -123,29 +176,9 @@
     const sfxWrong = new Audio('https://assets.mixkit.co/active_storage/sfx/2020/2020-preview.mp3'); 
     const sfxWin = new Audio('https://tiengdong.com/wp-content/uploads/Tieng-yeah-tre-con-www_tiengdong_com.mp3?_=1');
 
-    // LOGIN FUNCTION
-    document.getElementById("login-btn").onclick = async () => {
-        try {
-            const res = await signInWithPopup(auth, provider);
-            const q = query(collection(db, "Tienganh_so_cap"), where("email", "==", res.user.email));
-            const snap = await getDocs(q);
-            
-            if (!snap.empty) {
-                document.getElementById("user-welcome").innerText = "Chào " + res.user.displayName + "!";
-                showScreen('start-screen');
-            } else {
-                document.getElementById("login-msg").innerText = "Email không có quyền truy cập.";
-                await signOut(auth);
-            }
-        } catch (e) {
-            document.getElementById("login-msg").innerText = "Lỗi đăng nhập hoặc bị hủy.";
-        }
-    };
-
-    // GAME FUNCTIONS (Đưa vào window để gọi từ HTML)
     window.startCountdown = function() {
         showScreen('countdown-screen');
-        sfxReadyGo.play().catch(e => console.log("Audio waiting"));
+        sfxReadyGo.play().catch(e => console.log("Audio play blocked"));
         let count = 3;
         const timer = setInterval(() => {
             count--;
@@ -175,7 +208,8 @@
     }
 
     window.playPhoneAudio = function() {
-        new Audio(quizData[currentQ].audio).play();
+        const audio = new Audio(quizData[currentQ].audio);
+        audio.play().catch(e => console.log("Audio error"));
     }
 
     function check(btn, selected, correct) {
