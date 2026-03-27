@@ -3,126 +3,148 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spelling Mastery - Pro 2026</title>
+    <title>Spelling Master Pro - Green Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #4834d4; --secondary: #686de0; --accent: #ff9f43;
-            --success: #2ecc71; --error: #ff7675; --bg: #f0f3f7;
+            --primary: #10ac84; /* Xanh lá emerald */
+            --secondary: #218c74;
+            --accent: #ff9f43;
+            --success: #2ecc71;
+            --error: #ee5253;
+            --bg: #f5f6fa;
         }
 
-        * { box-sizing: border-box; transition: all 0.3s ease; }
+        * { box-sizing: border-box; transition: all 0.2s ease; font-family: 'Quicksand', sans-serif; }
 
         body {
-            font-family: 'Quicksand', sans-serif; background: var(--bg);
+            background: var(--bg);
             display: flex; justify-content: center; align-items: center;
             min-height: 100vh; margin: 0; color: #2d3436;
         }
 
         #game-container {
-            background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px);
-            border-radius: 40px; width: 100%; max-width: 480px; min-height: 620px;
-            padding: 50px 35px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+            background: #fff;
+            border-radius: 35px; width: 100%; max-width: 460px; min-height: 600px;
+            padding: 40px 30px; text-align: center; box-shadow: 0 15px 40px rgba(0,0,0,0.08);
             position: relative; margin: 20px;
         }
 
-        .btn-back {
-            position: absolute; top: 25px; left: 25px;
-            background: white; border: 1px solid #eee; padding: 8px 15px;
-            border-radius: 15px; cursor: pointer; font-weight: 700;
-            color: var(--secondary); font-family: 'Quicksand', sans-serif;
-            font-size: 14px; z-index: 10;
+        /* Tách biệt nút Quay lại và Thông tin trang */
+        .header-nav {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 30px; min-height: 45px;
         }
+
+        .btn-back {
+            background: #f1f2f6; border: none; padding: 10px 18px;
+            border-radius: 12px; cursor: pointer; font-weight: 700;
+            color: #576574; font-size: 13px;
+        }
+        .btn-back:hover { background: #dfe4ea; color: var(--error); }
+
+        .status-info { text-align: right; line-height: 1.2; }
+        #q-count { display: block; font-size: 12px; color: #a4b0be; font-weight: 800; }
+        #score-count { display: block; font-size: 14px; color: var(--primary); font-weight: 800; }
 
         .screen { display: none; }
-        .active { display: block; animation: fadeIn 0.5s; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .active { display: block; animation: fadeIn 0.4s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        h1 { font-size: 24px; font-weight: 800; color: var(--primary); margin-bottom: 25px; }
-
-        .menu-grid { display: grid; gap: 15px; }
-        .menu-btn {
-            background: white; border: none; padding: 20px; border-radius: 18px;
-            cursor: pointer; font-weight: 700; text-align: left;
-            font-family: 'Quicksand', sans-serif; font-size: 16px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05); display: flex; justify-content: space-between;
-        }
-        .menu-btn:hover { transform: translateX(5px); color: var(--primary); box-shadow: 0 10px 20px rgba(72, 52, 212, 0.1); }
-
+        /* Nút Loa màu xanh lá */
         .btn-play-audio {
-            background: #2d3436; color: white; border: none; width: 80px; height: 80px;
-            border-radius: 50%; cursor: pointer; margin-bottom: 25px; font-size: 30px;
+            background: var(--primary); color: white; border: none; width: 85px; height: 85px;
+            border-radius: 50%; cursor: pointer; margin-bottom: 25px; font-size: 32px;
+            box-shadow: 0 8px 20px rgba(16, 172, 132, 0.3);
         }
+        .btn-play-audio:hover { transform: scale(1.08); background: var(--secondary); }
+
+        .menu-btn {
+            background: #fff; border: 2px solid #f1f2f6; padding: 18px; border-radius: 18px;
+            cursor: pointer; font-weight: 700; width: 100%; margin-bottom: 12px;
+            text-align: left; display: flex; justify-content: space-between;
+            box-shadow: 0 4px 0 #f1f2f6;
+        }
+        .menu-btn:hover { border-color: var(--primary); transform: translateY(-3px); }
 
         .option-btn {
-            background: white; border: 2px solid #f1f2f6; padding: 15px;
+            background: #fff; border: 2px solid #f1f2f6; padding: 15px;
             border-radius: 15px; cursor: pointer; font-size: 17px; margin-bottom: 10px;
-            width: 100%; font-weight: 700; font-family: 'Quicksand', sans-serif;
-            box-shadow: 0 4px 0 #f1f2f6;
+            width: 100%; font-weight: 700; box-shadow: 0 4px 0 #f1f2f6;
         }
 
         .input-box {
-            width: 100%; padding: 15px; border-radius: 15px; border: 3px solid #eee;
-            font-size: 20px; text-align: center; margin-bottom: 15px;
-            outline: none; font-family: 'Quicksand', sans-serif; font-weight: 700;
+            width: 100%; padding: 16px; border-radius: 15px; border: 3px solid #eee;
+            font-size: 20px; text-align: center; margin-bottom: 10px; outline: none; font-weight: 700;
         }
 
+        .controls-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+
         .btn-confirm {
-            background: var(--accent); color: white; border: none; padding: 15px;
-            border-radius: 15px; font-weight: 800; cursor: pointer; width: 100%;
-            font-size: 16px; font-family: 'Quicksand', sans-serif; box-shadow: 0 5px 0 #e67e22;
+            background: var(--primary); color: white; border: none; padding: 15px;
+            border-radius: 15px; font-weight: 800; cursor: pointer; font-size: 15px;
+            box-shadow: 0 5px 0 #0d8a6a;
+        }
+        .btn-confirm:active { transform: translateY(3px); box-shadow: 0 2px 0 #0d8a6a; }
+
+        .btn-hint {
+            background: #fff; color: var(--accent); border: 2px solid var(--accent);
+            padding: 15px; border-radius: 15px; font-weight: 800; cursor: pointer;
         }
 
         .correct { background: var(--success) !important; color: white !important; border-color: var(--success) !important; box-shadow: 0 4px 0 #27ae60 !important; }
         .wrong { background: var(--error) !important; color: white !important; border-color: var(--error) !important; box-shadow: 0 4px 0 #c0392b !important; animation: shake 0.4s; }
         @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
 
-        .progress-bar { height: 8px; background: #eee; border-radius: 10px; margin-top: 20px; overflow: hidden; }
-        #progress-fill { height: 100%; background: var(--primary); width: 0%; transition: 0.4s; }
+        .progress-bar { height: 6px; background: #eee; border-radius: 10px; margin-top: 30px; overflow: hidden; }
+        #progress-fill { height: 100%; background: var(--primary); width: 0%; }
     </style>
 </head>
 <body>
 
 <div id="game-container">
-    <button id="global-back" class="btn-back" style="display:none" onclick="goHome()">← QUAY LẠI</button>
+    <div id="header-nav" class="header-nav" style="display:none">
+        <button class="btn-back" onclick="goHome()">← Thoát</button>
+        <div class="status-info">
+            <span id="q-count">CÂU 1/15</span>
+            <span id="score-count">ĐÚNG: 0</span>
+        </div>
+    </div>
 
     <div id="login-screen" class="screen active">
-        <h1 style="margin-top:40px">SPELLING MASTER</h1>
-        <button id="login-btn" class="btn-confirm" style="background:var(--primary); box-shadow:0 5px 0 #2c2cbb">Đăng nhập Google</button>
-        <p id="login-msg" style="margin-top:15px; color:var(--error); font-weight:700"></p>
+        <h1 style="font-size: 30px; margin-top: 50px;">SPELLING MASTER</h1>
+        <p style="color: #a4b0be; margin-bottom: 40px;">Nâng tầm kỹ năng đánh vần</p>
+        <button id="login-btn" class="btn-confirm" style="width: 100%; font-size: 18px;">Đăng nhập Google</button>
     </div>
 
     <div id="menu-screen" class="screen">
-        <h1 id="user-welcome">Xin chào!</h1>
+        <h1 id="user-welcome" style="text-align: left;">Xin chào!</h1>
         <div class="menu-grid">
-            <button class="menu-btn" onclick="startMode('mcq')">1. Trắc nghiệm khách quan</button>
-            <button class="menu-btn" onclick="startMode('fill')">2. Hoàn thành từ đục lỗ</button>
-            <button class="menu-btn" onclick="startMode('dictation')">3. Nghe chép chính tả</button>
-            <button class="menu-btn" onclick="startMode('mixed')" style="background:#f1efff">4. Bài kiểm tra tổng hợp</button>
+            <button class="menu-btn" onclick="startMode('mcq')">Trắc nghiệm khách quan</button>
+            <button class="menu-btn" onclick="startMode('fill')">Hoàn thành từ đục lỗ</button>
+            <button class="menu-btn" onclick="startMode('dictation')">Nghe chép chính tả</button>
+            <button class="menu-btn" onclick="startMode('mixed')" style="background: #e3fdf5; border-color: #10ac84;">Bài kiểm tra tổng hợp</button>
         </div>
     </div>
 
     <div id="play-screen" class="screen">
-        <div style="display:flex; justify-content:space-between; margin-bottom:20px; font-weight:700; color:#a5b1c2; font-size:13px">
-            <span id="q-count">CÂU 1/10</span>
-            <span id="score-count" style="color:var(--success)">ĐÚNG: 0</span>
-        </div>
         <button class="btn-play-audio" onclick="playSound()">🔈</button>
         <div id="game-area"></div>
-        <div id="action-area" style="margin-top:20px"></div>
+        <div id="action-area" class="controls-row"></div>
         <div class="progress-bar"><div id="progress-fill"></div></div>
     </div>
 
     <div id="end-screen" class="screen">
-        <h1>HOÀN THÀNH!</h1>
-        <h2 id="final-score" style="font-size:45px; color:var(--primary)">0/10</h2>
-        <button class="btn-confirm" onclick="goHome()">VỀ MỤC LỤC</button>
+        <h1 style="font-size: 40px;">🏆</h1>
+        <h2 id="final-score" style="font-size: 50px; color: var(--primary); margin: 0;">0/15</h2>
+        <p style="color: #7f8c8d;">Kết quả tuyệt vời! Hãy tiếp tục phát huy.</p>
+        <button class="btn-confirm" onclick="goHome()" style="width: 100%;">TIẾP TỤC HỌC</button>
     </div>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
-    import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
     
     const firebaseConfig = { apiKey: "AIzaSyCdlTVHwiLOGMnrFe12DE1dQSEHZaJ594I", authDomain: "nguyen-am-tieng-anh.firebaseapp.com", projectId: "nguyen-am-tieng-anh" };
     const app = initializeApp(firebaseConfig);
@@ -131,7 +153,7 @@
 
     onAuthStateChanged(auth, (user) => { 
         if (user) { 
-            document.getElementById('user-welcome').innerText = "Chào, " + user.displayName; 
+            document.getElementById('user-welcome').innerText = "Chào, " + user.displayName + "!"; 
             showScreen('menu-screen'); 
         } 
     });
@@ -154,51 +176,64 @@
         { word: "Samantha", options: ["Samantha", "Samanthj", "Sementha", "Xamantha"] }
     ];
 
-    let questions = [], currentIdx = 0, score = 0;
+    let questions = [], currentIdx = 0, score = 0, currentAudio = null;
     const sfxCorrect = new Audio('https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3');
     const sfxWrong = new Audio('https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3');
+
+    window.stopAllSounds = () => {
+        if (currentAudio) { currentAudio.pause(); currentAudio.currentTime = 0; }
+        window.speechSynthesis.cancel();
+    };
 
     window.showScreen = (id) => {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
         document.getElementById(id).classList.add('active');
-        document.getElementById('global-back').style.display = (id === 'play-screen') ? 'block' : 'none';
+        document.getElementById('header-nav').style.display = (id === 'play-screen') ? 'flex' : 'none';
     };
 
-    window.goHome = () => {
-        window.speechSynthesis.cancel(); // Tắt giọng đọc khi thoát
-        showScreen('menu-screen');
-    };
+    window.goHome = () => { stopAllSounds(); showScreen('menu-screen'); };
 
     window.startMode = (mode) => {
         currentIdx = 0; score = 0;
         let pool = [...dataRepo].sort(() => 0.5 - Math.random());
-
         if (mode === 'mixed') {
-            // Đảm bảo không trùng nội dung giữa các phần
             let p1 = pool.splice(0, 5).map(o => ({...o, type: 'mcq'}));
             let p2 = pool.splice(0, 5).map(o => ({...o, type: 'fill'}));
-            let p3 = pool.splice(0, 3).map(o => ({...o, type: 'dictation'})); // Lấy nốt số còn lại
+            let p3 = pool.splice(0, pool.length).map(o => ({...o, type: 'dictation'})).slice(0, 5);
             questions = [...p1, ...p2, ...p3];
         } else {
             questions = pool.map(o => ({...o, type: mode}));
         }
-        showScreen('play-screen');
-        loadQuestion();
+        showScreen('play-screen'); loadQuestion();
     };
 
     window.playSound = () => {
-        if (!questions[currentIdx]) return;
-        const audio = new Audio(`${questions[currentIdx].word}.mp3`);
-        audio.play().catch(() => {
-            // Nếu không tìm thấy file mp3, tự động chuyển sang đọc máy (backup)
-            window.speechSynthesis.cancel();
-            const utter = new SpeechSynthesisUtterance(questions[currentIdx].word);
+        stopAllSounds();
+        const q = questions[currentIdx];
+        currentAudio = new Audio(`${q.word}.mp3`);
+        currentAudio.play().catch(() => {
+            const utter = new SpeechSynthesisUtterance(q.word);
             utter.lang = 'en-US'; utter.rate = 0.7;
             window.speechSynthesis.speak(utter);
         });
     };
 
+    window.giveHint = () => {
+        const q = questions[currentIdx];
+        const input = document.querySelector('.input-box');
+        if (input) {
+            input.value = q.word;
+            input.style.color = 'var(--accent)';
+        } else {
+            // MCQ hint
+            document.querySelectorAll('.option-btn').forEach(btn => {
+                if (btn.innerText === q.word) btn.style.borderColor = 'var(--accent)';
+            });
+        }
+    };
+
     function loadQuestion() {
+        stopAllSounds();
         const q = questions[currentIdx];
         document.getElementById('q-count').innerText = `CÂU ${currentIdx + 1}/${questions.length}`;
         document.getElementById('score-count').innerText = `ĐÚNG: ${score}`;
@@ -214,27 +249,30 @@
                 btn.innerText = opt; btn.onclick = () => check(opt === q.word, btn);
                 area.appendChild(btn);
             });
-        } else if (q.type === 'fill') {
-            let masked = q.word.split('').map((c, i) => i % 2 === 1 ? '_' : c).join(' ');
-            area.innerHTML = `<h2 style="letter-spacing:10px; font-size:35px">${masked}</h2>`;
-            const input = document.createElement('input'); input.className = 'input-box';
-            input.placeholder = 'Nhập đáp án...'; area.appendChild(input);
-            const btn = document.createElement('button'); btn.className = 'btn-confirm';
-            btn.innerText = 'KIỂM TRA'; btn.onclick = () => check(input.value.trim().toLowerCase() === q.word.toLowerCase(), input);
-            action.appendChild(btn);
+            action.innerHTML = `<button class="btn-hint" onclick="giveHint()" style="grid-column: span 2">💡 GỢI Ý</button>`;
         } else {
-            const input = document.createElement('input'); input.className = 'input-box';
-            input.placeholder = 'Nghe và ghi lại...'; area.appendChild(input);
-            const btn = document.createElement('button'); btn.className = 'btn-confirm';
-            btn.innerText = 'GỬI'; btn.onclick = () => check(input.value.trim().toLowerCase() === q.word.toLowerCase(), input);
-            action.appendChild(btn);
+            if (q.type === 'fill') {
+                let masked = q.word.split('').map((c, i) => i % 2 === 1 ? '_' : c).join(' ');
+                area.innerHTML = `<h2 style="letter-spacing:10px; font-size:35px; margin-bottom:15px">${masked}</h2>`;
+            }
+            const input = document.createElement('input'); 
+            input.className = 'input-box'; input.placeholder = 'Nhập đáp án...'; 
+            input.onkeyup = (e) => { if(e.key === 'Enter') check(input.value.trim().toLowerCase() === q.word.toLowerCase(), input); };
+            area.appendChild(input);
+            
+            action.innerHTML = `
+                <button class="btn-hint" onclick="giveHint()">💡 GỢI Ý</button>
+                <button class="btn-confirm" onclick="check(document.querySelector('.input-box').value.trim().toLowerCase() === '${q.word.toLowerCase()}', document.querySelector('.input-box'))">KIỂM TRA</button>
+            `;
+            setTimeout(() => input.focus(), 500);
         }
         setTimeout(window.playSound, 600);
     }
 
     function check(isCorrect, el) {
-        const btns = document.querySelectorAll('.option-btn, .btn-confirm');
+        const btns = document.querySelectorAll('.option-btn, .btn-confirm, .btn-hint');
         btns.forEach(b => b.style.pointerEvents = 'none');
+        stopAllSounds();
 
         if (isCorrect) {
             el.classList.add('correct'); sfxCorrect.currentTime = 0; sfxCorrect.play(); score++;
