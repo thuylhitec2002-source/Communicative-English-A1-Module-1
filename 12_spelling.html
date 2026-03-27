@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alphabet Learning - Pro Edition</title>
+    <title>Alphabet Pro Edition - Fixed</title>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -29,17 +29,7 @@
         /* --- UI COMPONENTS --- */
         .screen { display: none; width: 100%; max-width: 850px; padding: 20px; animation: fadeIn 0.5s; }
         .active { display: block; }
-
-        .card { background: white; border-radius: 3rem; box-shadow: 0 15px 35px rgba(0,0,0,0.08); padding: 40px; text-align: center; }
-
-        /* --- LOGIN --- */
-        #login-screen { position: fixed; inset: 0; background: var(--bg); display: flex; justify-content: center; align-items: center; z-index: 9999; }
-        .google-btn {
-            display: inline-flex; align-items: center; justify-content: center; gap: 14px;
-            background: #FFFFFF; border: 1.5px solid #E5E7EB; padding: 1rem 3rem; border-radius: 100px; 
-            cursor: pointer; font-weight: 700; font-size: 1.05rem; font-family: inherit;
-        }
-        .google-btn:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(108, 92, 231, 0.1); border-color: var(--secondary); }
+        .card { background: white; border-radius: 3rem; box-shadow: 0 15px 35px rgba(0,0,0,0.08); padding: 40px; text-align: center; position: relative; }
 
         /* --- MENU --- */
         .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-top: 30px; }
@@ -49,88 +39,92 @@
         }
         .menu-item:hover { transform: translateY(-10px); box-shadow: 0 20px 0 #eee; border-color: var(--secondary); }
         .menu-item i { font-size: 50px; display: block; margin-bottom: 15px; }
-        .menu-item h3 { margin: 0; color: var(--secondary); font-size: 1.5rem; }
+        .menu-item h3 { margin: 0; font-family: 'Quicksand', sans-serif; color: var(--secondary); font-size: 1.5rem; }
 
         /* --- GRID ALPHABET --- */
-        .alphabet-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 15px; margin: 30px 0; }
+        .alphabet-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 12px; margin: 30px 0; }
         .letter-btn {
             aspect-ratio: 1/1; font-size: 1.8rem; font-weight: 800;
             border: 2px solid #dfe6e9; border-radius: 18px; background: white;
-            cursor: pointer; font-family: inherit; box-shadow: 0 6px 0 #dfe6e9;
+            cursor: pointer; font-family: 'Quicksand', sans-serif; box-shadow: 0 6px 0 #dfe6e9;
         }
-        .letter-btn:hover { transform: translateY(-5px) scale(1.05); box-shadow: 0 11px 0 #dfe6e9; border-color: var(--primary); color: var(--primary); }
+        .letter-btn:hover { transform: translateY(-5px); box-shadow: 0 11px 0 #dfe6e9; border-color: var(--primary); color: var(--primary); }
         .letter-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #dfe6e9; }
 
-        /* --- UTILS --- */
-        .btn-back { position: absolute; top: 20px; left: 20px; background: #eee; border: none; padding: 10px 20px; border-radius: 50px; cursor: pointer; font-weight: 700; }
-        .btn-main { padding: 15px 40px; border-radius: 100px; border: none; background: var(--secondary); color: white; font-weight: 800; cursor: pointer; box-shadow: 0 5px 15px rgba(108, 92, 231, 0.3); }
-        
-        /* Copying styles from your code for the Quiz */
+        /* --- QUIZ SPECIFIC --- */
         .display-word { min-height: 100px; margin-bottom: 25px; padding: 20px; background: #f0f7ff; border-radius: 20px; border: 2px solid #e1f0ff; }
-        #word-text { font-size: 3rem; font-weight: 900; color: var(--secondary); display: block; }
-        .progress-bar { height: 12px; background: #eee; border-radius: 10px; overflow: hidden; margin-top: 15px; }
-        #progress-fill { height: 100%; background: linear-gradient(90deg, var(--secondary), var(--primary)); width: 0%; }
+        #word-text { font-size: 3.5rem; font-weight: 900; color: var(--secondary); display: block; }
         
-        .num-btn.correct { background: var(--success) !important; color: white !important; border-color: var(--success) !important; box-shadow: 0 4px 0 #27ae60 !important; }
-        .num-btn.wrong { background: var(--error) !important; color: white !important; border-color: var(--error) !important; box-shadow: 0 4px 0 #e74c3c !important; animation: shake 0.4s; }
+        .btn-main { font-family: 'Quicksand', sans-serif; padding: 15px 35px; border-radius: 100px; border: none; background: var(--secondary); color: white; font-weight: 800; cursor: pointer; box-shadow: 0 5px 15px rgba(108, 92, 231, 0.3); }
+        .btn-hint { font-family: 'Quicksand', sans-serif; padding: 12px 25px; border-radius: 15px; border: 2px solid var(--hint); background: white; color: #d35400; font-weight: bold; cursor: pointer; margin-left: 10px; }
+        .btn-back { position: absolute; top: 25px; left: 25px; background: #f1f2f6; border: none; padding: 10px 20px; border-radius: 50px; cursor: pointer; font-weight: 700; font-family: 'Quicksand', sans-serif; }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        /* --- STATES & ANIMATIONS --- */
+        .correct { background: var(--success) !important; color: white !important; border-color: var(--success) !important; box-shadow: 0 4px 0 #27ae60 !important; transform: translateY(2px); }
+        .wrong { background: var(--error) !important; color: white !important; border-color: var(--error) !important; box-shadow: 0 4px 0 #e74c3c !important; animation: shake 0.4s; }
+        .highlight { background: var(--hint) !important; color: white !important; border-color: var(--hint) !important; transform: scale(1.1); box-shadow: 0 0 20px var(--hint); }
+
+        .progress-bar { height: 12px; background: #eee; border-radius: 10px; overflow: hidden; margin-top: 15px; }
+        #progress-fill { height: 100%; background: linear-gradient(90deg, var(--secondary), var(--primary)); width: 0%; transition: 0.5s; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes shake { 0%, 100% {transform: translateX(0);} 25% {transform: translateX(-5px);} 75% {transform: translateX(5px);} }
     </style>
 </head>
 <body>
 
-<div id="login-screen">
-    <div class="card" style="max-width: 500px;">
-        <h2>Hệ Thống Học Tập</h2>
-        <p>Vui lòng đăng nhập để bắt đầu học Alphabet</p>
-        <button id="login-btn" class="google-btn">
-            <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59L2.56 13.22C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path></svg>
-            Tiếp tục với Google
-        </button>
-        <div id="login-msg" style="margin-top: 20px; color: var(--error);"></div>
+<audio id="snd-correct" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3"></audio>
+<audio id="snd-wrong" src="https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3"></audio>
+<audio id="snd-win" src="https://tiengdong.com/wp-content/uploads/Am-thanh-chuc-mung-chien-thang-www_tiengdong_com.mp3?_=1"></audio>
+
+<div id="login-screen" style="position:fixed; inset:0; background:var(--bg); display:flex; justify-content:center; align-items:center; z-index:9999;">
+    <div class="card" style="max-width: 450px; width:90%;">
+        <h2 style="font-size: 2rem;">Hệ Thống Pro 🚀</h2>
+        <p>Vui lòng đăng nhập để bắt đầu học Alphabet.</p>
+        <button id="login-btn" class="btn-main" style="width:100%; margin-top: 20px;">Đăng nhập Google</button>
+        <div id="login-msg" style="margin-top: 15px; color: var(--error); font-weight: bold;"></div>
     </div>
 </div>
 
 <div id="menu-screen" class="screen">
     <div class="card">
-        <h1>Bảng Mục Lục 📚</h1>
-        <p id="user-welcome">Chào mừng bạn trở lại!</p>
+        <h1>Mục lục học tập 📚</h1>
+        <p id="user-welcome" style="font-weight: 700; color: var(--secondary);"></p>
         <div class="menu-grid">
             <div class="menu-item" onclick="showScreen('read-screen')">
                 <i>📖</i>
                 <h3>Luyện Đọc</h3>
-                <p>Khám phá 26 chữ cái</p>
+                <p>Học cách phát âm 26 chữ cái</p>
             </div>
             <div class="menu-item" onclick="showScreen('quiz-screen'); startQuiz();">
                 <i>🎧</i>
                 <h3>Thử Thách Nghe</h3>
-                <p>Kiểm tra kỹ năng của bạn</p>
+                <p>Kiểm tra trí nhớ Alphabet</p>
             </div>
         </div>
-        <button class="btn-main" id="logout-btn" style="margin-top: 30px; background: #ccc;">Đăng xuất</button>
+        <button class="btn-main" id="logout-btn" style="margin-top: 40px; background: #dfe6e9; color: #2d3436; box-shadow: none;">Đăng xuất</button>
     </div>
 </div>
 
 <div id="read-screen" class="screen">
-    <div class="card" style="position: relative;">
+    <div class="card">
         <button class="btn-back" onclick="showScreen('menu-screen')">← Quay lại</button>
-        <h1 style="margin-top: 20px;">Luyện Đọc Alphabet 🗣️</h1>
-        <p>Nhấn vào từng chữ để nghe phát âm</p>
+        <h1 style="margin-top: 30px;">Luyện Đọc Alphabet 🗣️</h1>
         <div class="alphabet-grid" id="read-grid"></div>
     </div>
 </div>
 
 <div id="quiz-screen" class="screen">
-    <div class="card" style="position: relative;">
+    <div class="card">
         <button class="btn-back" onclick="showScreen('menu-screen')">← Quay lại</button>
         <div id="quiz-content">
-            <h1>Thử Thách Nghe 🎧</h1>
+            <h1 style="margin-top: 30px;">Thử Thách Nghe 🎧</h1>
             <div class="display-word">
                 <span id="word-text">?</span>
             </div>
-            <div style="margin-bottom: 20px;">
+            <div style="display: flex; justify-content: center; align-items: center; gap: 10px;">
                 <button class="btn-main" onclick="playTargetVoice()">🔊 Nghe lại</button>
+                <button class="btn-hint" onclick="showHint()">💡 Gợi ý</button>
             </div>
             <div class="alphabet-grid" id="quiz-grid"></div>
             <div style="text-align: left; font-weight: bold; color: #888;">TIẾN ĐỘ: <span id="progress-text">0 / 26</span></div>
@@ -138,15 +132,14 @@
         </div>
 
         <div id="result-screen" style="display: none;">
-            <h2 id="res-title">Hoàn thành!</h2>
-            <h3 id="res-score" style="font-size: 2.5rem; color: var(--secondary);">0 / 26</h3>
-            <button class="btn-main" onclick="showScreen('menu-screen')">Về mục lục</button>
+            <h2 id="res-title">Kết quả</h2>
+            <h3 id="res-score" style="font-size: 3rem; color: var(--secondary); font-weight: 800;">0 / 26</h3>
+            <button class="btn-main" onclick="showScreen('menu-screen')">Quay về mục lục</button>
         </div>
     </div>
 </div>
 
 <script type="module">
-    // --- FIREBASE LOGIC (Giữ nguyên cấu trúc của bạn) ---
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
     import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
     import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
@@ -172,7 +165,7 @@
             if (!snap.empty) {
                 document.getElementById("login-screen").style.display = "none";
                 showScreen('menu-screen');
-                document.getElementById("user-welcome").innerText = `Xin chào, ${user.displayName}!`;
+                document.getElementById("user-welcome").innerText = `Chào mừng, ${user.displayName}!`;
             } else { await signOut(auth); }
         }
     });
@@ -188,14 +181,13 @@
     let score = 0;
     let targetLetter = "";
     let canClick = true;
+    let hintUsed = false;
 
-    // --- NAVIGATION ---
     function showScreen(screenId) {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
         document.getElementById(screenId).classList.add('active');
     }
 
-    // --- VOICES ---
     function speak(text) {
         window.speechSynthesis.cancel();
         const msg = new SpeechSynthesisUtterance(text);
@@ -204,7 +196,7 @@
         window.speechSynthesis.speak(msg);
     }
 
-    // --- RENDER READ SCREEN ---
+    // Render Read Grid
     const readGrid = document.getElementById('read-grid');
     alphabet.forEach(letter => {
         const btn = document.createElement('button');
@@ -214,7 +206,7 @@
         readGrid.appendChild(btn);
     });
 
-    // --- QUIZ LOGIC ---
+    // Quiz Logic
     function startQuiz() {
         quizData = [...alphabet].sort(() => Math.random() - 0.5);
         currentIdx = 0;
@@ -233,23 +225,21 @@
             btn.className = 'letter-btn num-btn';
             btn.id = `q-${letter}`;
             btn.innerText = letter;
-            btn.onclick = () => checkAnswer(letter);
+            btn.onclick = () => checkAnswer(letter, btn);
             grid.appendChild(btn);
         });
     }
 
     function loadQuestion() {
-        if (currentIdx >= 26) {
-            finishQuiz();
-            return;
-        }
+        if (currentIdx >= 26) { finishQuiz(); return; }
         canClick = true;
+        hintUsed = false;
         targetLetter = quizData[currentIdx];
         document.getElementById('word-text').innerText = "?";
         document.getElementById('progress-text').innerText = `${currentIdx + 1} / 26`;
         document.getElementById('progress-fill').style.width = `${(currentIdx / 26) * 100}%`;
         
-        document.querySelectorAll('.num-btn').forEach(b => b.classList.remove('correct', 'wrong'));
+        document.querySelectorAll('.num-btn').forEach(b => b.classList.remove('correct', 'wrong', 'highlight'));
         setTimeout(playTargetVoice, 500);
     }
 
@@ -257,14 +247,22 @@
         speak(targetLetter);
     }
 
-    function checkAnswer(letter) {
+    function showHint() {
         if (!canClick) return;
-        const btn = document.getElementById(`q-${letter}`);
+        hintUsed = true;
+        const btn = document.getElementById(`q-${targetLetter}`);
+        btn.classList.add('highlight');
+        setTimeout(() => btn.classList.remove('highlight'), 1200);
+    }
+
+    function checkAnswer(letter, btn) {
+        if (!canClick) return;
         
         if (letter === targetLetter) {
             canClick = false;
-            score++;
+            if (!hintUsed) score++;
             btn.classList.add('correct');
+            document.getElementById('snd-correct').play().catch(()=>{});
             document.getElementById('word-text').innerText = targetLetter;
             setTimeout(() => {
                 currentIdx++;
@@ -272,6 +270,7 @@
             }, 1000);
         } else {
             btn.classList.add('wrong');
+            document.getElementById('snd-wrong').play().catch(()=>{});
             setTimeout(() => btn.classList.remove('wrong'), 500);
         }
     }
@@ -280,6 +279,7 @@
         document.getElementById('quiz-content').style.display = 'none';
         document.getElementById('result-screen').style.display = 'block';
         document.getElementById('res-score').innerText = `Đúng ${score} / 26 câu`;
+        document.getElementById('snd-win').play().catch(()=>{});
     }
 </script>
 
