@@ -206,10 +206,10 @@
 
     let questions = [], currentIdx = 0, score = 0, currentType = '';
     
-    // Hệ thống âm thanh (File mp3 trong thư mục)
-    const sfxCorrect = new Audio('correct.mp3');
-    const sfxWrong = new Audio('wrong.mp3');
-    const sfxWin = new Audio('victory.mp3');
+    // Hệ thống âm thanh (File mp3 trong thư mục) 
+    const sfxCorrect = new Audio('https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3');
+    const sfxWrong = new Audio('https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3');
+    const sfxWin = new Audio('https://tiengdong.com/wp-content/uploads/Am-thanh-chuc-mung-chien-thang-www_tiengdong_com.mp3?_=1');
 
     window.showScreen = (id) => {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -273,23 +273,35 @@
     }
 
     function check(isCorrect, el) {
-        if (isCorrect) { el.classList.add('correct'); sfxCorrect.play(); score++; }
-        else { el.classList.add('wrong'); sfxWrong.play(); }
-        
-        // Vô hiệu hóa nhấn tiếp
-        const btns = document.querySelectorAll('.option-btn, .btn-confirm');
-        btns.forEach(b => b.style.pointerEvents = 'none');
+    // Vô hiệu hóa tất cả nút để tránh bấm nhiều lần khi đang chờ chuyển câu
+    const btns = document.querySelectorAll('.option-btn, .btn-confirm');
+    btns.forEach(b => b.style.pointerEvents = 'none');
 
-        setTimeout(() => {
-            currentIdx++;
-            if (currentIdx < questions.length) loadQuestion();
-            else {
-                showScreen('end-screen');
-                document.getElementById('final-score').innerText = `${score}/${questions.length}`;
-                sfxWin.play();
-            }
-        }, 1500);
+    if (isCorrect) {
+        el.classList.add('correct');
+        // Reset âm thanh về 0 để phát ngay lập tức (quan trọng)
+        sfxCorrect.currentTime = 0; 
+        sfxCorrect.play().catch(e => console.log("Audio block"));
+        score++;
+    } else {
+        el.classList.add('wrong');
+        sfxWrong.currentTime = 0;
+        sfxWrong.play().catch(e => console.log("Audio block"));
     }
+
+    // Đợi 1.2 giây để người dùng thấy đáp án rồi mới chuyển câu
+    setTimeout(() => {
+        currentIdx++;
+        if (currentIdx < questions.length) {
+            loadQuestion();
+        } else {
+            showScreen('end-screen');
+            document.getElementById('final-score').innerText = `${score}/${questions.length}`;
+            sfxWin.currentTime = 0;
+            sfxWin.play().catch(e => console.log("Audio block"));
+        }
+    }, 1200);
+}
 </script>
 </body>
 </html>
