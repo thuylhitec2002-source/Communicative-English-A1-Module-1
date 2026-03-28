@@ -166,24 +166,29 @@
         };
         
         recognition.onresult = (e) => {
-            let text = e.results[0][0].transcript.toLowerCase().trim();
-            
-            // XỬ LÝ KÝ TỰ ĐẶC BIỆT
-            text = text.replace(/\bat\b/g, "@").replace(/\bdot\b/g, ".");
-            text = text.replace(/\bslash\b/g, "/").replace(/\sover\b/g, "/");
+    let text = e.results[0][0].transcript.toLowerCase().trim();
+    
+    // 1. CHUẨN HÓA KÝ TỰ ĐẶC BIỆT TRƯỚC
+    text = text.replace(/\bat\b/g, "@").replace(/\bdot\b/g, ".");
+    text = text.replace(/\bslash\b/g, "/").replace(/\sover\b/g, "/");
 
-            if (data[currentIdx].q.toLowerCase().includes("email")) {
-                text = text.replace(/\s+/g, ""); 
-            }
-            if (data[currentIdx].q.toLowerCase().includes("phone")) {
-                text = text.replace(/-/g, "").replace(/\s+/g, "");
-            }
+    // 2. CHỈ XÓA KHOẢNG TRẮNG NẾU LÀ EMAIL (Để email dính liền)
+    if (data[currentIdx].q.toLowerCase().includes("email")) {
+        text = text.replace(/\s+/g, ""); 
+    }
+    
+    // 3. CHỈ XÓA KHOẢNG TRẮNG VÀ GẠCH NGANG NẾU LÀ SỐ ĐIỆN THOẠI
+    if (data[currentIdx].q.toLowerCase().includes("phone")) {
+        text = text.replace(/-/g, "").replace(/\s+/g, "");
+    }
 
-            finalTranscript = text.replace(/[.,!?]$/, "");
-            document.getElementById('user-said').innerText = `Kết quả: "${finalTranscript}"`;
-            document.getElementById('btnConfirm').classList.remove('hidden');
-            document.getElementById('status').innerText = "Hãy xác nhận kết quả!";
-        };
+    // ĐỊA CHỈ (Address) SẼ KHÔNG BỊ XÓA KHOẢNG TRẮNG -> Giữ được chữ (ví dụ: "123 blue street")
+
+    finalTranscript = text.replace(/[.,!?]$/, "");
+    document.getElementById('user-said').innerText = `Kết quả: "${finalTranscript}"`;
+    document.getElementById('btnConfirm').classList.remove('hidden');
+    document.getElementById('status').innerText = "Hãy xác nhận kết quả!";
+};
         recognition.onend = () => document.getElementById('btnMic').classList.remove('active');
     }
 
