@@ -3,72 +3,96 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Membership Application Pro - Elite Edition</title>
+    <title>Membership Application Master - Pro Max</title>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
     <style>
         :root { 
-            --primary: #4f46e5; --primary-light: #eef2ff;
-            --success: #10b981; --error: #ef4444; --warning: #f59e0b;
-            --bg: #f3f4f6; --text-main: #1f2937;
+            --primary: #6366f1; 
+            --primary-dark: #4f46e5;
+            --success: #10b981; 
+            --error: #ef4444; 
+            --warning: #f59e0b;
+            --bg: #f0f4ff;
+            --text-main: #1f2937;
         }
         
         * { box-sizing: border-box; transition: all 0.2s ease; font-family: 'Quicksand', sans-serif; }
 
-        body { background: var(--bg); margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        body { 
+            background: var(--bg); margin: 0; display: flex; justify-content: center; align-items: center; 
+            min-height: 100vh; padding: 40px 20px; 
+        }
 
-        /* --- NAVIGATION & CONTROLS --- */
+        /* --- TOP NAVIGATION --- */
         .top-bar { 
-            position: absolute; top: 0; left: 0; right: 0; 
-            padding: 20px 30px; display: flex; justify-content: space-between; align-items: center; 
+            position: absolute; top: 20px; left: 0; right: 0; 
+            padding: 0 40px; display: flex; justify-content: space-between; align-items: center; 
+            z-index: 100;
         }
-        .control-btns { display: flex; gap: 10px; }
+        .control-btns { display: flex; gap: 12px; }
         .icon-btn { 
-            background: white; border: 2px solid #e5e7eb; padding: 10px 15px; 
-            border-radius: 12px; cursor: pointer; font-weight: 700; color: #4b5563; font-size: 14px;
+            background: white; border: 2px solid #e2e8f0; padding: 10px 20px; 
+            border-radius: 14px; cursor: pointer; font-weight: 700; color: #475569; font-size: 14px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
         }
-        .icon-btn:hover { border-color: var(--primary); color: var(--primary); }
+        .icon-btn:hover { border-color: var(--primary); color: var(--primary); transform: translateY(-2px); }
 
-        /* --- CARD STYLING --- */
+        /* --- MAIN CARD (WIDER) --- */
         .card { 
-            background: white; padding: 45px 35px; border-radius: 2.5rem; 
-            box-shadow: 0 20px 40px rgba(0,0,0,0.08); width: 100%; max-width: 580px; 
-            text-align: center; position: relative; margin-top: 40px;
+            background: white; padding: 60px 45px; border-radius: 3rem; 
+            box-shadow: 0 25px 50px rgba(0,0,0,0.06); width: 100%; 
+            max-width: 650px; /* Mở rộng khung trắng */
+            text-align: center; position: relative;
         }
         
-        .header-title { color: var(--primary); font-weight: 800; margin-bottom: 5px; text-transform: uppercase; }
-        .sub-instruction { color: #6b7280; font-size: 0.9rem; margin-bottom: 25px; font-weight: 600; font-style: italic; }
+        .header-title { color: var(--primary); font-weight: 800; margin-bottom: 8px; text-transform: uppercase; font-size: 1.8rem; }
+        .sub-instruction { color: #64748b; font-size: 1rem; margin-bottom: 35px; font-weight: 600; font-style: italic; }
 
-        /* --- FORM ELEMENTS --- */
-        .form-section { text-align: left; margin-bottom: 30px; border-bottom: 1px solid #f1f5f9; padding-bottom: 10px; }
-        .section-label { color: var(--primary); font-weight: 800; font-size: 0.9rem; display: block; margin-bottom: 15px; }
+        /* --- PURPLE SUBHEADINGS (THE HIGHLIGHT) --- */
+        .form-section { text-align: left; margin-bottom: 40px; }
+        .section-label { 
+            background: var(--primary); 
+            color: white; 
+            padding: 10px 20px; 
+            border-radius: 12px; 
+            font-weight: 800; 
+            font-size: 0.95rem; 
+            display: inline-block; 
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+            letter-spacing: 0.5px;
+        }
 
-        .input-row { margin-bottom: 15px; }
-        .input-row label { display: block; font-weight: 700; color: #4b5563; font-size: 0.9rem; margin-bottom: 6px; }
+        .input-row { margin-bottom: 18px; }
+        .input-row label { display: block; font-weight: 700; color: #475569; font-size: 0.95rem; margin-bottom: 8px; }
         
         .input-field { 
-            width: 100%; padding: 12px 15px; border: 2px solid #e5e7eb; border-radius: 12px; 
-            font-size: 1rem; font-weight: 700; outline: none; background: #fcfcfc;
+            width: 100%; padding: 14px 18px; border: 2.5px solid #f1f5f9; border-radius: 15px; 
+            font-size: 1.05rem; font-weight: 700; outline: none; background: #f8fafc;
         }
-        .input-field:focus { border-color: var(--primary); background: white; }
-        .input-field.correct { border-color: var(--success); background: #f0fdf4; }
-        .input-field.wrong { border-color: var(--error); background: #fef2f2; }
+        .input-field:focus { border-color: var(--primary); background: white; box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1); }
+        .input-field.correct { border-color: var(--success); background: #f0fdf4; color: #15803d; }
+        .input-field.wrong { border-color: var(--error); background: #fef2f2; color: #b91c1c; }
 
         /* Gender Selection */
         .gender-container { display: flex; gap: 15px; margin: 10px 0; }
         .gender-option { 
-            flex: 1; padding: 10px; border: 2px solid #e5e7eb; border-radius: 10px; 
-            cursor: pointer; font-weight: 700; font-size: 0.85rem; text-align: center;
+            flex: 1; padding: 12px; border: 2.5px solid #f1f5f9; border-radius: 12px; 
+            cursor: pointer; font-weight: 700; font-size: 0.9rem; text-align: center; background: #f8fafc;
         }
-        .gender-option.selected { background: var(--primary); color: white; border-color: var(--primary); }
+        .gender-option.selected { background: var(--primary); color: white; border-color: var(--primary); box-shadow: 0 4px 10px rgba(99, 102, 241, 0.2); }
         .gender-option.correct-choice { background: var(--success); color: white; border-color: var(--success); }
 
         /* Buttons */
-        .btn-main { width: 100%; padding: 16px; background: var(--primary); color: white; border: none; border-radius: 15px; font-size: 1.1rem; font-weight: 800; cursor: pointer; margin-top: 10px; box-shadow: 0 8px 20px rgba(79, 70, 229, 0.2); }
-        .btn-main:hover { transform: translateY(-3px); }
-        .btn-secondary { background: #64748b; margin-top: 10px; }
+        .btn-main { width: 100%; padding: 18px; background: var(--primary); color: white; border: none; border-radius: 1.2rem; font-size: 1.1rem; font-weight: 800; cursor: pointer; margin-top: 15px; box-shadow: 0 8px 20px rgba(99, 102, 241, 0.2); }
+        .btn-main:hover { transform: translateY(-3px); background: var(--primary-dark); }
+        
+        .action-group { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; }
+        .btn-secondary { background: #64748b; box-shadow: 0 8px 20px rgba(100, 116, 139, 0.2); }
+        .btn-retry { background: var(--warning); box-shadow: 0 8px 20px rgba(245, 158, 11, 0.2); }
 
         .hidden { display: none !important; }
-        #result-msg { margin: 20px 0; font-weight: 800; font-size: 1.1rem; }
+        #result-msg { margin: 25px 0; font-weight: 800; font-size: 1.2rem; }
     </style>
 </head>
 <body>
@@ -81,34 +105,34 @@
     </div>
 
     <div id="login-screen">
-        <div class="card" style="max-width: 450px;">
-            <h1>LOGIN</h1>
-            <p>Đăng nhập để bắt đầu ứng dụng của bạn.</p>
+        <div class="card" style="max-width: 480px;">
+            <h1 class="header-title">LOGIN</h1>
+            <p style="margin-bottom: 30px; font-weight: 500; color: #64748b;">Đăng nhập để bắt đầu ứng dụng Membership.</p>
             <button id="login-btn" class="btn-main">Tiếp tục với Google</button>
-            <p id="login-msg" style="color: var(--error); margin-top: 15px; font-weight: 700;"></p>
+            <p id="login-msg" style="color: var(--error); margin-top: 20px; font-weight: 700;"></p>
         </div>
     </div>
 
     <div id="main-app" class="hidden">
         <div class="card">
             <div id="welcome-view">
-                <span style="font-size: 60px;">🏁</span>
+                <span style="font-size: 70px; display: block; margin-bottom: 10px;">📄</span>
                 <h1 class="header-title">Membership Application</h1>
-                <p id="user-welcome" style="font-weight: 700; color: var(--primary);"></p>
+                <p id="user-welcome" style="font-weight: 700; color: var(--primary); font-size: 1.2rem;"></p>
                 <p class="sub-instruction">Vui lòng điền tất cả các ô bằng chữ IN HOA.</p>
                 <button class="btn-main" onclick="startForm()">BẮT ĐẦU ĐIỀN ĐƠN 🚀</button>
             </div>
 
             <div id="form-view" class="hidden">
-                <h1 class="header-title" style="font-size: 1.4rem;">Membership application</h1>
-                <p class="sub-instruction">(Complete all fields in capital letters)</p>
+                <h1 class="header-title" style="font-size: 1.6rem; margin-bottom: 5px;">ĐƠN ĐĂNG KÝ THÀNH VIÊN</h1>
+                <p class="sub-instruction" style="margin-bottom: 30px;">(Complete all fields in capital letters)</p>
 
                 <div class="form-section">
                     <span class="section-label">1. PERSONAL INFORMATION</span>
                     <div class="input-row"><label>First Name:</label><input type="text" class="input-field" data-ans="ENZO"></div>
                     <div class="input-row"><label>Last Name:</label><input type="text" class="input-field" data-ans="FERRARI"></div>
-                    <label style="font-weight: 700; color: #4b5563; font-size: 0.9rem;">Gender:</label>
-                    <div class="gender-container" id="gender-group">
+                    <label style="font-weight: 700; color: #475569; font-size: 0.95rem;">Gender:</label>
+                    <div class="gender-container">
                         <div class="gender-option" onclick="selectGender(this, 'Male')">Male</div>
                         <div class="gender-option" onclick="selectGender(this, 'Female')">Female</div>
                         <div class="gender-option" onclick="selectGender(this, 'Other')">Other</div>
@@ -132,9 +156,10 @@
 
                 <div id="result-msg"></div>
                 <button class="btn-main" id="submit-btn" onclick="checkForm()">KIỂM TRA ĐƠN ✅</button>
-                <div id="post-check-btns" class="hidden">
+                
+                <div id="post-check-btns" class="action-group hidden">
                     <button class="btn-main btn-secondary" onclick="showAnswers()">HIỆN ĐÁP ÁN 💡</button>
-                    <button class="btn-main" style="background: var(--warning); box-shadow: 0 8px 20px rgba(245, 158, 11, 0.2);" onclick="resetForm()">LÀM LẠI 🔄</button>
+                    <button class="btn-main btn-retry" onclick="resetForm()">LÀM LẠI 🔄</button>
                 </div>
             </div>
         </div>
@@ -211,7 +236,7 @@
         function checkForm() {
             const inputs = document.querySelectorAll('.input-field');
             let score = 0;
-            let total = inputs.length + 1; // +1 cho Gender
+            let total = inputs.length + 1;
 
             inputs.forEach(input => {
                 const isCorrect = input.value.trim().toLowerCase() === input.getAttribute('data-ans').toLowerCase();
@@ -228,6 +253,7 @@
             document.getElementById(score === total ? 'snd-correct' : 'snd-wrong').play();
             document.getElementById('submit-btn').classList.add('hidden');
             document.getElementById('post-check-btns').classList.remove('hidden');
+            bgMusic.pause();
         }
 
         function showAnswers() {
@@ -242,7 +268,7 @@
         }
 
         function resetForm() {
-            location.reload(); // Tải lại trang cho sạch nhanh nhất
+            location.reload();
         }
     </script>
 </body>
