@@ -185,30 +185,33 @@
             document.getElementById('btnConfirm').classList.add('hidden');
         };
         
+        // --- ĐOẠN MỚI THAY VÀO ---
         recognition.onresult = (e) => {
-            let text = e.results[0][0].transcript.toLowerCase().trim();
-            
-            // XỬ LÝ EMAIL: Xóa sạch khoảng trắng dư thừa do máy suy luận
-            if (data[currentIdx].q.includes("email")) {
-                text = text.replace(/\s+/g, ""); 
-            }
+    let text = e.results[0][0].transcript.toLowerCase().trim();
+    
+    // 1. Ép tất cả "at" rời rạc thành "@" và "dot" thành "."
+    text = text.replace(/\bat\b/g, "@"); 
+    text = text.replace(/\bdot\b/g, ".");
+    
+    // 2. Xử lý riêng cho EMAIL: Xóa sạch mọi khoảng trắng sau khi đã đổi ký tự
+    if (data[currentIdx].q.toLowerCase().includes("email")) {
+        text = text.replace(/\s+/g, ""); 
+    }
 
-            // CHUẨN HÓA KÝ TỰ ĐẶC BIỆT
-            text = text.replace(/\sat\s/g, "@").replace(/\sdot\s/g, ".");
-            text = text.replace(/\sslash\s/g, "/").replace(/\sover\s/g, "/");
-            
-            // XỬ LÝ SỐ ĐIỆN THOẠI: Xóa gạch ngang
-            if (data[currentIdx].q.includes("phone")) {
-                text = text.replace(/-/g, "").replace(/\s+/g, "");
-            }
+    // 3. Xử lý SỐ NHÀ: Đổi slash/over thành "/"
+    text = text.replace(/\bslash\b/g, "/").replace(/\bover\b/g, "/");
 
-            currentTranscript = text.replace(/[.,!?]$/, "");
-            document.getElementById('user-said').innerText = `Kết quả: "${currentTranscript}"`;
-            
-            // Hiện nút Xác nhận thay vì chấm điểm tự động
-            document.getElementById('btnConfirm').classList.remove('hidden');
-            document.getElementById('status').innerText = "Đã nghe xong. Hãy kiểm tra!";
-        };
+    // 4. Xử lý SỐ ĐIỆN THOẠI: Xóa gạch ngang và khoảng trắng
+    if (data[currentIdx].q.toLowerCase().includes("phone")) {
+        text = text.replace(/-/g, "").replace(/\s+/g, "");
+    }
+
+    // 5. Hiển thị kết quả lên màn hình để chờ xác nhận
+    currentTranscript = text.replace(/[.,!?]$/, "");
+    document.getElementById('user-said').innerText = `Kết quả: "${currentTranscript}"`;
+    document.getElementById('btnConfirm').classList.remove('hidden');
+    document.getElementById('status').innerText = "Đã nghe xong. Hãy kiểm tra!";
+};
         recognition.onend = () => document.getElementById('btnMic').classList.remove('active');
     }
 
