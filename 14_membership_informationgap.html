@@ -3,68 +3,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Membership Application Master - Pro Edition</title>
+    <title>Membership Application Pro - Elite Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
     <style>
         :root { 
-            --primary: #4f46e5; 
-            --success: #10b981; 
-            --error: #ef4444; 
-            --bg: #f3f4f6;
-            --text-main: #1f2937;
-            --text-sub: #6b7280;
+            --primary: #4f46e5; --primary-light: #eef2ff;
+            --success: #10b981; --error: #ef4444; --warning: #f59e0b;
+            --bg: #f3f4f6; --text-main: #1f2937;
         }
         
-        * { box-sizing: border-box; transition: all 0.25s ease; font-family: 'Quicksand', sans-serif; }
+        * { box-sizing: border-box; transition: all 0.2s ease; font-family: 'Quicksand', sans-serif; }
 
-        body { 
-            background: var(--bg); margin: 0; display: flex; justify-content: center; align-items: center; 
-            min-height: 100vh; padding: 20px;
+        body { background: var(--bg); margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+
+        /* --- NAVIGATION & CONTROLS --- */
+        .top-bar { 
+            position: absolute; top: 0; left: 0; right: 0; 
+            padding: 20px 30px; display: flex; justify-content: space-between; align-items: center; 
         }
+        .control-btns { display: flex; gap: 10px; }
+        .icon-btn { 
+            background: white; border: 2px solid #e5e7eb; padding: 10px 15px; 
+            border-radius: 12px; cursor: pointer; font-weight: 700; color: #4b5563; font-size: 14px;
+        }
+        .icon-btn:hover { border-color: var(--primary); color: var(--primary); }
 
-        /* --- LOGIN & NAVIGATION --- */
-        #login-screen { position: fixed; inset: 0; background: var(--bg); display: flex; justify-content: center; align-items: center; z-index: 9999; }
-        .card { background: white; padding: 40px; border-radius: 2.5rem; box-shadow: 0 20px 40px rgba(0,0,0,0.08); width: 100%; max-width: 550px; text-align: center; position: relative; }
+        /* --- CARD STYLING --- */
+        .card { 
+            background: white; padding: 45px 35px; border-radius: 2.5rem; 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.08); width: 100%; max-width: 580px; 
+            text-align: center; position: relative; margin-top: 40px;
+        }
         
-        .top-controls { position: absolute; top: 20px; left: 20px; display: flex; gap: 10px; }
-        .icon-btn { background: white; border: 2px solid #eee; padding: 8px 12px; border-radius: 12px; cursor: pointer; font-size: 14px; font-weight: 700; color: #666; }
-        .icon-btn:hover { color: var(--error); border-color: var(--error); }
+        .header-title { color: var(--primary); font-weight: 800; margin-bottom: 5px; text-transform: uppercase; }
+        .sub-instruction { color: #6b7280; font-size: 0.9rem; margin-bottom: 25px; font-weight: 600; font-style: italic; }
 
-        /* --- FORM STYLING --- */
-        .header-title { color: var(--primary); font-weight: 800; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; }
-        .sub-instruction { color: var(--text-sub); font-size: 0.9rem; margin-bottom: 25px; font-weight: 600; font-style: italic; }
+        /* --- FORM ELEMENTS --- */
+        .form-section { text-align: left; margin-bottom: 30px; border-bottom: 1px solid #f1f5f9; padding-bottom: 10px; }
+        .section-label { color: var(--primary); font-weight: 800; font-size: 0.9rem; display: block; margin-bottom: 15px; }
 
-        .form-section { text-align: left; margin-bottom: 25px; }
-        .section-label { background: #f8fafc; color: var(--primary); padding: 5px 15px; border-radius: 8px; font-weight: 800; font-size: 0.85rem; display: inline-block; margin-bottom: 15px; }
-
-        .input-row { margin-bottom: 12px; }
-        .input-row label { display: block; font-weight: 700; color: #4b5563; font-size: 0.9rem; margin-bottom: 5px; }
+        .input-row { margin-bottom: 15px; }
+        .input-row label { display: block; font-weight: 700; color: #4b5563; font-size: 0.9rem; margin-bottom: 6px; }
         
         .input-field { 
             width: 100%; padding: 12px 15px; border: 2px solid #e5e7eb; border-radius: 12px; 
-            font-size: 1rem; font-weight: 700; outline: none; background: #fafafa;
+            font-size: 1rem; font-weight: 700; outline: none; background: #fcfcfc;
         }
         .input-field:focus { border-color: var(--primary); background: white; }
-        .input-field.correct { border-color: var(--success); background: #f0fdf4; color: #166534; }
-        .input-field.wrong { border-color: var(--error); background: #fef2f2; color: #991b1b; }
+        .input-field.correct { border-color: var(--success); background: #f0fdf4; }
+        .input-field.wrong { border-color: var(--error); background: #fef2f2; }
 
-        .btn-main { width: 100%; padding: 16px; background: var(--primary); color: white; border: none; border-radius: 15px; font-size: 1.1rem; font-weight: 800; cursor: pointer; margin-top: 20px; box-shadow: 0 8px 20px rgba(79, 70, 229, 0.2); }
-        .btn-main:hover { transform: translateY(-3px); box-shadow: 0 12px 25px rgba(79, 70, 229, 0.3); }
+        /* Gender Selection */
+        .gender-container { display: flex; gap: 15px; margin: 10px 0; }
+        .gender-option { 
+            flex: 1; padding: 10px; border: 2px solid #e5e7eb; border-radius: 10px; 
+            cursor: pointer; font-weight: 700; font-size: 0.85rem; text-align: center;
+        }
+        .gender-option.selected { background: var(--primary); color: white; border-color: var(--primary); }
+        .gender-option.correct-choice { background: var(--success); color: white; border-color: var(--success); }
+
+        /* Buttons */
+        .btn-main { width: 100%; padding: 16px; background: var(--primary); color: white; border: none; border-radius: 15px; font-size: 1.1rem; font-weight: 800; cursor: pointer; margin-top: 10px; box-shadow: 0 8px 20px rgba(79, 70, 229, 0.2); }
+        .btn-main:hover { transform: translateY(-3px); }
+        .btn-secondary { background: #64748b; margin-top: 10px; }
 
         .hidden { display: none !important; }
-        #result-msg { margin-top: 20px; font-weight: 800; font-size: 1.1rem; }
-
-        /* Gender selector placeholder style */
-        .gender-box { display: flex; gap: 20px; padding: 10px 0; }
-        .gender-item { display: flex; align-items: center; gap: 5px; font-weight: 700; font-size: 0.9rem; }
+        #result-msg { margin: 20px 0; font-weight: 800; font-size: 1.1rem; }
     </style>
 </head>
 <body>
 
+    <div class="top-bar">
+        <div class="control-btns">
+            <button class="icon-btn" onclick="toggleMusic()" id="music-btn">🔊 Nhạc: Bật</button>
+            <button class="icon-btn" id="logout-btn" style="display:none">🚪 Đăng xuất</button>
+        </div>
+    </div>
+
     <div id="login-screen">
         <div class="card" style="max-width: 450px;">
-            <h1 style="color: var(--primary); margin-bottom: 10px;">HỆ THỐNG TRỰC TUYẾN</h1>
-            <p style="color: var(--text-sub); margin-bottom: 30px;">Vui lòng đăng nhập để bắt đầu ứng dụng của bạn.</p>
+            <h1>LOGIN</h1>
+            <p>Đăng nhập để bắt đầu ứng dụng của bạn.</p>
             <button id="login-btn" class="btn-main">Tiếp tục với Google</button>
             <p id="login-msg" style="color: var(--error); margin-top: 15px; font-weight: 700;"></p>
         </div>
@@ -72,12 +91,8 @@
 
     <div id="main-app" class="hidden">
         <div class="card">
-            <div class="top-controls">
-                <button class="icon-btn" id="logout-btn">🚪 Đăng xuất</button>
-            </div>
-
             <div id="welcome-view">
-                <span style="font-size: 60px;">📝</span>
+                <span style="font-size: 60px;">🏁</span>
                 <h1 class="header-title">Membership Application</h1>
                 <p id="user-welcome" style="font-weight: 700; color: var(--primary);"></p>
                 <p class="sub-instruction">Vui lòng điền tất cả các ô bằng chữ IN HOA.</p>
@@ -85,23 +100,18 @@
             </div>
 
             <div id="form-view" class="hidden">
-                <h1 class="header-title" style="font-size: 1.5rem;">Đơn đăng ký thành viên</h1>
-                <p class="sub-instruction">(Please complete all fields in capital letters)</p>
+                <h1 class="header-title" style="font-size: 1.4rem;">Membership application</h1>
+                <p class="sub-instruction">(Complete all fields in capital letters)</p>
 
                 <div class="form-section">
                     <span class="section-label">1. PERSONAL INFORMATION</span>
-                    <div class="input-row">
-                        <label>First Name:</label>
-                        <input type="text" class="input-field" data-ans="ENZO">
-                    </div>
-                    <div class="input-row">
-                        <label>Last Name:</label>
-                        <input type="text" class="input-field" data-ans="FERRARI">
-                    </div>
-                    <div class="gender-box">
-                        <div class="gender-item">Male [X]</div>
-                        <div class="gender-item">Female [ ]</div>
-                        <div class="gender-item">Other [ ]</div>
+                    <div class="input-row"><label>First Name:</label><input type="text" class="input-field" data-ans="ENZO"></div>
+                    <div class="input-row"><label>Last Name:</label><input type="text" class="input-field" data-ans="FERRARI"></div>
+                    <label style="font-weight: 700; color: #4b5563; font-size: 0.9rem;">Gender:</label>
+                    <div class="gender-container" id="gender-group">
+                        <div class="gender-option" onclick="selectGender(this, 'Male')">Male</div>
+                        <div class="gender-option" onclick="selectGender(this, 'Female')">Female</div>
+                        <div class="gender-option" onclick="selectGender(this, 'Other')">Other</div>
                     </div>
                 </div>
 
@@ -122,11 +132,15 @@
 
                 <div id="result-msg"></div>
                 <button class="btn-main" id="submit-btn" onclick="checkForm()">KIỂM TRA ĐƠN ✅</button>
-                <button class="btn-main hidden" id="reset-btn" onclick="resetForm()">LÀM LẠI 🔄</button>
+                <div id="post-check-btns" class="hidden">
+                    <button class="btn-main btn-secondary" onclick="showAnswers()">HIỆN ĐÁP ÁN 💡</button>
+                    <button class="btn-main" style="background: var(--warning); box-shadow: 0 8px 20px rgba(245, 158, 11, 0.2);" onclick="resetForm()">LÀM LẠI 🔄</button>
+                </div>
             </div>
         </div>
     </div>
 
+    <audio id="bg-music" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" loop></audio>
     <audio id="snd-correct" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3"></audio>
     <audio id="snd-wrong" src="https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3"></audio>
 
@@ -138,10 +152,7 @@
         const firebaseConfig = {
             apiKey: "AIzaSyCdlTVHwiLOGMnrFe12DE1dQSEHZaJ594I",
             authDomain: "nguyen-am-tieng-anh.firebaseapp.com",
-            projectId: "nguyen-am-tieng-anh",
-            storageBucket: "nguyen-am-tieng-anh.firebasestorage.app",
-            messagingSenderId: "878440633705",
-            appId: "1:878440633705:web:755de6cb273eb139ebd9f8"
+            projectId: "nguyen-am-tieng-anh"
         };
 
         const app = initializeApp(firebaseConfig);
@@ -156,14 +167,14 @@
                 if (!snap.empty) {
                     document.getElementById("login-screen").classList.add('hidden');
                     document.getElementById("main-app").classList.remove('hidden');
-                    document.getElementById("user-welcome").innerText = "Chào mừng, " + user.displayName + "!";
+                    document.getElementById("logout-btn").style.display = "block";
+                    document.getElementById("user-welcome").innerText = "Xin chào, " + user.displayName + "!";
                 } else { await signOut(auth); }
             }
         });
 
         document.getElementById("login-btn").onclick = async () => {
-            try { await signInWithPopup(auth, provider); } 
-            catch (e) { document.getElementById("login-msg").innerText = "Lỗi đăng nhập!"; }
+            try { await signInWithPopup(auth, provider); } catch (e) { }
         };
 
         document.getElementById("logout-btn").onclick = async () => {
@@ -173,70 +184,66 @@
     </script>
 
     <script>
+        const bgMusic = document.getElementById('bg-music');
+        let selectedGender = null;
+
+        function toggleMusic() {
+            const btn = document.getElementById('music-btn');
+            if (bgMusic.paused) {
+                bgMusic.play(); btn.innerText = "🔊 Nhạc: Bật";
+            } else {
+                bgMusic.pause(); btn.innerText = "🔇 Nhạc: Tắt";
+            }
+        }
+
         function startForm() {
             document.getElementById('welcome-view').classList.add('hidden');
             document.getElementById('form-view').classList.remove('hidden');
+            bgMusic.play().catch(() => {});
+        }
+
+        function selectGender(el, val) {
+            document.querySelectorAll('.gender-option').forEach(opt => opt.classList.remove('selected'));
+            el.classList.add('selected');
+            selectedGender = val;
         }
 
         function checkForm() {
             const inputs = document.querySelectorAll('.input-field');
             let score = 0;
-            let empty = false;
+            let total = inputs.length + 1; // +1 cho Gender
 
             inputs.forEach(input => {
-                if (input.value.trim() === "") empty = true;
-                const correctAns = input.getAttribute('data-ans').toLowerCase();
-                const userAns = input.value.trim().toLowerCase();
-
-                if (userAns === correctAns) {
-                    input.className = "input-field correct";
-                    score++;
-                } else {
-                    input.className = "input-field wrong";
-                }
+                const isCorrect = input.value.trim().toLowerCase() === input.getAttribute('data-ans').toLowerCase();
+                input.className = isCorrect ? "input-field correct" : "input-field wrong";
+                if (isCorrect) score++;
             });
 
-            if (empty) {
-                alert("Bạn ơi, hãy điền đầy đủ các thông tin nhé!");
-                return;
-            }
-
+            if (selectedGender === 'Male') score++;
+            
             const resultMsg = document.getElementById('result-msg');
-            if (score === inputs.length) {
-                resultMsg.innerText = "🌟 XUẤT SẮC! ĐƠN ĐĂNG KÝ HOÀN HẢO!";
-                resultMsg.style.color = "var(--success)";
-                document.getElementById('snd-correct').play();
-            } else {
-                resultMsg.innerText = `CỐ GẮNG LÊN! BẠN ĐÃ ĐÚNG ${score}/${inputs.length} Ô.`;
-                resultMsg.style.color = "var(--error)";
-                document.getElementById('snd-wrong').play();
-            }
-
+            resultMsg.innerText = `KẾT QUẢ: ${score}/${total} ĐÚNG.`;
+            resultMsg.style.color = (score === total) ? "var(--success)" : "var(--error)";
+            
+            document.getElementById(score === total ? 'snd-correct' : 'snd-wrong').play();
             document.getElementById('submit-btn').classList.add('hidden');
-            document.getElementById('reset-btn').classList.remove('hidden');
+            document.getElementById('post-check-btns').classList.remove('hidden');
+        }
+
+        function showAnswers() {
+            document.querySelectorAll('.input-field').forEach(input => {
+                input.value = input.getAttribute('data-ans');
+                input.className = "input-field correct";
+            });
+            document.querySelectorAll('.gender-option').forEach(opt => {
+                opt.classList.remove('selected');
+                if (opt.innerText === 'Male') opt.classList.add('correct-choice');
+            });
         }
 
         function resetForm() {
-            document.getElementById('welcome-view').classList.remove('hidden');
-            document.getElementById('form-view').classList.add('hidden');
-            document.getElementById('submit-btn').classList.remove('hidden');
-            document.getElementById('reset-btn').classList.add('hidden');
-            document.getElementById('result-msg').innerText = "";
-            document.querySelectorAll('.input-field').forEach(input => {
-                input.value = "";
-                input.className = "input-field";
-            });
+            location.reload(); // Tải lại trang cho sạch nhanh nhất
         }
-
-        // Hỗ trợ nhấn Enter để kiểm tra đơn
-        document.addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
-                if (!document.getElementById('form-view').classList.contains('hidden') && 
-                    document.getElementById('reset-btn').classList.contains('hidden')) {
-                    checkForm();
-                }
-            }
-        });
     </script>
 </body>
 </html>
