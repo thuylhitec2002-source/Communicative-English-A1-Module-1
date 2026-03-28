@@ -8,7 +8,7 @@
     <style>
         :root {
             --primary: #6366f1;
-            --success: #10b981; /* Xanh lá */
+            --success: #10b981; 
             --error: #f43f5e;
             --bg: #eff6ff;
             --card-bg: #ffffff;
@@ -25,7 +25,6 @@
             min-height: 100vh; margin: 0; overflow: hidden;
         }
 
-        /* --- HIỆU ỨNG ĐUNG ĐƯA NHẸ --- */
         @keyframes floating {
             0%, 100% { transform: translateY(0px); }
             50% { transform: translateY(-12px); }
@@ -34,7 +33,7 @@
         .card {
             background: var(--card-bg);
             width: 90%;
-            max-width: 460px;
+            max-width: 500px;
             padding: 60px 40px;
             border-radius: 45px;
             box-shadow: 0 20px 40px rgba(0,0,0,0.06);
@@ -44,16 +43,14 @@
             border: 1px solid rgba(255,255,255,1);
         }
 
-        /* Hiệu ứng nổi lên khi di chuột tới */
         .card:hover {
             transform: translateY(-5px) scale(1.02);
             box-shadow: 0 30px 60px rgba(99, 102, 241, 0.1);
         }
 
-        .vi-q { font-size: 1.7rem; font-weight: 800; color: #1e293b; display: block; margin-bottom: 12px; line-height: 1.3; }
+        .vi-q { font-size: 1.5rem; font-weight: 800; color: #1e293b; display: block; margin-bottom: 12px; line-height: 1.3; }
         .en-m { color: var(--primary); font-style: italic; font-size: 1.1rem; margin-bottom: 40px; display: block; font-weight: 600; opacity: 0.8; }
 
-        /* --- NÚT MIC XANH LÁ 3D --- */
         .mic-btn {
             background: var(--success);
             color: white;
@@ -62,7 +59,7 @@
             border-radius: 50%;
             font-size: 42px;
             cursor: pointer;
-            box-shadow: 0 10px 0 #059669; /* Đổ bóng khối phía dưới */
+            box-shadow: 0 10px 0 #059669;
             margin-bottom: 20px;
             display: inline-flex; align-items: center; justify-content: center;
             position: relative;
@@ -88,7 +85,7 @@
         .correction-box {
             background: #fff1f2; color: #9f1239;
             padding: 20px; border-radius: 20px;
-            margin-top: 25px; font-size: 0.95rem;
+            margin-top: 25px; font-size: 0.9rem;
             display: none; border: 2px solid #fecaca;
             text-align: left; line-height: 1.6;
         }
@@ -115,7 +112,7 @@
 <div id="login-screen">
     <div class="card">
         <h1 style="color: var(--primary); font-size: 2.2rem; margin-bottom: 10px;">SPEAKING MASTER</h1>
-        <p style="color: #64748b; margin-bottom: 40px; font-weight: 500;">Tự động đọc hướng dẫn & Phản hồi 3D.</p>
+        <p style="color: #64748b; margin-bottom: 40px; font-weight: 500;">Hệ thống luyện nói thông minh Pro.</p>
         <button id="login-btn" class="btn-next" style="display:block">Đăng nhập với Google</button>
         <p id="login-msg" style="color:var(--error); margin-top:20px; font-weight:700;"></p>
     </div>
@@ -176,11 +173,41 @@
     };
     document.getElementById("logout-btn").onclick = () => { signOut(auth); location.reload(); };
 
-    // --- GAME LOGIC ---
+    // --- Cập nhật KHO DỮ LIỆU CÂU HỎI ---
     const data = [
-        { vi: "Hãy giới thiệu tên của bạn.", en: "My name is [Name].", reg: /^my name (is|'s) [a-z\s]+$/i, errorMsg: "Cấu trúc đúng: 'My name is [Tên của bạn]'." },
-        { vi: "Bạn bao nhiêu tuổi?", en: "I am [Số] years old.", reg: /^i (am|'m) \d+ years old$/i, errorMsg: "Cấu trúc đúng: 'I am [Số] years old'." },
-        { vi: "Quốc tịch của bạn?", en: "I am from [Country].", reg: /^i (am|'m) from [a-z\s]+$/i, errorMsg: "Cấu trúc đúng: 'I am from [Tên nước]'." }
+        { vi: "Hãy giới thiệu tên của bạn.", en: "My name is [Name].", reg: /^my name (is|'s) [a-z\s]+$/i, errorMsg: "Cấu trúc: 'My name is [Tên của bạn]'." },
+        { vi: "Bạn bao nhiêu tuổi?", en: "I am [Số] years old.", reg: /^i (am|'m) \d+ years old$/i, errorMsg: "Cấu trúc: 'I am [Số] years old'." },
+        { vi: "Quốc tịch của bạn?", en: "I am from [Country].", reg: /^i (am|'m) from [a-z\s]+$/i, errorMsg: "Cấu trúc: 'I am from [Tên nước]'." },
+        { 
+            vi: "Bạn đánh vần tên mình thế nào?", 
+            en: "It's [A-B-C...].", 
+            reg: /^(it is|it's) [a-z\s-]+$/i, 
+            errorMsg: "Hãy đánh vần tên bạn. Ví dụ: It's A-L-E-X." 
+        },
+        { 
+            vi: "Bạn sống ở thành phố nào?", 
+            en: "It's [City Name].", 
+            reg: /^(it is|it's) [a-z\s]+$/i, 
+            errorMsg: "Hãy nói thành phố bạn sống. Ví dụ: It's Ho Chi Minh City." 
+        },
+        { 
+            vi: "Số điện thoại của bạn là gì?", 
+            en: "It's [Số điện thoại].", 
+            reg: /^(it is|it's) [\d\s]+$/i, 
+            errorMsg: "Hãy đọc số điện thoại. Ví dụ: It's zero nine eight..." 
+        },
+        { 
+            vi: "Địa chỉ Email của bạn là gì?", 
+            en: "It's [Email Address].", 
+            reg: /^(it is|it's) [a-z0-9\s._@]+$/i, 
+            errorMsg: "Hãy đọc Email. Ví dụ: It's alex at gmail dot com." 
+        },
+        { 
+            vi: "Địa chỉ của bạn là gì?", 
+            en: "It's [Address].", 
+            reg: /^(it is|it's) [a-z0-9\s,.-]+$/i, 
+            errorMsg: "Hãy đọc địa chỉ. Ví dụ: It's 123 Blue Street." 
+        }
     ];
 
     let currentIdx = 0, recognition;
@@ -189,6 +216,7 @@
         const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
         recognition = new SpeechRec();
         recognition.lang = 'en-US';
+        recognition.continuous = false;
         
         recognition.onstart = () => {
             window.speechSynthesis.cancel();
@@ -203,7 +231,6 @@
         };
 
         recognition.onend = () => document.getElementById('btnMic').classList.remove('active');
-        
         loadQuestion();
     }
 
@@ -211,35 +238,29 @@
         const q = data[currentIdx];
         document.getElementById('vi-q').innerText = q.vi;
         document.getElementById('en-m').innerText = "Mẫu: " + q.en;
-        document.getElementById('status').innerText = "Chăm chú lắng nghe...";
+        document.getElementById('status').innerText = "Đang chuẩn bị...";
         document.getElementById('btnNext').classList.add('hidden');
         document.getElementById('correction-box').style.display = 'none';
         document.getElementById('user-said').innerText = "";
-        
         autoReadGuide();
     }
 
-    // TỰ ĐỘNG ĐỌC MẪU KHÔNG CẦN BẤM
     function autoReadGuide() {
         window.speechSynthesis.cancel();
         const q = data[currentIdx];
         const utterVi = new SpeechSynthesisUtterance(q.vi);
         utterVi.lang = 'vi-VN';
-        
         const utterEn = new SpeechSynthesisUtterance(q.en.replace(/\[|\]/g, ""));
         utterEn.lang = 'en-US';
         utterEn.rate = 0.85;
-
         utterVi.onend = () => window.speechSynthesis.speak(utterEn);
         utterEn.onend = () => { document.getElementById('status').innerText = "Chạm Mic để trả lời"; };
-        
         window.speechSynthesis.speak(utterVi);
     }
 
     function checkAnswer(text) {
         const q = data[currentIdx];
         const card = document.getElementById('test-screen');
-        
         if (q.reg.test(text)) {
             document.getElementById('snd-correct').play();
             document.getElementById('status').innerText = "TUYỆT VỜI! 🎉";
@@ -251,7 +272,7 @@
             setTimeout(() => card.classList.remove('error-shake'), 400);
             document.getElementById('correction-box').innerText = q.errorMsg;
             document.getElementById('correction-box').style.display = 'block';
-            document.getElementById('status').innerText = "Cố gắng lên, hãy nói lại nhé!";
+            document.getElementById('status').innerText = "Hãy thử lại nhé!";
             document.getElementById('status').style.color = "var(--error)";
         }
     }
@@ -261,7 +282,7 @@
         if (currentIdx < data.length) {
             document.getElementById('status').style.color = "#64748b";
             loadQuestion();
-        } else { alert("Bạn đã hoàn thành xuất sắc bài nói!"); location.reload(); }
+        } else { alert("Bạn đã hoàn thành bài thi!"); location.reload(); }
     };
 
     document.getElementById('btnMic').onclick = () => recognition.start();
