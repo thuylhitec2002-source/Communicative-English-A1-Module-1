@@ -3,94 +3,226 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Speaking Practice - Strict Mode</title>
-    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;600;800&display=swap&subset=vietnamese" rel="stylesheet">
+    <title>Speaking Practice Pro - 3D Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #6366f1; --success: #22c55e; --error: #ef4444; --bg: #f8fafc; }
-        body { font-family: 'Lexend', Arial, sans-serif; background: var(--bg); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .card { background: white; width: 95%; max-width: 450px; padding: 35px; border-radius: 30px; box-shadow: 0 20px 40px rgba(0,0,0,0.05); text-align: center; }
-        .vi-q { font-size: 1.3rem; font-weight: 700; color: #1e293b; display: block; margin-bottom: 10px; line-height: 1.4; }
-        .en-m { color: #64748b; font-style: italic; font-size: 1rem; margin-bottom: 25px; display: block; }
-        .mic-btn { background: var(--primary); color: white; border: none; width: 85px; height: 85px; border-radius: 50%; font-size: 35px; cursor: pointer; outline: none; transition: 0.3s; }
-        .mic-btn.active { background: var(--error); animation: pulse 1s infinite; }
-        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); } 70% { box-shadow: 0 0 0 20px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
-        .status { margin-top: 15px; font-weight: 600; color: #475569; min-height: 25px; }
-        .correction-box { background: #fee2e2; color: #991b1b; padding: 12px; border-radius: 12px; margin-top: 15px; font-size: 0.9rem; display: none; border: 1px solid #fecaca; line-height: 1.4; text-align: left; }
-        .user-said { color: #94a3b8; font-size: 0.85rem; font-style: italic; margin-top: 10px; }
-        .btn-next { background: var(--success); color: white; border: none; padding: 15px 40px; border-radius: 15px; font-weight: 800; cursor: pointer; width: 100%; margin-top: 20px; display: none; font-family: inherit; }
+        :root {
+            --primary: #6366f1;
+            --success: #10b981;
+            --error: #f43f5e;
+            --bg: #e0e7ff;
+            --card-bg: #f8fafc;
+            --shadow: 8px 8px 16px #bebebe, -8px -8px 16px #ffffff;
+            --inner-shadow: inset 4px 4px 8px #bebebe, inset -4px -4px 8px #ffffff;
+        }
+
+        body {
+            font-family: 'Lexend', sans-serif;
+            background: var(--bg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            color: #1e293b;
+        }
+
+        /* --- LOGIN UI --- */
+        #login-screen {
+            position: fixed; inset: 0; background: var(--bg);
+            display: flex; justify-content: center; align-items: center; z-index: 9999;
+        }
+
+        /* --- CARD 3D --- */
+        .card {
+            background: var(--card-bg);
+            width: 90%;
+            max-width: 450px;
+            padding: 40px;
+            border-radius: 40px;
+            box-shadow: var(--shadow);
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.8);
+        }
+
+        .vi-q { font-size: 1.5rem; font-weight: 800; color: #1e293b; display: block; margin-bottom: 12px; }
+        .en-m { color: #64748b; font-style: italic; font-size: 1rem; margin-bottom: 30px; display: block; }
+
+        /* --- MIC BUTTON 3D --- */
+        .mic-btn {
+            background: var(--card-bg);
+            color: var(--primary);
+            border: none;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            font-size: 40px;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+            margin-bottom: 20px;
+        }
+
+        .mic-btn:active, .mic-btn.active {
+            box-shadow: var(--inner-shadow);
+            transform: scale(0.95);
+            color: var(--error);
+        }
+
+        .mic-btn.active { animation: pulse 1.5s infinite; }
+        @keyframes pulse {
+            0% { color: var(--primary); }
+            50% { color: var(--error); }
+            100% { color: var(--primary); }
+        }
+
+        .status { margin-top: 20px; font-weight: 600; min-height: 28px; }
+
+        .correction-box {
+            background: #ffe4e6;
+            color: #9f1239;
+            padding: 15px;
+            border-radius: 20px;
+            margin-top: 20px;
+            font-size: 0.9rem;
+            display: none;
+            border: 2px solid #fecaca;
+            text-align: left;
+            box-shadow: inset 2px 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .btn-next {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 18px 45px;
+            border-radius: 20px;
+            font-weight: 800;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 25px;
+            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
+            font-family: inherit;
+            display: none;
+        }
+
+        .btn-next:hover { transform: translateY(-3px); box-shadow: 0 15px 25px rgba(99, 102, 241, 0.4); }
+        .btn-next:active { transform: translateY(0); }
+
+        .user-said { color: #94a3b8; font-size: 0.85rem; margin-top: 15px; font-weight: 500; }
+
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
-<div id="start-screen" class="card">
-    <h1>Strict Speaking Test 🎙️</h1>
-    <p>Giới thiệu bản thân bạn.</p>
-    <button class="btn-next" style="display:block" onclick="initApp()">BẮT ĐẦU</button>
+<div id="login-screen">
+    <div class="card">
+        <h1 style="color: var(--primary); font-weight: 800;">SPEAKING TEST</h1>
+        <p style="color: #64748b; margin-bottom: 30px;">Vui lòng đăng nhập để bắt đầu tập luyện.</p>
+        <button id="login-btn" class="btn-next" style="display:block">Đăng nhập với Google</button>
+        <p id="login-msg" style="color:var(--error); margin-top:15px; font-size:0.9rem; font-weight:600;"></p>
+    </div>
 </div>
 
-<div id="test-screen" class="card" style="display:none;">
-    <div class="q-area">
+<div id="test-screen" class="card hidden">
+    <div id="q-area">
         <span class="vi-q" id="vi-q">...</span>
         <span class="en-m" id="en-m">...</span>
     </div>
     <button class="mic-btn" id="btnMic">🎙️</button>
-    <div class="status" id="status">Đang tải hướng dẫn...</div>
+    <div class="status" id="status">Sẵn sàng</div>
     <div id="correction-box" class="correction-box"></div>
     <div class="user-said" id="user-said"></div>
     <button id="btnNext" class="btn-next" onclick="goNext()">TIẾP THEO →</button>
+    <button id="logout-btn" style="background:none; border:none; color:#94a3b8; margin-top:20px; cursor:pointer; font-weight:600;">Đăng xuất</button>
 </div>
 
-<audio id="snd-tink" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3"></audio>
-<audio id="snd-wrong" src="https://tiengdong.com/wp-content/uploads/Am-thanh-tra-loi-sai-www_tiengdong_com.mp3?_=1"></audio>
+<audio id="snd-correct" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3"></audio>
+<audio id="snd-wrong" src="https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3"></audio>
 
-<script>
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+    import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyCdlTVHwiLOGMnrFe12DE1dQSEHZaJ594I",
+        authDomain: "nguyen-am-tieng-anh.firebaseapp.com",
+        projectId: "nguyen-am-tieng-anh",
+        storageBucket: "nguyen-am-tieng-anh.firebasestorage.app",
+        messagingSenderId: "878440633705",
+        appId: "1:878440633705:web:755de6cb273eb139ebd9f8"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth();
+    const db = getFirestore(app);
+    const provider = new GoogleAuthProvider();
+
+    // 1. Kiểm tra đăng nhập tự động
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            const q = query(collection(db, "Tienganh_so_cap"), where("email", "==", user.email));
+            const snap = await getDocs(q);
+            if (!snap.empty) {
+                document.getElementById('login-screen').classList.add('hidden');
+                document.getElementById('test-screen').classList.remove('hidden');
+                initGame();
+            } else { await signOut(auth); }
+        }
+    });
+
+    document.getElementById("login-btn").onclick = async () => {
+        try { await signInWithPopup(auth, provider); } 
+        catch (e) { document.getElementById("login-msg").innerText = "Lỗi đăng nhập!"; }
+    };
+
+    document.getElementById("logout-btn").onclick = () => { signOut(auth); location.reload(); };
+
+    // --- GAME LOGIC ---
     const data = [
         { 
             vi: "Hãy giới thiệu tên của bạn.", 
             en: "My name is [Name].", 
-            // KHÔNG chấp nhận "My name are"
             reg: /^my name (is|'s) [a-z\s]+$/i,
             errorMsg: "Lỗi: Cấu trúc phải là 'My name is [Tên]'. Đảm bảo không dùng 'are' hay thừa từ."
         },
         { 
             vi: "Bạn bao nhiêu tuổi?", 
             en: "I am [Số] years old.", 
-            // CHỈ chấp nhận số đứng trước years old, KHÔNG chấp nhận "third years old"
             reg: /^i (am|'m) \d+ years old$/i,
-            errorMsg: "Lỗi: Phải nói 'I am [Số] years old'. Ví dụ: I am 20 years old. (Không dùng số thứ tự như third/first)"
+            errorMsg: "Lỗi: Phải nói 'I am [Số] years old'. Ví dụ: I am 20 years old."
         },
         { 
             vi: "Quốc tịch của bạn?", 
             en: "I am from [Country].", 
-            // KHÔNG chấp nhận "from the north", "from vietnamese"
-            reg: /^i (am|'m) from (?!the |canadian|vietnamese|american|japanese|korean|chinese)[a-z\s]+$/i,
-            errorMsg: "Lỗi: 'I am from [Tên nước]'. Đừng thêm 'the' hoặc dùng quốc tịch (Vietnamese) ở đây."
+            // ĐÃ SỬA: Loại bỏ lookahead chặn quốc gia, cho phép tên nước tự do
+            reg: /^i (am|'m) from [a-z\s]+$/i,
+            errorMsg: "Lỗi: Hãy nói 'I am from [Tên nước]'. Ví dụ: I am from Vietnam."
         }
     ];
 
     let currentIdx = 0;
     let recognition;
-    let micStream = null;
 
-    async function initApp() {
-        try {
-            micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            document.getElementById('start-screen').style.display = 'none';
-            document.getElementById('test-screen').style.display = 'block';
-            setupSpeech();
-            loadQuestion();
-        } catch (err) { alert("Lỗi: Cần cấp quyền Micro!"); }
+    function initGame() {
+        setupSpeech();
+        loadQuestion();
     }
 
     function setupSpeech() {
         const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRec) { alert("Trình duyệt không hỗ trợ nhận diện giọng nói."); return; }
         recognition = new SpeechRec();
         recognition.lang = 'en-US';
         recognition.onstart = () => {
-            window.speechSynthesis.cancel();
             document.getElementById('btnMic').classList.add('active');
             document.getElementById('status').innerText = "Đang lắng nghe...";
-            document.getElementById('correction-box').style.display = 'none';
+            document.getElementById('status').style.color = "var(--primary)";
         };
         recognition.onresult = (e) => {
             const text = e.results[0][0].transcript.toLowerCase().trim().replace(/[.,!?]$/, "");
@@ -104,59 +236,41 @@
         const q = data[currentIdx];
         document.getElementById('vi-q').innerText = q.vi;
         document.getElementById('en-m').innerText = "Cấu trúc: " + q.en;
-        document.getElementById('status').innerText = "Đang đọc hướng dẫn...";
-        document.getElementById('btnMic').style.display = 'none';
+        document.getElementById('status').innerText = "Chạm để nói";
+        document.getElementById('status').style.color = "#475569";
+        document.getElementById('btnMic').style.display = 'inline-flex';
         document.getElementById('btnNext').style.display = 'none';
         document.getElementById('correction-box').style.display = 'none';
         document.getElementById('user-said').innerText = "";
-
-        speak(q.vi, 'vi-VN', () => {
-            speak(q.en.replace(/\[|\]/g, ""), 'en-US', () => {
-                document.getElementById('status').innerText = "Chạm để nói";
-                document.getElementById('btnMic').style.display = 'inline-block';
-            });
-        });
     }
 
     function checkAnswer(text) {
         const q = data[currentIdx];
-        
-        // Kiểm tra khớp chính xác cấu trúc Regex từ đầu đến cuối
         if (q.reg.test(text)) {
-            document.getElementById('snd-tink').play();
+            document.getElementById('snd-correct').play();
             document.getElementById('status').innerText = "CHÍNH XÁC! 🎉";
             document.getElementById('status').style.color = "var(--success)";
-            setTimeout(() => {
-                document.getElementById('btnMic').style.display = 'none';
-                document.getElementById('btnNext').style.display = 'block';
-            }, 600);
+            document.getElementById('btnMic').style.display = 'none';
+            document.getElementById('btnNext').style.display = 'block';
         } else {
             document.getElementById('snd-wrong').play();
-            showError(q.errorMsg);
+            document.getElementById('correction-box').innerText = q.errorMsg;
+            document.getElementById('correction-box').style.display = 'block';
+            document.getElementById('status').innerText = "Hãy thử lại!";
+            document.getElementById('status').style.color = "var(--error)";
         }
     }
 
-    function showError(msg) {
-        const box = document.getElementById('correction-box');
-        box.innerText = msg;
-        box.style.display = 'block';
-        document.getElementById('status').innerText = "Sai rồi, hãy nói lại!";
-        document.getElementById('status').style.color = "var(--error)";
-    }
-
-    function goNext() {
+    window.goNext = () => {
         currentIdx++;
         if (currentIdx < data.length) loadQuestion();
         else { alert("Hoàn thành bài tập!"); location.reload(); }
-    }
+    };
 
-    function speak(text, lang, callback) {
-        const u = new SpeechSynthesisUtterance(text);
-        u.lang = lang; u.rate = 1.0; u.onend = callback;
-        window.speechSynthesis.speak(u);
-    }
-
-    document.getElementById('btnMic').onclick = () => recognition.start();
+    document.getElementById('btnMic').onclick = () => {
+        window.speechSynthesis.cancel();
+        recognition.start();
+    };
 </script>
 </body>
 </html>
