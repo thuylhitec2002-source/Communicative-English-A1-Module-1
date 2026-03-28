@@ -3,19 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Speaking Practice - Google Edition</title>
+    <title>Speaking Mastery - Professional Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --google-blue: #4285F4;
-            --google-red: #EA4335;
-            --google-yellow: #FBBC05;
-            --google-green: #34A853;
-            --bg: #f8f9fa;
-            --text: #3c4043;
+            --google-blue: #4285F4; --google-red: #EA4335;
+            --google-yellow: #FBBC05; --google-green: #34A853;
+            --bg: #f1f3f4; --text: #202124;
         }
 
-        * { box-sizing: border-box; transition: all 0.3s ease; font-family: 'Lexend', sans-serif; }
+        * { box-sizing: border-box; transition: all 0.25s ease; font-family: 'Lexend', sans-serif; }
 
         body {
             background: var(--bg);
@@ -23,50 +20,51 @@
             min-height: 100vh; margin: 0; color: var(--text);
         }
 
+        /* --- CARD DESIGN: THOÁNG & CHUYÊN NGHIỆP --- */
         .card {
             background: white;
-            width: 90%; max-width: 500px;
-            padding: 50px 40px;
-            border-radius: 24px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+            width: 95%; max-width: 550px;
+            padding: 60px 50px; /* Tăng padding để thoáng hơn */
+            border-radius: 32px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
             text-align: center;
             position: relative;
         }
 
-        .card:hover { box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        h1 { font-size: 2.2rem; margin-bottom: 15px; color: var(--google-blue); font-weight: 800; }
+        .en-question { font-size: 1.8rem; font-weight: 700; color: #202124; margin-bottom: 40px; display: block; line-height: 1.4; }
 
-        h1 { font-size: 1.8rem; margin-bottom: 8px; color: var(--google-blue); }
-        .en-question { font-size: 1.5rem; font-weight: 700; color: #202124; margin-bottom: 25px; display: block; }
-
-        /* Nút Google */
+        /* --- BUTTONS --- */
         .google-btn {
-            display: inline-flex; align-items: center; gap: 12px;
+            display: inline-flex; align-items: center; justify-content: center; gap: 12px;
             background: white; color: #3c4043; border: 1px solid #dadce0;
-            padding: 12px 24px; border-radius: 8px; cursor: pointer;
-            font-weight: 600; font-size: 1rem; box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            padding: 14px 28px; border-radius: 12px; cursor: pointer;
+            font-weight: 600; font-size: 1.1rem; box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
-        .google-btn:hover { background: #f8f9fa; border-color: #d2d2d2; }
-        .google-btn svg { width: 20px; height: 20px; }
+        .google-btn:hover { background: #f8f9fa; border-color: #d2d2d2; transform: translateY(-2px); }
 
-        /* Micro Xanh nhẹ */
         .mic-btn {
             background: var(--google-green); color: white;
-            border: none; width: 80px; height: 80px;
-            border-radius: 50%; font-size: 32px; cursor: pointer;
-            box-shadow: 0 4px 10px rgba(52, 168, 83, 0.3);
-            margin: 20px 0;
+            border: none; width: 90px; height: 90px;
+            border-radius: 50%; font-size: 38px; cursor: pointer;
+            box-shadow: 0 8px 15px rgba(52, 168, 83, 0.25);
+            margin: 30px 0;
         }
         .mic-btn.active { background: var(--google-red); animation: pulse 1.2s infinite; }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+        @keyframes pulse { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(234, 67, 53, 0.4); } 70% { box-shadow: 0 0 0 20px rgba(234, 67, 53, 0); } 100% { transform: scale(1); } }
 
-        .control-row { display: flex; justify-content: center; gap: 15px; margin-top: 10px; }
-        .sub-btn { background: #f1f3f4; border: none; padding: 10px 18px; border-radius: 8px; font-size: 0.9rem; font-weight: 600; cursor: pointer; color: #5f6368; }
-        .sub-btn:hover { background: #e8eaed; color: #202124; }
+        .control-row { display: flex; justify-content: center; gap: 20px; margin: 20px 0; }
+        .sub-btn { background: #f8f9fa; border: 1px solid #eee; padding: 12px 22px; border-radius: 12px; font-size: 1rem; font-weight: 600; cursor: pointer; color: #5f6368; }
+        .sub-btn:hover { background: #fff; border-color: var(--google-blue); color: var(--google-blue); }
 
-        .status { margin-top: 20px; font-weight: 600; color: #70757a; font-size: 0.9rem; }
-        .btn-next { background: var(--google-blue); color: white; border: none; padding: 15px; border-radius: 12px; font-weight: 800; cursor: pointer; width: 100%; margin-top: 30px; font-size: 1.1rem; }
+        .btn-skip { background: none; border: none; color: #9aa0a6; font-size: 1rem; font-weight: 600; cursor: pointer; text-decoration: underline; margin-top: 15px; display: block; width: 100%; }
+        .btn-skip:hover { color: var(--google-red); }
 
-        .hint-box { background: #fff8e1; color: #795548; padding: 15px; border-radius: 12px; margin-top: 20px; display: none; text-align: left; font-size: 0.9rem; border-left: 4px solid var(--google-yellow); }
+        .status { margin-top: 25px; font-weight: 700; color: #70757a; font-size: 1.1rem; min-height: 1.5em; }
+
+        .btn-next { background: var(--google-blue); color: white; border: none; padding: 18px; border-radius: 16px; font-weight: 800; cursor: pointer; width: 100%; margin-top: 35px; font-size: 1.2rem; box-shadow: 0 4px 12px rgba(66, 133, 244, 0.3); }
+
+        .hint-box { background: #fffdf0; color: #795548; padding: 20px; border-radius: 16px; margin-top: 25px; display: none; text-align: left; font-size: 1rem; border-left: 5px solid var(--google-yellow); }
 
         .hidden { display: none !important; }
     </style>
@@ -75,9 +73,9 @@
 
 <div id="game-container">
     <div id="login-screen" class="card">
-        <svg style="width:48px; height:48px; margin-bottom:20px" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59L2.56 13.22C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path></svg>
-        <h1> Speaking Mastery</h1>
-        <p style="color:#70757a; margin-bottom:30px">Học tiếng Anh theo phong cách Google</p>
+        <svg style="width:60px; height:60px; margin-bottom:25px" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59L2.56 13.22C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path></svg>
+        <h1>Speaking Mastery</h1>
+        <p style="color:#70757a; margin-bottom:40px; font-size:1.1rem">Luyện nói tiếng Anh chuẩn Google</p>
         <button id="login-btn" class="google-btn">
             <svg viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59L2.56 13.22C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path></svg>
             Tiếp tục với Google
@@ -85,9 +83,9 @@
     </div>
 
     <div id="start-screen" class="card hidden">
-        <h1 id="welcome-text">Sẵn sàng chưa?</h1>
-        <p style="color:#70757a; margin-bottom:30px">Hãy nói to, rõ ràng theo cấu trúc hướng dẫn.</p>
-        <button class="btn-next" onclick="initGame()">BẮT ĐẦU BÀI HỌC</button>
+        <h1 id="welcome-text">Chào mừng bạn!</h1>
+        <p style="color:#70757a; margin-bottom:40px; font-size:1.1rem">Hãy chuẩn bị micro và không gian yên tĩnh nhé.</p>
+        <button class="btn-next" onclick="initGame()">BẮT ĐẦU NGAY</button>
     </div>
 
     <div id="test-screen" class="card hidden">
@@ -96,15 +94,19 @@
         <div class="status" id="status">Sẵn sàng</div>
         
         <div class="control-row">
-            <button class="sub-btn" onclick="autoReadQuestion()">🔈 Nghe câu hỏi</button>
+            <button class="sub-btn" onclick="autoReadQuestion()">🔈 Nghe lại</button>
             <button class="sub-btn" onclick="showHint()">💡 Gợi ý</button>
         </div>
 
+        <button class="btn-skip" id="btnSkip" onclick="goNext()">Bỏ qua câu này ➔</button>
+
         <div id="hint-box" class="hint-box"></div>
-        <div id="user-said" style="color:#94a3b8; font-size:0.8rem; margin-top:15px; font-style:italic"></div>
+        <div id="user-said" style="color:#94a3b8; font-size:0.9rem; margin-top:20px; font-style:italic"></div>
         
         <button id="btnNext" class="btn-next hidden" onclick="goNext()">TIẾP THEO ➔</button>
-        <button class="google-btn" style="margin-top:30px; font-size:0.8rem" onclick="logout()">Đăng xuất</button>
+        
+        <br>
+        <button class="google-btn" style="margin-top:40px; padding: 10px 20px; font-size:0.9rem" onclick="logout()">Đăng xuất</button>
     </div>
 </div>
 
@@ -137,16 +139,16 @@
     window.logout = () => { signOut(auth).then(() => location.reload()); };
     document.getElementById("login-btn").onclick = () => signInWithPopup(auth, provider);
 
-    // --- GAME LOGIC ---
+    // --- GAME DATA ---
     const data = [
-        { q: "What is your name?", en: "My name is [Name].", reg: /^(my name (is|'s)\s)?[a-z\s]+$/i, hint: "My name is [Tên của bạn]" },
-        { q: "How do you spell your name?", en: "It's [A-B-C...].", reg: /^((it is|it's)\s)?([a-z]\s?)+$/i, hint: "T-H-U-Y (Đánh vần từng chữ)" },
-        { q: "How old are you?", en: "I am [Age] years old.", reg: /^((i am|i'm)\s)?\d+(\syears\sold)?$/i, hint: "I am 20 years old" },
-        { q: "What is your nationality?", en: "I am from [Country].", reg: /^((i am|i'm|i am from|i'm from)\s)?[a-z\s]+$/i, hint: "I am from Vietnam" },
-        { q: "Which city do you live in?", en: "I live in [City Name].", reg: /^((it is|it's|i live in)\s)?[a-z\s]+$/i, hint: "I live in Danang" },
-        { q: "What is your phone number?", en: "It's [Phone number].", reg: /^((it is|it's)\s)?[\d\s]+$/i, hint: "0-9-8..." },
-        { q: "What is your email address?", en: "It's [Email].", reg: /^((it is|it's)\s)?[a-z0-9\s._@]+$/i, hint: "alex at gmail dot com" },
-        { q: "What is your address?", en: "It's [Address].", reg: /^((it is|it's)\s)?[a-z0-9\s,.-]+$/i, hint: "123 Blue Street" }
+        { q: "What is your name?", reg: /^(my name (is|'s)\s)?[a-z\s]+$/i, hint: "My name is [Tên]" },
+        { q: "How do you spell your name?", reg: /^((it is|it's)\s)?([a-z]\s?)+$/i, hint: "T-H-U-Y (Đánh vần dứt khoát)" },
+        { q: "How old are you?", reg: /^((i am|i'm)\s)?\d+(\syears\sold)?$/i, hint: "I am 20 years old" },
+        { q: "What is your nationality?", reg: /^((i am|i'm|i am from|i'm from)\s)?[a-z\s]+$/i, hint: "I am from Vietnam" },
+        { q: "Which city do you live in?", reg: /^((it is|it's|i live in)\s)?[a-z\s]+$/i, hint: "I live in Danang" },
+        { q: "What is your phone number?", reg: /^((it is|it's)\s)?[\d\s]+$/i, hint: "0-2-4-3-3-3..." },
+        { q: "What is your email address?", reg: /^((it is|it's)\s)?[a-z0-9\s._@]+$/i, hint: "alex at gmail dot com" },
+        { q: "What is your address?", reg: /^((it is|it's)\s)?[a-z0-9\s,.-]+$/i, hint: "123 Blue Street" }
     ];
 
     let currentIdx = 0, recognition;
@@ -164,12 +166,15 @@
         recognition.lang = 'en-US';
         recognition.onstart = () => {
             document.getElementById('btnMic').classList.add('active');
-            document.getElementById('status').innerText = "Đang nghe...";
+            document.getElementById('status').innerText = "Đang lắng nghe...";
         };
         recognition.onresult = (e) => {
-            let text = e.results[0][0].transcript.toLowerCase().trim().replace(/[.,!?]$/, "");
-            // Tối ưu Gmail: chuyển chữ "at" thành "@", "dot" thành "."
+            let text = e.results[0][0].transcript.toLowerCase().trim();
+            // Xử lý thông minh cho số điện thoại: Xóa dấu gạch ngang và khoảng trắng
+            text = text.replace(/-/g, "").replace(/\s/g, "");
+            // Xử lý cho Email
             text = text.replace(/\sat\s/g, "@").replace(/\sdot\s/g, ".");
+            
             document.getElementById('user-said').innerText = `Máy nghe: "${text}"`;
             checkAnswer(text);
         };
@@ -179,9 +184,10 @@
     function loadQuestion() {
         const q = data[currentIdx];
         document.getElementById('en-q').innerText = q.q;
-        document.getElementById('status').innerText = "Bấm Mic để trả lời";
+        document.getElementById('status').innerText = "Sẵn sàng";
         document.getElementById('status').style.color = "#70757a";
         document.getElementById('btnNext').classList.add('hidden');
+        document.getElementById('btnSkip').classList.remove('hidden');
         document.getElementById('hint-box').style.display = 'none';
         document.getElementById('user-said').innerText = "";
         autoReadQuestion();
@@ -198,7 +204,6 @@
         const hb = document.getElementById('hint-box');
         hb.innerText = "Gợi ý: " + data[currentIdx].hint;
         hb.style.display = 'block';
-        // Đọc gợi ý
         const utter = new SpeechSynthesisUtterance(data[currentIdx].hint.replace(/\[|\]/g, ""));
         utter.lang = 'en-US';
         window.speechSynthesis.speak(utter);
@@ -210,6 +215,7 @@
             document.getElementById('status').innerText = "CHÍNH XÁC! 🎉";
             document.getElementById('status').style.color = "var(--google-green)";
             document.getElementById('btnNext').classList.remove('hidden');
+            document.getElementById('btnSkip').classList.add('hidden');
         } else {
             document.getElementById('snd-wrong').play();
             document.getElementById('status').innerText = "Hãy thử lại!";
