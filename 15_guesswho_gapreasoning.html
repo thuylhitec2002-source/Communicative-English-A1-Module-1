@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reasoning Gap - Private Edition</title>
+    <title>Reasoning Gap Fix - Pro Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -21,7 +21,7 @@
         .card { 
             background: white; padding: 40px; border-radius: 40px; 
             width: 100%; max-width: 900px; box-shadow: 0 20px 60px rgba(0,0,0,0.1); 
-            text-align: center; position: relative; border: 1px solid rgba(255,255,255,0.7);
+            text-align: center; position: relative; overflow: hidden;
         }
 
         .screen { display: none; }
@@ -34,37 +34,32 @@
         .game-table th, .game-table td { 
             padding: 18px; border-radius: 20px; background: white; 
             border: 2px solid #f1f2f6; font-weight: 700; font-size: 15px;
-            box-shadow: 0 6px 0 #f1f2f6; /* Hiệu ứng 3D */
-            position: relative;
+            box-shadow: 0 6px 0 #f1f2f6; position: relative;
         }
 
-        /* Hover hiệu ứng nổi cho từng cột/ô */
         .game-table td:hover { 
             transform: translateY(-5px); 
             box-shadow: 0 12px 20px rgba(0,0,0,0.05);
             border-color: var(--primary-light);
-            background: #fdfdff;
         }
 
-        /* Header Tên màu tím nhạt */
         .game-table th { 
             background: #efedff; color: var(--primary); 
-            cursor: pointer; font-size: 16px; border-color: #dcd9f8;
+            cursor: pointer; border-color: #dcd9f8;
             box-shadow: 0 6px 0 #dcd9f8;
         }
-        .game-table th:hover { background: var(--primary); color: white; border-color: var(--primary); transform: translateY(-3px); }
+        .game-table th:hover { background: var(--primary); color: white; transform: translateY(-3px); }
         
-        /* Trạng thái bị gạch tên */
         .game-table th.eliminated { 
             background: #eee !important; color: #ccc !important; 
             box-shadow: 0 2px 0 #ddd !important; transform: translateY(4px);
             text-decoration: line-through;
         }
 
-        /* Highlight màu cam khi tiết lộ */
+        /* Highlight màu cam - Đã sửa lỗi hiển thị */
         .secret-active { 
             background: #fff4e6 !important; 
-            border-color: var(--orange) !important; 
+            border: 3px solid var(--orange) !important; 
             box-shadow: 0 6px 0 #d35400 !important;
             color: var(--orange) !important;
         }
@@ -74,17 +69,17 @@
             background: var(--primary); color: white; font-weight: 800; 
             cursor: pointer; box-shadow: 0 8px 15px rgba(108, 92, 231, 0.3); font-size: 16px;
         }
-        .btn-main:hover { transform: translateY(-3px); box-shadow: 0 12px 25px rgba(108, 92, 231, 0.4); }
 
-        /* Lớp phủ bảo mật */
+        /* Lớp phủ bảo mật - Đã sửa logic ẩn/hiện */
         #reveal-overlay {
             position: absolute; inset: 0; background: rgba(15, 15, 20, 0.98); 
             border-radius: 40px; z-index: 1000; display: flex; flex-direction: column;
             justify-content: center; align-items: center; color: white;
+            transition: opacity 0.5s ease;
         }
+        #reveal-overlay.peek { opacity: 0.1; pointer-events: none; } /* Làm mờ để xem bảng */
 
         .top-bar { position: absolute; top: 25px; right: 30px; display: flex; gap: 15px; }
-        .hint-text { color: #888; font-style: italic; margin-top: 15px; font-size: 14px; }
         
         @keyframes shake { 0%, 100% {transform: translateX(0);} 25% {transform: translateX(-8px);} 75% {transform: translateX(8px);} }
         .error-shake { animation: shake 0.4s; }
@@ -98,46 +93,30 @@
     </div>
 
     <div id="login-screen" class="screen active">
-        <h1 style="color: var(--primary);">REASONING GAP PRO</h1>
-        <p>Đăng nhập để vào trò chơi tìm mật danh.</p>
+        <h1>REASONING GAP PRO</h1>
         <button id="login-btn" class="btn-main">Tiếp tục với Google</button>
     </div>
 
-    <div id="rule-screen" class="screen">
-        <span style="font-size: 60px;">🕵️‍♂️</span>
-        <h1>LUẬT CHƠI</h1>
-        <div style="text-align: left; padding: 25px; background: #f9f9ff; border-radius: 25px; margin-bottom: 25px; border: 1px dashed var(--primary-light);">
-            <p>• <b>Người Giữ Bí Mật:</b> Bấm xem danh tính và GHI NHỚ, sau đó ẩn đi ngay.</p>
-            <p>• <b>Người Hỏi:</b> Hỏi và gạch tên (click vào tên tím) để loại trừ.</p>
-            <p>• <b>Xác nhận:</b> Khi muốn đoán, Người Hỏi hãy <b>click đúp (Double Click)</b> vào tên nhân vật. Hệ thống sẽ tự kiểm tra.</p>
-        </div>
-        <button class="btn-main" onclick="startRound(1)">TÔI ĐÃ HIỂU - CHƠI THÔI 🚀</button>
-    </div>
-
     <div id="play-screen" class="screen">
-        <h2 id="round-title" style="color: var(--primary); letter-spacing: 2px;">VÒNG 1</h2>
+        <h2 id="round-title" style="color: var(--primary);">VÒNG 1</h2>
 
         <div id="reveal-overlay">
-            <h2 style="color: var(--orange)">BẢO MẬT DANH TÍNH</h2>
-            <p style="opacity: 0.7">Người hỏi vui lòng quay mặt đi.</p>
-            <button class="btn-main" style="background: var(--orange)" onclick="revealSecret()">XEM MẬT DANH CỦA TÔI</button>
-            <button class="btn-main hidden" id="btn-done" style="background: var(--success); margin-top:10px;" onclick="hideSecret()">XONG, BẮT ĐẦU ĐOÁN</button>
+            <h2 id="overlay-msg" style="color: var(--orange)">BẢO MẬT DANH TÍNH</h2>
+            <p>Người hỏi vui lòng quay mặt đi.</p>
+            <button class="btn-main" style="background: var(--orange)" onmousedown="peekStart()" onmouseup="peekEnd()" ontouchstart="peekStart()" ontouchend="peekEnd()">NHẤN GIỮ ĐỂ XEM MẬT DANH</button>
+            <p style="margin-top:20px; font-size:13px; opacity:0.6">Thả tay ra để ẩn đi và bắt đầu đoán.</p>
+            <button class="btn-main" style="background: var(--success); margin-top:20px" onclick="startGameNow()">BẮT ĐẦU ĐOÁN ✅</button>
         </div>
 
         <div id="table-container"></div>
-        <p class="hint-text">💡 Click 1 lần để gạch tên | Click đúp (2 lần) để CHỐT ĐÁP ÁN</p>
+        <p style="color:#888; font-style:italic">💡 Click 1 lần để gạch tên | Click đúp (2 lần) để CHỐT ĐÁP ÁN</p>
     </div>
 
     <div id="end-screen" class="screen">
-        <span style="font-size: 80px;">✨</span>
-        <h1 style="color: var(--success)">CHIẾN THẮNG!</h1>
-        <p>Hai bạn đã phối hợp cực kỳ ăn ý.</p>
-        <button class="btn-main" onclick="location.reload()">CHƠI LẠI VÒNG 1</button>
+        <h1>🏆 CHIẾN THẮNG!</h1>
+        <button class="btn-main" onclick="location.reload()">CHƠI LẠI</button>
     </div>
 </div>
-
-<audio id="snd-correct" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3"></audio>
-<audio id="snd-wrong" src="https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3"></audio>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
@@ -148,7 +127,7 @@
     const auth = getAuth();
     const provider = new GoogleAuthProvider();
 
-    onAuthStateChanged(auth, (user) => { if (user) showScreen('rule-screen'); });
+    onAuthStateChanged(auth, (user) => { if (user) startRound(1); });
     document.getElementById('login-btn').onclick = () => signInWithPopup(auth, provider);
     document.getElementById('logout-btn').onclick = () => { signOut(auth); location.reload(); };
 </script>
@@ -180,8 +159,8 @@
     function startRound(r) {
         currentRound = r;
         isShowingSecret = false;
-        document.getElementById('reveal-overlay').classList.remove('hidden');
-        document.getElementById('btn-done').classList.add('hidden');
+        document.getElementById('reveal-overlay').style.display = 'flex';
+        document.getElementById('reveal-overlay').classList.remove('peek');
         renderTable();
         showScreen('play-screen');
     }
@@ -207,16 +186,21 @@
         document.getElementById('round-title').innerText = data.title;
     }
 
-    function revealSecret() {
+    // Cơ chế Nhấn giữ để xem
+    function peekStart() {
         isShowingSecret = true;
         renderTable();
-        document.getElementById('btn-done').classList.remove('hidden');
+        document.getElementById('reveal-overlay').classList.add('peek');
     }
 
-    function hideSecret() {
+    function peekEnd() {
         isShowingSecret = false;
         renderTable();
-        document.getElementById('reveal-overlay').classList.add('hidden');
+        document.getElementById('reveal-overlay').classList.remove('peek');
+    }
+
+    function startGameNow() {
+        document.getElementById('reveal-overlay').style.display = 'none';
     }
 
     function toggleEliminate(el) {
@@ -226,20 +210,17 @@
     function checkWin(name) {
         const secret = gameData[currentRound].secret;
         if (name === secret) {
-            document.getElementById('snd-correct').play();
             if (currentRound === 1) {
-                alert("CHÍNH XÁC! Hãy sẵn sàng cho Vòng 2.");
+                alert("CHÍNH XÁC! Sang Vòng 2 nào.");
                 startRound(2);
             } else {
                 showScreen('end-screen');
             }
         } else {
-            document.getElementById('snd-wrong').play();
             document.getElementById('main-card').classList.add('error-shake');
             setTimeout(() => document.getElementById('main-card').classList.remove('error-shake'), 400);
         }
     }
 </script>
-
 </body>
 </html>
