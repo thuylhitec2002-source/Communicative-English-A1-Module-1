@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speaking Practice - Strict Mode</title>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;600;800&display=swap&subset=vietnamese" rel="stylesheet">
+    <style>
+        :root { --primary: #6366f1; --success: #22c55e; --error: #ef4444; --bg: #f8fafc; }
+        body { font-family: 'Lexend', Arial, sans-serif; background: var(--bg); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .card { background: white; width: 95%; max-width: 450px; padding: 35px; border-radius: 30px; box-shadow: 0 20px 40px rgba(0,0,0,0.05); text-align: center; }
+        .vi-q { font-size: 1.3rem; font-weight: 700; color: #1e293b; display: block; margin-bottom: 10px; line-height: 1.4; }
+        .en-m { color: #64748b; font-style: italic; font-size: 1rem; margin-bottom: 25px; display: block; }
+        .mic-btn { background: var(--primary); color: white; border: none; width: 85px; height: 85px; border-radius: 50%; font-size: 35px; cursor: pointer; outline: none; transition: 0.3s; }
+        .mic-btn.active { background: var(--error); animation: pulse 1s infinite; }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); } 70% { box-shadow: 0 0 0 20px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
+        .status { margin-top: 15px; font-weight: 600; color: #475569; min-height: 25px; }
+        .correction-box { background: #fee2e2; color: #991b1b; padding: 12px; border-radius: 12px; margin-top: 15px; font-size: 0.9rem; display: none; border: 1px solid #fecaca; line-height: 1.4; text-align: left; }
+        .user-said { color: #94a3b8; font-size: 0.85rem; font-style: italic; margin-top: 10px; }
+        .btn-next { background: var(--success); color: white; border: none; padding: 15px 40px; border-radius: 15px; font-weight: 800; cursor: pointer; width: 100%; margin-top: 20px; display: none; font-family: inherit; }
+    </style>
+</head>
+<body>
+
+<div id="start-screen" class="card">
+    <h1>Strict Speaking Test 🎙️</h1>
+    <p>Giới thiệu bản thân bạn.</p>
+    <button class="btn-next" style="display:block" onclick="initApp()">BẮT ĐẦU</button>
+</div>
+
+<div id="test-screen" class="card" style="display:none;">
+    <div class="q-area">
+        <span class="vi-q" id="vi-q">...</span>
+        <span class="en-m" id="en-m">...</span>
+    </div>
+    <button class="mic-btn" id="btnMic">🎙️</button>
+    <div class="status" id="status">Đang tải hướng dẫn...</div>
+    <div id="correction-box" class="correction-box"></div>
+    <div class="user-said" id="user-said"></div>
+    <button id="btnNext" class="btn-next" onclick="goNext()">TIẾP THEO →</button>
+</div>
+
+<audio id="snd-tink" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3"></audio>
+<audio id="snd-wrong" src="https://tiengdong.com/wp-content/uploads/Am-thanh-tra-loi-sai-www_tiengdong_com.mp3?_=1"></audio>
+
+<script>
+    const data = [
+        { 
+            vi: "Hãy giới thiệu tên của bạn.", 
+            en: "My name is [Name].", 
+            // KHÔNG chấp nhận "My name are"
+            reg: /^my name (is|'s) [a-z\s]+$/i,
+            errorMsg: "Lỗi: Cấu trúc phải là 'My name is [Tên]'. Đảm bảo không dùng 'are' hay thừa từ."
+        },
+        { 
+            vi: "Bạn bao nhiêu tuổi?", 
+            en: "I am [Số] years old.", 
+            // CHỈ chấp nhận số đứng trước years old, KHÔNG chấp nhận "third years old"
+            reg: /^i (am|'m) \d+ years old$/i,
+            errorMsg: "Lỗi: Phải nói 'I am [Số] years old'. Ví dụ: I am 20 years old. (Không dùng số thứ tự như third/first)"
+        },
+        { 
+            vi: "Quốc tịch của bạn?", 
+            en: "I am from [Country].", 
+            // KHÔNG chấp nhận "from the north", "from vietnamese"
+            reg: /^i (am|'m) from (?!the |canadian|vietnamese|american|japanese|korean|chinese)[a-z\s]+$/i,
+            errorMsg: "Lỗi: 'I am from [Tên nước]'. Đừng thêm 'the' hoặc dùng quốc tịch (Vietnamese) ở đây."
+        }
+    ];
+
+    let currentIdx = 0;
+    let recognition;
+    let micStream = null;
+
+    async function initApp() {
+        try {
+            micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            document.getElementById('start-screen').style.display = 'none';
+            document.getElementById('test-screen').style.display = 'block';
+            setupSpeech();
+            loadQuestion();
+        } catch (err) { alert("Lỗi: Cần cấp quyền Micro!"); }
+    }
+
+    function setupSpeech() {
+        const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+        recognition = new SpeechRec();
+        recognition.lang = 'en-US';
+        recognition.onstart = () => {
+            window.speechSynthesis.cancel();
+            document.getElementById('btnMic').classList.add('active');
+            document.getElementById('status').innerText = "Đang lắng nghe...";
+            document.getElementById('correction-box').style.display = 'none';
+        };
+        recognition.onresult = (e) => {
+            const text = e.results[0][0].transcript.toLowerCase().trim().replace(/[.,!?]$/, "");
+            document.getElementById('user-said').innerText = `Máy nghe thấy: "${text}"`;
+            checkAnswer(text);
+        };
+        recognition.onend = () => document.getElementById('btnMic').classList.remove('active');
+    }
+
+    function loadQuestion() {
+        const q = data[currentIdx];
+        document.getElementById('vi-q').innerText = q.vi;
+        document.getElementById('en-m').innerText = "Cấu trúc: " + q.en;
+        document.getElementById('status').innerText = "Đang đọc hướng dẫn...";
+        document.getElementById('btnMic').style.display = 'none';
+        document.getElementById('btnNext').style.display = 'none';
+        document.getElementById('correction-box').style.display = 'none';
+        document.getElementById('user-said').innerText = "";
+
+        speak(q.vi, 'vi-VN', () => {
+            speak(q.en.replace(/\[|\]/g, ""), 'en-US', () => {
+                document.getElementById('status').innerText = "Chạm để nói";
+                document.getElementById('btnMic').style.display = 'inline-block';
+            });
+        });
+    }
+
+    function checkAnswer(text) {
+        const q = data[currentIdx];
+        
+        // Kiểm tra khớp chính xác cấu trúc Regex từ đầu đến cuối
+        if (q.reg.test(text)) {
+            document.getElementById('snd-tink').play();
+            document.getElementById('status').innerText = "CHÍNH XÁC! 🎉";
+            document.getElementById('status').style.color = "var(--success)";
+            setTimeout(() => {
+                document.getElementById('btnMic').style.display = 'none';
+                document.getElementById('btnNext').style.display = 'block';
+            }, 600);
+        } else {
+            document.getElementById('snd-wrong').play();
+            showError(q.errorMsg);
+        }
+    }
+
+    function showError(msg) {
+        const box = document.getElementById('correction-box');
+        box.innerText = msg;
+        box.style.display = 'block';
+        document.getElementById('status').innerText = "Sai rồi, hãy nói lại!";
+        document.getElementById('status').style.color = "var(--error)";
+    }
+
+    function goNext() {
+        currentIdx++;
+        if (currentIdx < data.length) loadQuestion();
+        else { alert("Hoàn thành bài tập!"); location.reload(); }
+    }
+
+    function speak(text, lang, callback) {
+        const u = new SpeechSynthesisUtterance(text);
+        u.lang = lang; u.rate = 1.0; u.onend = callback;
+        window.speechSynthesis.speak(u);
+    }
+
+    document.getElementById('btnMic').onclick = () => recognition.start();
+</script>
+</body>
+</html>
