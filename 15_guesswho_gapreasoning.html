@@ -3,84 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reasoning Gap Fix - Pro Edition</title>
+    <title>Reasoning Gap Game - Final Pro</title>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #6c5ce7;
-            --primary-light: #a29bfe;
-            --success: #00b894;
-            --error: #ff7675;
-            --orange: #e67e22;
-            --bg: #f0f3f7;
+            --primary: #6366f1;
+            --success: #10b981;
+            --error: #ef4444;
+            --orange: #f39c12;
+            --bg: #f0f4ff;
         }
 
-        * { box-sizing: border-box; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); font-family: 'Quicksand', sans-serif; }
-        body { background: var(--bg); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        * { box-sizing: border-box; transition: all 0.2s ease; font-family: 'Quicksand', sans-serif; }
+        body { background: var(--bg); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; }
 
         .card { 
-            background: white; padding: 40px; border-radius: 40px; 
-            width: 100%; max-width: 900px; box-shadow: 0 20px 60px rgba(0,0,0,0.1); 
-            text-align: center; position: relative; overflow: hidden;
+            background: white; padding: 50px 40px; border-radius: 40px; 
+            width: 100%; max-width: 950px; box-shadow: 0 20px 60px rgba(0,0,0,0.08); 
+            text-align: center; position: relative;
         }
 
-        .screen { display: none; }
-        .active { display: block; animation: zoomIn 0.4s; }
-        @keyframes zoomIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        .top-bar { position: absolute; top: 25px; right: 30px; display: flex; gap: 15px; }
+        .logout-btn { background: none; border: 1px solid #ddd; padding: 8px 15px; border-radius: 12px; cursor: pointer; font-weight: 700; color: #888; }
 
-        /* --- TABLE 3D & HOVER --- */
+        .screen { display: none; }
+        .active { display: block; animation: fadeIn 0.4s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* --- TABLE STYLING --- */
         .game-table { width: 100%; border-collapse: separate; border-spacing: 12px; margin: 25px 0; }
         
         .game-table th, .game-table td { 
-            padding: 18px; border-radius: 20px; background: white; 
-            border: 2px solid #f1f2f6; font-weight: 700; font-size: 15px;
-            box-shadow: 0 6px 0 #f1f2f6; position: relative;
+            padding: 18px; border-radius: 20px; background: #f8fafc; 
+            border: 2px solid #edf2f7; font-weight: 700; font-size: 15px;
+            box-shadow: 0 6px 0 #edf2f7;
         }
 
-        .game-table td:hover { 
-            transform: translateY(-5px); 
-            box-shadow: 0 12px 20px rgba(0,0,0,0.05);
-            border-color: var(--primary-light);
-        }
+        /* Subheading Tím */
+        .row-label { background: var(--primary) !important; color: white !important; border: none !important; box-shadow: 0 6px 0 #4f46e5 !important; width: 150px; }
 
-        .game-table th { 
-            background: #efedff; color: var(--primary); 
-            cursor: pointer; border-color: #dcd9f8;
-            box-shadow: 0 6px 0 #dcd9f8;
-        }
-        .game-table th:hover { background: var(--primary); color: white; transform: translateY(-3px); }
-        
-        .game-table th.eliminated { 
-            background: #eee !important; color: #ccc !important; 
-            box-shadow: 0 2px 0 #ddd !important; transform: translateY(4px);
-            text-decoration: line-through;
-        }
+        /* Tên nhân vật Tím nhạt */
+        .name-header { background: #eef2ff !important; color: var(--primary) !important; border: 2px solid #e0e7ff !important; box-shadow: 0 6px 0 #e0e7ff !important; cursor: pointer; }
+        .name-header:hover { transform: translateY(-3px); background: #e0e7ff !important; }
+        .name-header.eliminated { background: #eee !important; color: #ccc !important; box-shadow: 0 2px 0 #ddd !important; text-decoration: line-through; transform: translateY(4px); }
 
-        /* Highlight màu cam - Đã sửa lỗi hiển thị */
-        .secret-active { 
-            background: #fff4e6 !important; 
-            border: 3px solid var(--orange) !important; 
-            box-shadow: 0 6px 0 #d35400 !important;
-            color: var(--orange) !important;
-        }
+        /* Hover hiệu ứng 3D cho các ô thông tin */
+        .info-cell:hover { transform: translateY(-5px); box-shadow: 0 12px 20px rgba(0,0,0,0.05); border-color: var(--primary); }
 
         .btn-main { 
             padding: 16px 40px; border-radius: 100px; border: none; 
             background: var(--primary); color: white; font-weight: 800; 
-            cursor: pointer; box-shadow: 0 8px 15px rgba(108, 92, 231, 0.3); font-size: 16px;
+            cursor: pointer; box-shadow: 0 8px 15px rgba(99, 102, 241, 0.3); font-size: 16px;
         }
+        .btn-main:hover { transform: translateY(-3px); }
 
-        /* Lớp phủ bảo mật - Đã sửa logic ẩn/hiện */
-        #reveal-overlay {
-            position: absolute; inset: 0; background: rgba(15, 15, 20, 0.98); 
-            border-radius: 40px; z-index: 1000; display: flex; flex-direction: column;
-            justify-content: center; align-items: center; color: white;
-            transition: opacity 0.5s ease;
-        }
-        #reveal-overlay.peek { opacity: 0.1; pointer-events: none; } /* Làm mờ để xem bảng */
+        .orange-box { border: 3px solid var(--orange) !important; background: #fff9f0 !important; color: var(--orange) !important; box-shadow: 0 6px 0 #e67e22 !important; }
 
-        .top-bar { position: absolute; top: 25px; right: 30px; display: flex; gap: 15px; }
-        
         @keyframes shake { 0%, 100% {transform: translateX(0);} 25% {transform: translateX(-8px);} 75% {transform: translateX(8px);} }
         .error-shake { animation: shake 0.4s; }
     </style>
@@ -89,31 +67,39 @@
 
 <div class="card" id="main-card">
     <div class="top-bar">
-        <button id="logout-btn" style="background:none; border:none; color:#aaa; font-weight:bold; cursor:pointer">🚪 ĐĂNG XUẤT</button>
+        <button id="logout-btn" class="logout-btn" style="display:none">🚪 ĐĂNG XUẤT</button>
     </div>
 
     <div id="login-screen" class="screen active">
-        <h1>REASONING GAP PRO</h1>
+        <h1 style="color: var(--primary);">REASONING GAP GAME</h1>
+        <p style="color: #666; margin-bottom: 30px;">Vui lòng đăng nhập để bắt đầu trò chơi.</p>
         <button id="login-btn" class="btn-main">Tiếp tục với Google</button>
     </div>
 
-    <div id="play-screen" class="screen">
-        <h2 id="round-title" style="color: var(--primary);">VÒNG 1</h2>
-
-        <div id="reveal-overlay">
-            <h2 id="overlay-msg" style="color: var(--orange)">BẢO MẬT DANH TÍNH</h2>
-            <p>Người hỏi vui lòng quay mặt đi.</p>
-            <button class="btn-main" style="background: var(--orange)" onmousedown="peekStart()" onmouseup="peekEnd()" ontouchstart="peekStart()" ontouchend="peekEnd()">NHẤN GIỮ ĐỂ XEM MẬT DANH</button>
-            <p style="margin-top:20px; font-size:13px; opacity:0.6">Thả tay ra để ẩn đi và bắt đầu đoán.</p>
-            <button class="btn-main" style="background: var(--success); margin-top:20px" onclick="startGameNow()">BẮT ĐẦU ĐOÁN ✅</button>
+    <div id="reveal-screen" class="screen">
+        <h2 style="color: var(--orange);">GIAI ĐOẠN 1: XÁC NHẬN DANH TÍNH</h2>
+        <p style="color: #888;">Người hỏi vui lòng quay mặt đi chỗ khác.</p>
+        <div style="margin: 40px 0;">
+            <button class="btn-main" style="background: var(--orange);" onclick="showPrivateIdentity()">BẤM ĐỂ XEM DANH TÍNH CỦA BẠN</button>
         </div>
+    </div>
 
-        <div id="table-container"></div>
-        <p style="color:#888; font-style:italic">💡 Click 1 lần để gạch tên | Click đúp (2 lần) để CHỐT ĐÁP ÁN</p>
+    <div id="private-screen" class="screen">
+        <h2 style="color: var(--orange);">MẬT DANH CỦA BẠN</h2>
+        <div id="private-table-container"></div>
+        <p style="font-style: italic; color: #888; margin-bottom: 25px;">Hãy ghi nhớ thông tin này!</p>
+        <button class="btn-main" style="background: var(--success);" onclick="prepareGuessing()">XONG - BẮT ĐẦU ĐOÁN ✅</button>
+    </div>
+
+    <div id="guess-screen" class="screen">
+        <h2 id="round-title" style="color: var(--primary);">VÒNG 1</h2>
+        <div id="main-table-container"></div>
+        <p style="color:#888; font-size: 14px;">💡 Click 1 lần để gạch tên | Click đúp (2 lần) để CHỐT ĐÁP ÁN</p>
     </div>
 
     <div id="end-screen" class="screen">
-        <h1>🏆 CHIẾN THẮNG!</h1>
+        <h1 style="font-size: 60px;">🏆</h1>
+        <h2 style="color: var(--success);">CHIẾN THẮNG!</h2>
         <button class="btn-main" onclick="location.reload()">CHƠI LẠI</button>
     </div>
 </div>
@@ -121,13 +107,26 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
     import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
-    
+    import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
     const firebaseConfig = { apiKey: "AIzaSyCdlTVHwiLOGMnrFe12DE1dQSEHZaJ594I", authDomain: "nguyen-am-tieng-anh.firebaseapp.com", projectId: "nguyen-am-tieng-anh" };
     const app = initializeApp(firebaseConfig);
     const auth = getAuth();
+    const db = getFirestore(app);
     const provider = new GoogleAuthProvider();
 
-    onAuthStateChanged(auth, (user) => { if (user) startRound(1); });
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            const q = query(collection(db, "Tienganh_so_cap"), where("email", "==", user.email));
+            const snap = await getDocs(q);
+            if (!snap.empty) {
+                document.getElementById('login-screen').classList.remove('active');
+                document.getElementById('logout-btn').style.display = 'block';
+                showScreen('reveal-screen');
+            } else { await signOut(auth); }
+        }
+    });
+
     document.getElementById('login-btn').onclick = () => signInWithPopup(auth, provider);
     document.getElementById('logout-btn').onclick = () => { signOut(auth); location.reload(); };
 </script>
@@ -135,84 +134,74 @@
 <script>
     const gameData = {
         1: { secret: "SAKURA", title: "VÒNG 1", people: [
-            { name: "AKIRA", gender: "Male (Mr.)", country: "Japan", email: "leo_it@gmail.com", phone: "081987 6543" },
-            { name: "SAKURA", gender: "Female (Ms.)", country: "Japan", email: "luna_it@gmail.com", phone: "093987 6543" },
-            { name: "NAM", gender: "Male (Mr.)", country: "Vietnam", email: "luca_es@yahoo.it", phone: "081555 6666" },
-            { name: "LAN", gender: "Female (Ms.)", country: "Vietnam", email: "lucia_es@gmail.com", phone: "093555 6666" }
+            { name: "AKIRA", GENDER: "Male (Mr.)", COUNTRY: "Japan", EMAIL: "leo_it@gmail.com", PHONE: "081987 6543" },
+            { name: "SAKURA", GENDER: "Female (Ms.)", COUNTRY: "Japan", EMAIL: "luna_it@gmail.com", PHONE: "093987 6543" },
+            { name: "NAM", GENDER: "Male (Mr.)", COUNTRY: "Vietnam", EMAIL: "luca_es@yahoo.it", PHONE: "081555 6666" },
+            { name: "LAN", GENDER: "Female (Ms.)", COUNTRY: "Vietnam", EMAIL: "lucia_es@gmail.com", PHONE: "093555 6666" }
         ]},
         2: { secret: "LEO", title: "VÒNG 2", people: [
-            { name: "LEO", gender: "Male (Mr.)", country: "Italy", email: "leo_vn@gmail.com", phone: "0399 876 543" },
-            { name: "LUNA", gender: "Female (Ms.)", country: "Italy", email: "luna_it@gmail.com", phone: "0349 876 543" },
-            { name: "LUCA", gender: "Male (Mr.)", country: "Spain", email: "luca_es@yahoo.it", phone: "0395 556 666" },
-            { name: "LUCIA", gender: "Female (Ms.)", country: "France", email: "lucia_fr@gmail.com", phone: "0445 556 666" }
+            { name: "LEO", GENDER: "Male (Mr.)", COUNTRY: "Italy", EMAIL: "leo_vn@gmail.com", PHONE: "0399 876 543" },
+            { name: "LUNA", GENDER: "Female (Ms.)", COUNTRY: "Italy", EMAIL: "luna_it@gmail.com", PHONE: "0349 876 543" },
+            { name: "LUCA", GENDER: "Male (Mr.)", COUNTRY: "Spain", EMAIL: "luca_es@yahoo.it", PHONE: "0395 556 666" },
+            { name: "LUCIA", GENDER: "Female (Ms.)", COUNTRY: "France", EMAIL: "lucia_fr@gmail.com", PHONE: "0445 556 666" }
         ]}
     };
 
     let currentRound = 1;
-    let isShowingSecret = false;
 
     function showScreen(id) {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
         document.getElementById(id).classList.add('active');
     }
 
-    function startRound(r) {
-        currentRound = r;
-        isShowingSecret = false;
-        document.getElementById('reveal-overlay').style.display = 'flex';
-        document.getElementById('reveal-overlay').classList.remove('peek');
-        renderTable();
-        showScreen('play-screen');
-    }
-
-    function renderTable() {
+    // HIỆN RIÊNG 1 CỘT CHO NGƯỜI GIỮ BÍ MẬT
+    window.showPrivateIdentity = () => {
         const data = gameData[currentRound];
-        let html = `<table class="game-table"><tr><th>Chi tiết</th>`;
+        const person = data.people.find(p => p.name === data.secret);
+        
+        let html = `<table class="game-table" style="max-width:300px; margin:auto">
+            <tr><th class="name-header orange-box">${person.name}</th></tr>`;
+        ['GENDER', 'COUNTRY', 'EMAIL', 'PHONE'].forEach(row => {
+            html += `<tr><td class="info-cell orange-box">${person[row]}</td></tr>`;
+        });
+        html += `</table>`;
+        
+        document.getElementById('private-table-container').innerHTML = html;
+        showScreen('private-screen');
+    };
+
+    // BẮT ĐẦU GIAI ĐOẠN ĐOÁN (Hiện 4 người)
+    window.prepareGuessing = () => {
+        renderMainTable();
+        showScreen('guess-screen');
+    };
+
+    function renderMainTable() {
+        const data = gameData[currentRound];
+        let html = `<table class="game-table"><tr><th class="row-label">Chi tiết</th>`;
         data.people.forEach(p => {
-            html += `<th onclick="toggleEliminate(this)" ondblclick="checkWin('${p.name}')">${p.name}</th>`;
+            html += `<th class="name-header" onclick="this.classList.toggle('eliminated')" ondblclick="checkWin('${p.name}')">${p.name}</th>`;
         });
         html += `</tr>`;
 
-        ['gender', 'country', 'email', 'phone'].forEach(row => {
-            html += `<tr><td><b>${row.toUpperCase()}</b></td>`;
+        ['GENDER', 'COUNTRY', 'EMAIL', 'PHONE'].forEach(row => {
+            html += `<tr><td class="row-label">${row}</td>`;
             data.people.forEach(p => {
-                const isSecret = (p.name === data.secret && isShowingSecret);
-                html += `<td class="${isSecret ? 'secret-active' : ''}">${p[row]}</td>`;
+                html += `<td class="info-cell">${p[row]}</td>`;
             });
             html += `</tr>`;
         });
         html += `</table>`;
-        document.getElementById('table-container').innerHTML = html;
+        document.getElementById('main-table-container').innerHTML = html;
         document.getElementById('round-title').innerText = data.title;
     }
 
-    // Cơ chế Nhấn giữ để xem
-    function peekStart() {
-        isShowingSecret = true;
-        renderTable();
-        document.getElementById('reveal-overlay').classList.add('peek');
-    }
-
-    function peekEnd() {
-        isShowingSecret = false;
-        renderTable();
-        document.getElementById('reveal-overlay').classList.remove('peek');
-    }
-
-    function startGameNow() {
-        document.getElementById('reveal-overlay').style.display = 'none';
-    }
-
-    function toggleEliminate(el) {
-        el.classList.toggle('eliminated');
-    }
-
     function checkWin(name) {
-        const secret = gameData[currentRound].secret;
-        if (name === secret) {
+        if (name === gameData[currentRound].secret) {
             if (currentRound === 1) {
-                alert("CHÍNH XÁC! Sang Vòng 2 nào.");
-                startRound(2);
+                alert("ĐÚNG RỒI! CHUYỂN SANG VÒNG 2");
+                currentRound = 2;
+                showScreen('reveal-screen');
             } else {
                 showScreen('end-screen');
             }
@@ -222,5 +211,6 @@
         }
     }
 </script>
+
 </body>
 </html>
