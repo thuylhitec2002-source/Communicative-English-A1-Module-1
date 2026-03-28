@@ -3,55 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reasoning Gap Game - Final Pro</title>
+    <title>Reasoning Gap - Pro Elite</title>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #6366f1;
-            --success: #10b981;
-            --error: #ef4444;
-            --orange: #f39c12;
-            --bg: #f0f4ff;
+            --primary: #6366f1; --success: #10b981; --error: #ef4444;
+            --orange: #f39c12; --bg: #f0f4ff;
         }
 
         * { box-sizing: border-box; transition: all 0.2s ease; font-family: 'Quicksand', sans-serif; }
-        body { background: var(--bg); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; }
+        body { background: var(--bg); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; overflow: hidden; }
 
         .card { 
-            background: white; padding: 50px 40px; border-radius: 40px; 
+            background: white; padding: 45px; border-radius: 40px; 
             width: 100%; max-width: 950px; box-shadow: 0 20px 60px rgba(0,0,0,0.08); 
-            text-align: center; position: relative;
+            text-align: center; position: relative; z-index: 10;
         }
 
-        .top-bar { position: absolute; top: 25px; right: 30px; display: flex; gap: 15px; }
-        .logout-btn { background: none; border: 1px solid #ddd; padding: 8px 15px; border-radius: 12px; cursor: pointer; font-weight: 700; color: #888; }
+        .top-bar { position: absolute; top: 20px; right: 25px; }
+        .logout-btn { background: #eee; border: none; padding: 8px 15px; border-radius: 12px; cursor: pointer; font-weight: 700; color: #888; }
 
         .screen { display: none; }
         .active { display: block; animation: fadeIn 0.4s; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* --- TABLE STYLING --- */
-        .game-table { width: 100%; border-collapse: separate; border-spacing: 12px; margin: 25px 0; }
-        
+        /* --- TABLE --- */
+        .game-table { width: 100%; border-collapse: separate; border-spacing: 12px; margin: 20px 0; }
         .game-table th, .game-table td { 
             padding: 18px; border-radius: 20px; background: #f8fafc; 
-            border: 2px solid #edf2f7; font-weight: 700; font-size: 15px;
-            box-shadow: 0 6px 0 #edf2f7;
+            border: 2px solid #edf2f7; font-weight: 700; font-size: 15px; box-shadow: 0 6px 0 #edf2f7;
         }
-
-        /* Subheading Tím */
-        .row-label { background: var(--primary) !important; color: white !important; border: none !important; box-shadow: 0 6px 0 #4f46e5 !important; width: 150px; }
-
-        /* Tên nhân vật Tím nhạt */
+        .row-label { background: var(--primary) !important; color: white !important; border: none !important; box-shadow: 0 6px 0 #4f46e5 !important; width: 140px; }
         .name-header { background: #eef2ff !important; color: var(--primary) !important; border: 2px solid #e0e7ff !important; box-shadow: 0 6px 0 #e0e7ff !important; cursor: pointer; }
-        .name-header:hover { transform: translateY(-3px); background: #e0e7ff !important; }
-        .name-header.eliminated { background: #eee !important; color: #ccc !important; box-shadow: 0 2px 0 #ddd !important; text-decoration: line-through; transform: translateY(4px); }
+        .name-header.eliminated { background: #eee !important; color: #ccc !important; box-shadow: 0 2px 0 #ddd !important; text-decoration: line-through; transform: translateY(4px); opacity: 0.6; }
 
-        /* Hover hiệu ứng 3D cho các ô thông tin */
-        .info-cell:hover { transform: translateY(-5px); box-shadow: 0 12px 20px rgba(0,0,0,0.05); border-color: var(--primary); }
+        /* --- INPUT --- */
+        .guess-box { display: flex; gap: 10px; justify-content: center; margin-top: 25px; align-items: center; }
+        .input-name { padding: 15px 25px; border-radius: 15px; border: 3px solid #eee; font-size: 18px; font-weight: 800; outline: none; width: 250px; text-transform: uppercase; }
+        .input-name:focus { border-color: var(--primary); }
 
         .btn-main { 
-            padding: 16px 40px; border-radius: 100px; border: none; 
+            padding: 16px 35px; border-radius: 100px; border: none; 
             background: var(--primary); color: white; font-weight: 800; 
             cursor: pointer; box-shadow: 0 8px 15px rgba(99, 102, 241, 0.3); font-size: 16px;
         }
@@ -59,6 +51,10 @@
 
         .orange-box { border: 3px solid var(--orange) !important; background: #fff9f0 !important; color: var(--orange) !important; box-shadow: 0 6px 0 #e67e22 !important; }
 
+        /* --- BALLOONS --- */
+        .balloon { position: fixed; bottom: -100px; width: 50px; height: 70px; border-radius: 50%; z-index: 5; animation: floatUp 4s linear forwards; }
+        @keyframes floatUp { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-120vh); opacity: 0; } }
+        
         @keyframes shake { 0%, 100% {transform: translateX(0);} 25% {transform: translateX(-8px);} 75% {transform: translateX(8px);} }
         .error-shake { animation: shake 0.4s; }
     </style>
@@ -66,43 +62,58 @@
 <body>
 
 <div class="card" id="main-card">
-    <div class="top-bar">
-        <button id="logout-btn" class="logout-btn" style="display:none">🚪 ĐĂNG XUẤT</button>
-    </div>
+    <div class="top-bar"><button id="logout-btn" class="logout-btn" style="display:none">🚪 ĐĂNG XUẤT</button></div>
 
     <div id="login-screen" class="screen active">
         <h1 style="color: var(--primary);">REASONING GAP GAME</h1>
-        <p style="color: #666; margin-bottom: 30px;">Vui lòng đăng nhập để bắt đầu trò chơi.</p>
         <button id="login-btn" class="btn-main">Tiếp tục với Google</button>
     </div>
 
+    <div id="rule-screen" class="screen">
+        <span style="font-size: 50px;">📜</span>
+        <h1>LUẬT CHƠI</h1>
+        <div style="text-align: left; background: #f9faff; padding: 25px; border-radius: 20px; margin-bottom: 25px; border: 2px dashed #e0e7ff;">
+            <p>1. <b>Giai đoạn 1:</b> Một người xem "Mật danh" của mình (Người hỏi quay mặt đi).</p>
+            <p>2. <b>Giai đoạn 2:</b> Người hỏi nhìn bảng, click vào tên để gạch bỏ người bị loại.</p>
+            <p>3. <b>Xác nhận:</b> Nhập tên người bạn đoán vào ô bên dưới để chốt đáp án.</p>
+        </div>
+        <button class="btn-main" onclick="showScreen('reveal-screen')">SẴN SÀNG! 🚀</button>
+    </div>
+
     <div id="reveal-screen" class="screen">
-        <h2 style="color: var(--orange);">GIAI ĐOẠN 1: XÁC NHẬN DANH TÍNH</h2>
-        <p style="color: #888;">Người hỏi vui lòng quay mặt đi chỗ khác.</p>
-        <div style="margin: 40px 0;">
-            <button class="btn-main" style="background: var(--orange);" onclick="showPrivateIdentity()">BẤM ĐỂ XEM DANH TÍNH CỦA BẠN</button>
+        <h2 id="reveal-title" style="color: var(--orange);">XÁC NHẬN DANH TÍNH</h2>
+        <p style="background: #fff4e6; color: #d35400; padding: 10px; border-radius: 10px; font-weight: 800;">⚠️ NGƯỜI ĐOÁN VUI LÒNG QUAY MẶT ĐI CHỖ KHÁC!</p>
+        <div style="margin: 30px 0;">
+            <button class="btn-main" style="background: var(--orange);" onclick="showPrivateIdentity()">BẤM ĐỂ XEM DANH TÍNH</button>
         </div>
     </div>
 
     <div id="private-screen" class="screen">
         <h2 style="color: var(--orange);">MẬT DANH CỦA BẠN</h2>
         <div id="private-table-container"></div>
-        <p style="font-style: italic; color: #888; margin-bottom: 25px;">Hãy ghi nhớ thông tin này!</p>
-        <button class="btn-main" style="background: var(--success);" onclick="prepareGuessing()">XONG - BẮT ĐẦU ĐOÁN ✅</button>
+        <button class="btn-main" style="background: var(--success); margin-top: 20px;" onclick="prepareGuessing()">XONG - BẮT ĐẦU ĐOÁN ✅</button>
     </div>
 
     <div id="guess-screen" class="screen">
         <h2 id="round-title" style="color: var(--primary);">VÒNG 1</h2>
         <div id="main-table-container"></div>
-        <p style="color:#888; font-size: 14px;">💡 Click 1 lần để gạch tên | Click đúp (2 lần) để CHỐT ĐÁP ÁN</p>
+        <div class="guess-box">
+            <input type="text" id="user-guess" class="input-name" placeholder="NHẬP TÊN ĐOÁN...">
+            <button class="btn-main" onclick="handleGuess()">XÁC NHẬN</button>
+        </div>
+        <p style="color:#888; font-size: 14px; margin-top: 15px;">💡 Click vào tên nhân vật phía trên để gạch bỏ người bị loại.</p>
     </div>
 
     <div id="end-screen" class="screen">
         <h1 style="font-size: 60px;">🏆</h1>
-        <h2 style="color: var(--success);">CHIẾN THẮNG!</h2>
+        <h2 style="color: var(--success);">CHIẾN THẮNG HOÀN TOÀN!</h2>
         <button class="btn-main" onclick="location.reload()">CHƠI LẠI</button>
     </div>
 </div>
+
+<audio id="snd-correct" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3"></audio>
+<audio id="snd-wrong" src="https://cdn.pixabay.com/audio/2022/03/10/audio_8b0fae46ef.mp3"></audio>
+<audio id="snd-scratch" src="https://assets.mixkit.co/active_storage/sfx/2014/2014-preview.mp3"></audio>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
@@ -122,7 +133,7 @@
             if (!snap.empty) {
                 document.getElementById('login-screen').classList.remove('active');
                 document.getElementById('logout-btn').style.display = 'block';
-                showScreen('reveal-screen');
+                showScreen('rule-screen');
             } else { await signOut(auth); }
         }
     });
@@ -134,7 +145,7 @@
 <script>
     const gameData = {
         1: { secret: "SAKURA", title: "VÒNG 1", people: [
-            { name: "AKIRA", GENDER: "Male (Mr.)", COUNTRY: "Japan", EMAIL: "leo_it@gmail.com", PHONE: "081987 6543" },
+            { name: "AKIRA", GENDER: "Female (Ms.)", COUNTRY: "Japan", EMAIL: "leo_it@gmail.com", PHONE: "081987 6543" },
             { name: "SAKURA", GENDER: "Female (Ms.)", COUNTRY: "Japan", EMAIL: "luna_it@gmail.com", PHONE: "093987 6543" },
             { name: "NAM", GENDER: "Male (Mr.)", COUNTRY: "Vietnam", EMAIL: "luca_es@yahoo.it", PHONE: "081555 6666" },
             { name: "LAN", GENDER: "Female (Ms.)", COUNTRY: "Vietnam", EMAIL: "lucia_es@gmail.com", PHONE: "093555 6666" }
@@ -149,46 +160,39 @@
 
     let currentRound = 1;
 
-    function showScreen(id) {
+    window.showScreen = (id) => {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
         document.getElementById(id).classList.add('active');
-    }
+    };
 
-    // HIỆN RIÊNG 1 CỘT CHO NGƯỜI GIỮ BÍ MẬT
     window.showPrivateIdentity = () => {
         const data = gameData[currentRound];
         const person = data.people.find(p => p.name === data.secret);
-        
-        let html = `<table class="game-table" style="max-width:300px; margin:auto">
-            <tr><th class="name-header orange-box">${person.name}</th></tr>`;
+        let html = `<table class="game-table" style="max-width:350px; margin:auto"><tr><th class="name-header orange-box">${person.name}</th></tr>`;
         ['GENDER', 'COUNTRY', 'EMAIL', 'PHONE'].forEach(row => {
             html += `<tr><td class="info-cell orange-box">${person[row]}</td></tr>`;
         });
         html += `</table>`;
-        
         document.getElementById('private-table-container').innerHTML = html;
         showScreen('private-screen');
     };
 
-    // BẮT ĐẦU GIAI ĐOẠN ĐOÁN (Hiện 4 người)
     window.prepareGuessing = () => {
         renderMainTable();
         showScreen('guess-screen');
+        document.getElementById('user-guess').value = '';
     };
 
     function renderMainTable() {
         const data = gameData[currentRound];
         let html = `<table class="game-table"><tr><th class="row-label">Chi tiết</th>`;
         data.people.forEach(p => {
-            html += `<th class="name-header" onclick="this.classList.toggle('eliminated')" ondblclick="checkWin('${p.name}')">${p.name}</th>`;
+            html += `<th class="name-header" onclick="eliminate(this)">${p.name}</th>`;
         });
         html += `</tr>`;
-
         ['GENDER', 'COUNTRY', 'EMAIL', 'PHONE'].forEach(row => {
             html += `<tr><td class="row-label">${row}</td>`;
-            data.people.forEach(p => {
-                html += `<td class="info-cell">${p[row]}</td>`;
-            });
+            data.people.forEach(p => { html += `<td class="info-cell">${p[row]}</td>`; });
             html += `</tr>`;
         });
         html += `</table>`;
@@ -196,18 +200,45 @@
         document.getElementById('round-title').innerText = data.title;
     }
 
-    function checkWin(name) {
-        if (name === gameData[currentRound].secret) {
-            if (currentRound === 1) {
-                alert("ĐÚNG RỒI! CHUYỂN SANG VÒNG 2");
-                currentRound = 2;
-                showScreen('reveal-screen');
-            } else {
-                showScreen('end-screen');
-            }
+    function eliminate(el) {
+        el.classList.toggle('eliminated');
+        document.getElementById('snd-scratch').currentTime = 0;
+        document.getElementById('snd-scratch').play();
+    }
+
+    function handleGuess() {
+        const guess = document.getElementById('user-guess').value.trim().toUpperCase();
+        const secret = gameData[currentRound].secret;
+
+        if (guess === secret) {
+            document.getElementById('snd-correct').play();
+            spawnBalloons();
+            setTimeout(() => {
+                if (currentRound === 1) {
+                    currentRound = 2;
+                    document.getElementById('reveal-title').innerText = "XÁC NHẬN DANH TÍNH (VÒNG 2)";
+                    showScreen('reveal-screen');
+                } else {
+                    showScreen('end-screen');
+                }
+            }, 2500);
         } else {
+            document.getElementById('snd-wrong').play();
             document.getElementById('main-card').classList.add('error-shake');
             setTimeout(() => document.getElementById('main-card').classList.remove('error-shake'), 400);
+        }
+    }
+
+    function spawnBalloons() {
+        const colors = ['#6366f1', '#10b981', '#f39c12', '#ef4444', '#a29bfe'];
+        for (let i = 0; i < 30; i++) {
+            const b = document.createElement('div');
+            b.className = 'balloon';
+            b.style.left = Math.random() * 100 + 'vw';
+            b.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            b.style.animationDelay = Math.random() * 2 + 's';
+            document.body.appendChild(b);
+            setTimeout(() => b.remove(), 5000);
         }
     }
 </script>
