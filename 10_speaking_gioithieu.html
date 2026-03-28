@@ -3,140 +3,109 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Speaking Practice Pro - Google Style</title>
+    <title>Speaking Practice - Google Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #6366f1;
-            --success: #10b981; 
-            --error: #f43f5e;
-            --bg: #eff6ff;
-            --card-bg: #ffffff;
+            --google-blue: #4285F4;
+            --google-red: #EA4335;
+            --google-yellow: #FBBC05;
+            --google-green: #34A853;
+            --bg: #f8f9fa;
+            --text: #3c4043;
         }
 
-        * { box-sizing: border-box; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        * { box-sizing: border-box; transition: all 0.3s ease; font-family: 'Lexend', sans-serif; }
 
         body {
-            font-family: 'Lexend', sans-serif;
             background: var(--bg);
-            background-image: radial-gradient(circle, #dbeafe 1px, transparent 1px);
-            background-size: 24px 24px;
             display: flex; justify-content: center; align-items: center;
-            min-height: 100vh; margin: 0; overflow: hidden;
-        }
-
-        @keyframes floating {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-12px); }
+            min-height: 100vh; margin: 0; color: var(--text);
         }
 
         .card {
-            background: var(--card-bg);
-            width: 90%;
-            max-width: 500px;
-            padding: 60px 40px;
-            border-radius: 45px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.06);
+            background: white;
+            width: 90%; max-width: 500px;
+            padding: 50px 40px;
+            border-radius: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
             text-align: center;
             position: relative;
-            animation: floating 5s ease-in-out infinite;
-            border: 1px solid rgba(255,255,255,1);
         }
 
-        .card:hover {
-            transform: translateY(-5px) scale(1.01);
-            box-shadow: 0 30px 60px rgba(99, 102, 241, 0.1);
-        }
+        .card:hover { box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
 
-        .vi-q { font-size: 1.6rem; font-weight: 800; color: #1e293b; display: block; margin-bottom: 12px; line-height: 1.3; }
-        .en-m { color: var(--primary); font-style: italic; font-size: 1.1rem; margin-bottom: 40px; display: block; font-weight: 600; opacity: 0.8; }
+        h1 { font-size: 1.8rem; margin-bottom: 8px; color: var(--google-blue); }
+        .en-question { font-size: 1.5rem; font-weight: 700; color: #202124; margin-bottom: 25px; display: block; }
 
-        /* --- NÚT MIC XANH LÁ --- */
-        .mic-btn {
-            background: var(--success);
-            color: white;
-            border: none;
-            width: 90px; height: 90px;
-            border-radius: 50%;
-            font-size: 38px;
-            cursor: pointer;
-            box-shadow: 0 10px 0 #059669;
-            margin-bottom: 10px;
-            display: inline-flex; align-items: center; justify-content: center;
-        }
-        .mic-btn:active, .mic-btn.active {
-            transform: translateY(8px);
-            box-shadow: 0 2px 0 #059669;
-        }
-        .mic-btn.active {
-            background: var(--error);
-            box-shadow: 0 2px 0 #9f1239;
-            animation: pulse 1s infinite alternate;
-        }
-
-        /* --- NÚT GOOGLE LOGOUT --- */
-        .google-logout {
-            display: inline-flex; align-items: center; gap: 10px;
+        /* Nút Google */
+        .google-btn {
+            display: inline-flex; align-items: center; gap: 12px;
             background: white; color: #3c4043; border: 1px solid #dadce0;
-            padding: 8px 16px; border-radius: 20px; cursor: pointer;
-            font-weight: 600; font-size: 0.85rem; margin-top: 30px;
-            box-shadow: 0 1px 2px rgba(60,64,67,0.3);
+            padding: 12px 24px; border-radius: 8px; cursor: pointer;
+            font-weight: 600; font-size: 1rem; box-shadow: 0 1px 2px rgba(0,0,0,0.1);
         }
-        .google-logout:hover { background: #f8f9fa; border-color: #d2d2d2; }
-        .google-logout svg { width: 18px; height: 18px; }
+        .google-btn:hover { background: #f8f9fa; border-color: #d2d2d2; }
+        .google-btn svg { width: 20px; height: 20px; }
 
-        .status { margin-top: 20px; font-weight: 700; color: #64748b; font-size: 0.9rem; }
-
-        .btn-skip {
-            background: none; border: none; color: #94a3b8;
-            font-size: 0.85rem; font-weight: 600; cursor: pointer;
-            margin-top: 15px; text-decoration: underline;
+        /* Micro Xanh nhẹ */
+        .mic-btn {
+            background: var(--google-green); color: white;
+            border: none; width: 80px; height: 80px;
+            border-radius: 50%; font-size: 32px; cursor: pointer;
+            box-shadow: 0 4px 10px rgba(52, 168, 83, 0.3);
+            margin: 20px 0;
         }
-        .btn-skip:hover { color: var(--primary); }
+        .mic-btn.active { background: var(--google-red); animation: pulse 1.2s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
 
-        .btn-next {
-            background: var(--primary); color: white; border: none;
-            padding: 18px; border-radius: 22px; font-weight: 800;
-            cursor: pointer; width: 100%; margin-top: 30px;
-            box-shadow: 0 8px 0 #4338ca; font-family: inherit; font-size: 1.1rem;
-        }
+        .control-row { display: flex; justify-content: center; gap: 15px; margin-top: 10px; }
+        .sub-btn { background: #f1f3f4; border: none; padding: 10px 18px; border-radius: 8px; font-size: 0.9rem; font-weight: 600; cursor: pointer; color: #5f6368; }
+        .sub-btn:hover { background: #e8eaed; color: #202124; }
 
-        .correction-box { background: #fff1f2; color: #9f1239; padding: 18px; border-radius: 20px; margin-top: 20px; display: none; border: 2px solid #fecaca; text-align: left; font-size: 0.9rem; }
+        .status { margin-top: 20px; font-weight: 600; color: #70757a; font-size: 0.9rem; }
+        .btn-next { background: var(--google-blue); color: white; border: none; padding: 15px; border-radius: 12px; font-weight: 800; cursor: pointer; width: 100%; margin-top: 30px; font-size: 1.1rem; }
+
+        .hint-box { background: #fff8e1; color: #795548; padding: 15px; border-radius: 12px; margin-top: 20px; display: none; text-align: left; font-size: 0.9rem; border-left: 4px solid var(--google-yellow); }
 
         .hidden { display: none !important; }
-        @keyframes pulse { from { transform: scale(1) translateY(8px); } to { transform: scale(1.08) translateY(8px); } }
     </style>
 </head>
 <body>
 
-<div id="login-screen">
-    <div class="card">
-        <h1 style="color: var(--primary); font-size: 2.2rem;">SPEAKING TEST</h1>
-        <button id="login-btn" class="btn-next" style="display:block">Đăng nhập với Google</button>
-    </div>
-</div>
-
-<div id="test-screen" class="card hidden">
-    <div id="q-area">
-        <span class="vi-q" id="vi-q">...</span>
-        <span class="en-m" id="en-m">...</span>
+<div id="game-container">
+    <div id="login-screen" class="card">
+        <svg style="width:48px; height:48px; margin-bottom:20px" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59L2.56 13.22C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path></svg>
+        <h1> Speaking Mastery</h1>
+        <p style="color:#70757a; margin-bottom:30px">Học tiếng Anh theo phong cách Google</p>
+        <button id="login-btn" class="google-btn">
+            <svg viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59L2.56 13.22C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path></svg>
+            Tiếp tục với Google
+        </button>
     </div>
 
-    <button class="mic-btn" id="btnMic">🎙️</button>
-    <div class="status" id="status">Sẵn sàng</div>
-    
-    <button class="btn-skip" onclick="goNext()">Bỏ qua câu này ➔</button>
+    <div id="start-screen" class="card hidden">
+        <h1 id="welcome-text">Sẵn sàng chưa?</h1>
+        <p style="color:#70757a; margin-bottom:30px">Hãy nói to, rõ ràng theo cấu trúc hướng dẫn.</p>
+        <button class="btn-next" onclick="initGame()">BẮT ĐẦU BÀI HỌC</button>
+    </div>
 
-    <div id="correction-box" class="correction-box"></div>
-    <div id="user-said" style="color:#94a3b8; font-size:0.8rem; margin-top:15px; font-style:italic"></div>
-    
-    <button id="btnNext" class="btn-next hidden" onclick="goNext()">TIẾP THEO ➔</button>
+    <div id="test-screen" class="card hidden">
+        <span class="en-question" id="en-q">Question</span>
+        <button class="mic-btn" id="btnMic">🎙️</button>
+        <div class="status" id="status">Sẵn sàng</div>
+        
+        <div class="control-row">
+            <button class="sub-btn" onclick="autoReadQuestion()">🔈 Nghe câu hỏi</button>
+            <button class="sub-btn" onclick="showHint()">💡 Gợi ý</button>
+        </div>
 
-    <br>
-    <button class="google-logout" id="logout-btn">
-        <svg viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59L2.56 13.22C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path></svg>
-        Đăng xuất
-    </button>
+        <div id="hint-box" class="hint-box"></div>
+        <div id="user-said" style="color:#94a3b8; font-size:0.8rem; margin-top:15px; font-style:italic"></div>
+        
+        <button id="btnNext" class="btn-next hidden" onclick="goNext()">TIẾP THEO ➔</button>
+        <button class="google-btn" style="margin-top:30px; font-size:0.8rem" onclick="logout()">Đăng xuất</button>
+    </div>
 </div>
 
 <audio id="snd-correct" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3"></audio>
@@ -159,100 +128,105 @@
             const snap = await getDocs(q);
             if (!snap.empty) {
                 document.getElementById('login-screen').classList.add('hidden');
-                document.getElementById('test-screen').classList.remove('hidden');
-                initGame();
+                document.getElementById('start-screen').classList.remove('hidden');
+                document.getElementById('welcome-text').innerText = "Chào " + user.displayName + "!";
             } else { await signOut(auth); }
         }
     });
 
+    window.logout = () => { signOut(auth).then(() => location.reload()); };
     document.getElementById("login-btn").onclick = () => signInWithPopup(auth, provider);
-    document.getElementById("logout-btn").onclick = () => { signOut(auth).then(() => location.reload()); };
 
-    // --- CẤU TRÚC DỮ LIỆU ĐÃ NỚI LỎNG REGEX ---
+    // --- GAME LOGIC ---
     const data = [
-        { vi: "Hãy giới thiệu tên của bạn.", en: "My name is [Name].", reg: /^my name (is|'s) [a-z\s]+$/i, errorMsg: "Mẫu: 'My name is [Tên]'." },
-        { vi: "Bạn bao nhiêu tuổi?", en: "I am [Số] years old.", reg: /^(i am|i'm) \d+ years old$/i, errorMsg: "Mẫu: 'I am [Số] years old'." },
-        { vi: "Quốc tịch của bạn?", en: "I am from [Country].", reg: /^(i am|i'm) from [a-z\s]+$/i, errorMsg: "Mẫu: 'I am from Vietnam'." },
-        { 
-            vi: "Đánh vần tên bạn?", 
-            en: "It's [A-B-C...].", 
-            // ĐÃ SỬA: Chấp nhận cả việc không có "It's" ở đầu và chấp nhận các khoảng trắng rời rạc
-            reg: /^((it is|it's)\s)?([a-z]\s?)+$/i, 
-            errorMsg: "Hãy đánh vần từng chữ cái. Ví dụ: T H U Y." 
-        },
-        { vi: "Bạn sống ở thành phố nào?", en: "It's [City Name].", reg: /^(it is|it's) [a-z\s]+$/i, errorMsg: "Mẫu: 'It's Ho Chi Minh City'." },
-        { vi: "Số điện thoại của bạn?", en: "It's [Số điện thoại].", reg: /^(it is|it's) [\d\s]+$/i, errorMsg: "Mẫu: 'It's 098...'" },
-        { vi: "Địa chỉ Email của bạn?", en: "It's [Email Address].", reg: /^(it is|it's) [a-z0-9\s._@]+$/i, errorMsg: "Mẫu: 'It's alex at gmail dot com'." },
-        { vi: "Địa chỉ của bạn là gì?", en: "It's [Address].", reg: /^(it is|it's) [a-z0-9\s,.-]+$/i, errorMsg: "Mẫu: 'It's 123 Blue Street'." }
+        { q: "What is your name?", en: "My name is [Name].", reg: /^(my name (is|'s)\s)?[a-z\s]+$/i, hint: "My name is [Tên của bạn]" },
+        { q: "How do you spell your name?", en: "It's [A-B-C...].", reg: /^((it is|it's)\s)?([a-z]\s?)+$/i, hint: "T-H-U-Y (Đánh vần từng chữ)" },
+        { q: "How old are you?", en: "I am [Age] years old.", reg: /^((i am|i'm)\s)?\d+(\syears\sold)?$/i, hint: "I am 20 years old" },
+        { q: "What is your nationality?", en: "I am from [Country].", reg: /^((i am|i'm|i am from|i'm from)\s)?[a-z\s]+$/i, hint: "I am from Vietnam" },
+        { q: "Which city do you live in?", en: "I live in [City Name].", reg: /^((it is|it's|i live in)\s)?[a-z\s]+$/i, hint: "I live in Danang" },
+        { q: "What is your phone number?", en: "It's [Phone number].", reg: /^((it is|it's)\s)?[\d\s]+$/i, hint: "0-9-8..." },
+        { q: "What is your email address?", en: "It's [Email].", reg: /^((it is|it's)\s)?[a-z0-9\s._@]+$/i, hint: "alex at gmail dot com" },
+        { q: "What is your address?", en: "It's [Address].", reg: /^((it is|it's)\s)?[a-z0-9\s,.-]+$/i, hint: "123 Blue Street" }
     ];
 
     let currentIdx = 0, recognition;
 
-    function initGame() {
+    window.initGame = () => {
+        document.getElementById('start-screen').classList.add('hidden');
+        document.getElementById('test-screen').classList.remove('hidden');
+        setupSpeech();
+        loadQuestion();
+    };
+
+    function setupSpeech() {
         const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
         recognition = new SpeechRec();
         recognition.lang = 'en-US';
         recognition.onstart = () => {
-            window.speechSynthesis.cancel();
             document.getElementById('btnMic').classList.add('active');
-            document.getElementById('status').innerText = "Đang lắng nghe...";
+            document.getElementById('status').innerText = "Đang nghe...";
         };
         recognition.onresult = (e) => {
-            const text = e.results[0][0].transcript.toLowerCase().trim().replace(/[.,!?]$/, "");
+            let text = e.results[0][0].transcript.toLowerCase().trim().replace(/[.,!?]$/, "");
+            // Tối ưu Gmail: chuyển chữ "at" thành "@", "dot" thành "."
+            text = text.replace(/\sat\s/g, "@").replace(/\sdot\s/g, ".");
             document.getElementById('user-said').innerText = `Máy nghe: "${text}"`;
             checkAnswer(text);
         };
         recognition.onend = () => document.getElementById('btnMic').classList.remove('active');
-        loadQuestion();
     }
 
     function loadQuestion() {
         const q = data[currentIdx];
-        document.getElementById('vi-q').innerText = q.vi;
-        document.getElementById('en-m').innerText = "Cấu trúc: " + q.en;
-        document.getElementById('status').innerText = "Lắng nghe hướng dẫn...";
-        document.getElementById('status').style.color = "#64748b";
+        document.getElementById('en-q').innerText = q.q;
+        document.getElementById('status').innerText = "Bấm Mic để trả lời";
+        document.getElementById('status').style.color = "#70757a";
         document.getElementById('btnNext').classList.add('hidden');
-        document.getElementById('correction-box').style.display = 'none';
-        
-        autoReadGuide();
+        document.getElementById('hint-box').style.display = 'none';
+        document.getElementById('user-said').innerText = "";
+        autoReadQuestion();
     }
 
-    function autoReadGuide() {
+    window.autoReadQuestion = () => {
         window.speechSynthesis.cancel();
-        const q = data[currentIdx];
-        const utterVi = new SpeechSynthesisUtterance(q.vi);
-        utterVi.lang = 'vi-VN';
-        const utterEn = new SpeechSynthesisUtterance(q.en.replace(/\[|\]/g, ""));
-        utterEn.lang = 'en-US';
-        utterVi.onend = () => window.speechSynthesis.speak(utterEn);
-        utterEn.onend = () => { document.getElementById('status').innerText = "Bấm Mic để trả lời"; };
-        window.speechSynthesis.speak(utterVi);
-    }
+        const utter = new SpeechSynthesisUtterance(data[currentIdx].q);
+        utter.lang = 'en-US';
+        window.speechSynthesis.speak(utter);
+    };
+
+    window.showHint = () => {
+        const hb = document.getElementById('hint-box');
+        hb.innerText = "Gợi ý: " + data[currentIdx].hint;
+        hb.style.display = 'block';
+        // Đọc gợi ý
+        const utter = new SpeechSynthesisUtterance(data[currentIdx].hint.replace(/\[|\]/g, ""));
+        utter.lang = 'en-US';
+        window.speechSynthesis.speak(utter);
+    };
 
     function checkAnswer(text) {
-        const q = data[currentIdx];
-        if (q.reg.test(text)) {
+        if (data[currentIdx].reg.test(text)) {
             document.getElementById('snd-correct').play();
             document.getElementById('status').innerText = "CHÍNH XÁC! 🎉";
-            document.getElementById('status').style.color = "var(--success)";
+            document.getElementById('status').style.color = "var(--google-green)";
             document.getElementById('btnNext').classList.remove('hidden');
         } else {
             document.getElementById('snd-wrong').play();
-            document.getElementById('correction-box').innerText = q.errorMsg;
-            document.getElementById('correction-box').style.display = 'block';
             document.getElementById('status').innerText = "Hãy thử lại!";
-            document.getElementById('status').style.color = "var(--error)";
+            document.getElementById('status').style.color = "var(--google-red)";
         }
     }
 
     window.goNext = () => {
         currentIdx++;
         if (currentIdx < data.length) loadQuestion();
-        else { alert("Hoàn thành bài luyện nói!"); location.reload(); }
+        else { alert("Hoàn thành bài tập!"); location.reload(); }
     };
 
-    document.getElementById('btnMic').onclick = () => recognition.start();
+    document.getElementById('btnMic').onclick = () => {
+        window.speechSynthesis.cancel();
+        recognition.start();
+    };
 </script>
 </body>
 </html>
