@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Speaking Mastery - Elite Pro 2026</title>
+    <title>Speaking Mastery - Ultimate Elite</title>
     <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         :root { 
             --primary: #6366f1; --success: #10b981; --error: #f43f5e; 
-            --bg: #e0e7ff; --glass: rgba(255, 255, 255, 0.85);
+            --warning: #f59e0b; --bg: #e0e7ff; --glass: rgba(255, 255, 255, 0.85);
         }
         
         * { box-sizing: border-box; transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); font-family: 'Lexend', sans-serif; }
@@ -16,7 +16,7 @@
 
         .card { 
             background: var(--glass); backdrop-filter: blur(25px); 
-            width: 100%; max-width: 650px; padding: 60px 45px; 
+            width: 100%; max-width: 550px; padding: 60px 45px; 
             border-radius: 50px; border: 1px solid rgba(255,255,255,0.8);
             box-shadow: 0 30px 60px rgba(0,0,0,0.1);
             text-align: center; position: relative;
@@ -25,7 +25,7 @@
         .status-msg { font-size: 1.4rem; font-weight: 800; color: #1e293b; margin-bottom: 20px; display: block; }
         .en-q-reveal { font-size: 1.7rem; font-weight: 700; color: var(--primary); margin-bottom: 30px; display: none; line-height: 1.4; }
 
-        /* --- MIC BEVEL DESIGN (Mỏng nhẹ) --- */
+        /* --- MIC BEVEL --- */
         .mic-btn {
             background: var(--success); color: white; border: none;
             width: 95px; height: 95px; border-radius: 50%; font-size: 42px;
@@ -33,36 +33,27 @@
             box-shadow: inset 0 -4px 0 rgba(0,0,0,0.15), 0 8px 20px rgba(16, 185, 129, 0.2);
             margin: 20px 0;
         }
-        .mic-btn:active { transform: translateY(2px); box-shadow: inset 0 -2px 0 rgba(0,0,0,0.15); }
         .mic-btn.active { background: var(--error); animation: pulse 1s infinite; box-shadow: 0 0 25px var(--error); }
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
 
-        /* --- NÚT XÁC NHẬN --- */
         .btn-confirm {
             background: #2d3436; color: white; border: none; padding: 14px 30px; 
             border-radius: 15px; font-weight: 800; cursor: pointer; width: 100%; 
             margin-top: 20px; font-size: 1rem; box-shadow: 0 4px 0 #000;
         }
 
+        /* --- BUTTON GROUP COLORS --- */
         .btn-group { display: flex; justify-content: center; gap: 12px; margin-top: 15px; }
         .action-btn {
             border: none; padding: 12px 20px; border-radius: 15px;
-            font-weight: 700; cursor: pointer; font-size: 0.85rem;
-            display: flex; align-items: center; gap: 8px; background: white; border: 1px solid #eee;
+            font-weight: 700; cursor: pointer; font-size: 0.9rem;
+            display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 0 rgba(0,0,0,0.05);
         }
-        /* Màu tím nhạt cho Nghe lại và Vàng nắng cho Gợi ý */
-.btn-replay { background: #e0e7ff !important; color: #4f46e5 !important; } 
-.btn-hint { background: #fef3c7 !important; color: #b45309 !important; }
+        .btn-replay { background: #e0e7ff; color: #4f46e5; }
+        .btn-hint { background: #fef3c7; color: #b45309; }
 
-.action-btn {
-    border: none; padding: 12px 20px; border-radius: 15px;
-    font-weight: 700; cursor: pointer; font-size: 0.9rem;
-    display: flex; align-items: center; gap: 8px;
-    box-shadow: 0 4px 0 rgba(0,0,0,0.05); /* Khối mỏng nhẹ */
-}
-.action-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 rgba(0,0,0,0.1); }
-
-        .btn-skip { background: none; border: none; color: #94a3b8; font-weight: 700; cursor: pointer; text-decoration: underline; margin-top: 20px; display: block; width: 100%; }
+        .btn-skip { background: none; border: none; color: #94a3b8; font-weight: 700; cursor: pointer; text-decoration: underline; margin-top: 25px; display: block; width: 100%; font-size: 1rem; }
+        .btn-skip:hover { color: var(--error); }
 
         .status { margin-top: 25px; font-weight: 800; color: #64748b; font-size: 1.1rem; }
         .user-said { color: #6366f1; font-size: 0.95rem; margin-top: 20px; font-style: italic; min-height: 25px; font-weight: 600; }
@@ -80,7 +71,7 @@
 
 <div id="game-container">
     <div id="login-screen" class="card">
-        <h1 style="color: var(--primary); font-weight: 800; font-size: 2.5rem;">SPEAKING MASTER</h1>
+        <h1 style="color: var(--primary); font-weight: 800;">SPEAKING MASTER</h1>
         <button id="login-btn" class="google-btn">
             <svg viewBox="0 0 48 48" width="20"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59L2.56 13.22C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path></svg>
             Đăng nhập với Google
@@ -89,12 +80,12 @@
 
     <div id="start-screen" class="card hidden">
         <h1 id="user-welcome" style="color: var(--primary);">Chào bạn!</h1>
-        <p style="color: #64748b; margin-bottom: 30px;">Lắng nghe câu hỏi và trả lời bằng tiếng Anh nhé.</p>
+        <p style="color: #64748b; margin-bottom: 30px;">Nghe câu hỏi và trả lời bằng tiếng Anh nhé.</p>
         <button class="btn-next" onclick="startGame()">BẮT ĐẦU ➔</button>
     </div>
 
     <div id="test-screen" class="card hidden">
-        <span class="status-msg" id="main-status">Câu hỏi mới...</span>
+        <span class="status-msg" id="main-status">Thử thách mới</span>
         <span class="en-q-reveal" id="en-q-reveal">...</span>
 
         <button class="mic-btn" id="btnMic">🎙️</button>
@@ -111,7 +102,7 @@
         <button id="btnNext" class="btn-next hidden" onclick="goNext()">TIẾP THEO ➔</button>
         <button class="btn-skip" id="btnSkip" onclick="goNext()">Bỏ qua câu này ➔</button>
 
-        <button class="google-btn" style="margin-top:35px; padding: 8px 20px; font-size:0.8rem" onclick="logout()">Đăng xuất</button>
+        <button class="google-btn" style="margin-top:35px; font-size:0.8rem" onclick="logout()">Đăng xuất</button>
     </div>
 </div>
 
@@ -177,15 +168,13 @@
         recognition.onresult = (e) => {
             let text = e.results[0][0].transcript.toLowerCase().trim();
             
-            // XỬ LÝ AT (@) & DOT (.) & SLASH (/) TRIỆT ĐỂ
+            // XỬ LÝ KÝ TỰ ĐẶC BIỆT
             text = text.replace(/\bat\b/g, "@").replace(/\bdot\b/g, ".");
             text = text.replace(/\bslash\b/g, "/").replace(/\sover\b/g, "/");
 
-            // Xử lý khoảng trắng cho EMAIL
             if (data[currentIdx].q.toLowerCase().includes("email")) {
                 text = text.replace(/\s+/g, ""); 
             }
-            // Xử lý SỐ ĐIỆN THOẠI
             if (data[currentIdx].q.toLowerCase().includes("phone")) {
                 text = text.replace(/-/g, "").replace(/\s+/g, "");
             }
@@ -193,7 +182,7 @@
             finalTranscript = text.replace(/[.,!?]$/, "");
             document.getElementById('user-said').innerText = `Kết quả: "${finalTranscript}"`;
             document.getElementById('btnConfirm').classList.remove('hidden');
-            document.getElementById('status').innerText = "Đã nghe xong. Hãy xác nhận!";
+            document.getElementById('status').innerText = "Hãy xác nhận kết quả!";
         };
         recognition.onend = () => document.getElementById('btnMic').classList.remove('active');
     }
@@ -239,7 +228,6 @@
             document.getElementById('en-q-reveal').style.display = 'block';
             document.getElementById('btnNext').classList.remove('hidden');
             document.getElementById('btnConfirm').classList.add('hidden');
-            document.getElementById('btnSkip').classList.add('hidden');
         } else {
             document.getElementById('snd-wrong').play();
             document.getElementById('test-screen').classList.add('error-shake');
@@ -253,9 +241,12 @@
         currentIdx++;
         if (currentIdx < data.length) {
             document.getElementById('status').style.color = "#64748b";
+            document.getElementById('btnNext').classList.add('hidden');
+            document.getElementById('btnConfirm').classList.add('hidden');
+            document.getElementById('user-said').innerText = "";
             loadQuestion();
         } else { 
-            alert("Tuyệt vời! Bạn đã hoàn thành bài tập."); 
+            alert("Bạn đã hoàn thành bài tập!"); 
             location.reload(); 
         }
     };
