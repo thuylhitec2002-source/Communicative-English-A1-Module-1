@@ -15,6 +15,7 @@
             --text-sub: #636E72;
             --bg-body: #F0F2F5;
             --translation: #3498db;
+            --abandon: #fab1a0;
         }
 
         * { box-sizing: border-box; transition: all 0.2s ease; }
@@ -94,7 +95,6 @@
             padding: 35px; position: relative; z-index: 10;
         }
 
-        /* Hiệu ứng icon động */
         .floating-icon {
             font-size: 5rem;
             margin-bottom: 20px;
@@ -110,7 +110,6 @@
         .progress-bar { height: 8px; background: #eee; border-radius: 10px; margin-bottom: 25px; overflow: hidden; }
         #progress { height: 100%; background: var(--primary-purple); width: 0%; transition: 0.5s ease; }
 
-        /* Đáp án điền vào chỗ trống */
         .blank-space {
             color: var(--primary-purple);
             border-bottom: 3px solid var(--primary-purple);
@@ -131,7 +130,6 @@
             transform: scale(1.02);
         }
 
-        /* Màu sắc logic mới */
         .correct-ans { background: #E6FFFA !important; border-color: var(--success) !important; color: #234E52 !important; }
         .wrong-ans { background: #FFF5F5 !important; border-color: var(--error) !important; color: #742A2A !important; animation: shake 0.5s; }
 
@@ -142,11 +140,14 @@
             display: none; border-left: 4px solid var(--translation); background: #f0faff; border-radius: 0 8px 8px 0;
         }
 
-        .navigation { display: flex; justify-content: space-between; gap: 15px; border-top: 1px solid #f0f0f0; padding-top: 25px; }
-        .nav-btn { flex: 1; padding: 14px; border-radius: 12px; border: none; cursor: pointer; font-weight: bold; font-family: inherit; font-size: 1rem; }
+        .navigation { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; border-top: 1px solid #f0f0f0; padding-top: 25px; }
+        .nav-btn { flex: 1; min-width: 100px; padding: 14px; border-radius: 12px; border: none; cursor: pointer; font-weight: bold; font-family: inherit; font-size: 0.9rem; }
         
         #start-btn, .btn-restart, #next-btn.active { background: var(--primary-purple); color: white; }
         #next-btn:disabled { background: #E0E0E0; cursor: not-allowed; color: #A0AEC0; }
+        
+        #abandon-btn { background: #f1f2f6; color: #a4b0be; border: 1px solid #dfe4ea; }
+        #abandon-btn:hover { background: var(--abandon); color: white; border-color: var(--abandon); }
 
         #quiz-content, #result-screen { display: none; }
     </style>
@@ -191,6 +192,7 @@
             <div id="translation-text"></div> 
             <div class="options" id="options-container"></div>
             <div class="navigation">
+                <button id="abandon-btn" class="nav-btn" onclick="abandonQuiz()">Bỏ cuộc</button>
                 <button id="prev-btn" class="nav-btn" onclick="goPrev()">Quay lại</button>
                 <button id="next-btn" class="nav-btn" onclick="goNext()" disabled>Tiếp theo →</button>
             </div>
@@ -198,7 +200,7 @@
 
         <div id="result-screen" style="text-align: center;">
             <div style="font-size: 5rem; margin-bottom: 20px;">🏆</div>
-            <h2 style="color: var(--primary-purple);">Hoàn thành!</h2>
+            <h2 id="result-title" style="color: var(--primary-purple);">Hoàn thành!</h2>
             <div id="score-summary" style="margin-bottom: 25px; font-weight: 700;"></div>
             <button class="nav-btn btn-restart" onclick="location.reload()">Chơi lại từ đầu</button>
         </div>
@@ -224,11 +226,9 @@
     const db = getFirestore(app);
     const provider = new GoogleAuthProvider();
 
-    // Theo dõi trạng thái đăng nhập
     onAuthStateChanged(auth, (user) => {
-        if (user) {
-            checkUserPermission(user.email);
-        } else {
+        if (user) { checkUserPermission(user.email); } 
+        else {
             document.getElementById("login-screen").style.display = "flex";
             document.getElementById("main-content").style.display = "none";
         }
@@ -298,11 +298,9 @@
         document.getElementById('q-num').innerText = `CÂU HỎI ${currentIdx + 1} / ${questions.length}`;
         document.getElementById('progress').style.width = `${((currentIdx + 1) / questions.length) * 100}%`;
         
-        // Hiển thị câu hỏi + điền từ nếu đã xong
         const displayWord = isAnswered ? `<span class="blank-space">${qData.options[qData.correct]}</span>` : "_____";
         document.getElementById('question-text').innerHTML = qData.q.replace("_____", displayWord);
 
-        // Hiển thị giải thích
         const transDiv = document.getElementById('translation-text');
         if (isAnswered) {
             transDiv.innerHTML = qData.trans.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
@@ -311,7 +309,6 @@
             transDiv.style.display = 'none';
         }
 
-        // Render Options
         const container = document.getElementById('options-container');
         container.innerHTML = '';
         document.getElementById('prev-btn').disabled = currentIdx === 0;
@@ -320,49 +317,37 @@
             const btn = document.createElement('button');
             btn.className = 'opt-btn';
             btn.innerText = opt;
-            
             if (isAnswered) {
                 btn.disabled = true;
                 if (index === qData.correct) btn.classList.add('correct-ans');
-                // Nếu người dùng từng chọn sai câu này
                 if (userAnswers[currentIdx] === index && index !== qData.correct) btn.classList.add('wrong-ans');
             } else {
                 btn.onclick = () => checkAnswer(index, btn);
             }
             container.appendChild(btn);
         });
-
         updateNextButton();
     }
 
     function checkAnswer(selected, btn) {
         const qData = questions[currentIdx];
         const allBtns = document.querySelectorAll('.opt-btn');
+        userAnswers[currentIdx] = selected; 
 
         if (selected === qData.correct) {
-            // ĐÚNG
-            userAnswers[currentIdx] = selected;
             btn.classList.add('correct-ans');
             document.getElementById('snd-correct').currentTime = 0;
             document.getElementById('snd-correct').play();
             if (attemptsPerQuestion[currentIdx] === 0) correctOnFirstTry++;
-            
-            // Khóa nút và hiện giải thích
-            allBtns.forEach(b => b.disabled = true);
-            finishQuestion(qData);
         } else {
-            // SAI
             btn.classList.add('wrong-ans');
             document.getElementById('snd-wrong').currentTime = 0;
             document.getElementById('snd-wrong').play();
             attemptsPerQuestion[currentIdx]++;
-            
-            // Tự động hiện đáp án đúng màu xanh và kết thúc câu hỏi
-            userAnswers[currentIdx] = selected; // Lưu lại để biết đã trả lời
             allBtns[qData.correct].classList.add('correct-ans');
-            allBtns.forEach(b => b.disabled = true);
-            finishQuestion(qData);
         }
+        allBtns.forEach(b => b.disabled = true);
+        finishQuestion(qData);
     }
 
     function finishQuestion(qData) {
@@ -388,11 +373,26 @@
 
     function goPrev() { if (currentIdx > 0) { currentIdx--; loadQuestion(); } }
 
-    function showResult() {
+    /** * HÀM BỎ CUỘC ĐÃ ĐƯỢC KHAI BÁO RÕ RÀNG Ở ĐÂY
+     */
+    window.abandonQuiz = function() {
+        if (confirm("Bạn có chắc chắn muốn dừng bài làm tại đây không? Số câu đúng của bạn sẽ được lưu lại.")) {
+            showResult(true);
+        }
+    }
+
+    function showResult(isAbandoned = false) {
         bgMusic.pause();
         document.getElementById('quiz-content').style.display = 'none';
         document.getElementById('result-screen').style.display = 'block';
-        document.getElementById('score-summary').innerText = `Bạn đạt: ${correctOnFirstTry}/${questions.length} điểm (Lần đầu chọn đúng)!`;
+        
+        if (isAbandoned) {
+            document.getElementById('result-title').innerText = "Đã dừng bài làm!";
+        } else {
+            document.getElementById('result-title').innerText = "Hoàn thành!";
+        }
+
+        document.getElementById('score-summary').innerText = `Kết quả của bạn: ${correctOnFirstTry}/${questions.length} câu đúng tuyệt đối.`;
         document.getElementById('snd-congrats').play();
     }
 </script>
