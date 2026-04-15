@@ -36,13 +36,27 @@
             text-align: center;
         }
 
+        /* Login Screen Styles */
+        .google-btn {
+            background: white; color: #2d3436; border: 1px solid #dfe6e9; padding: 1rem 2rem; border-radius: 50px; 
+            cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 12px; font-weight: bold; margin: 20px auto;
+            box-shadow: 0 8px 15px rgba(0,0,0,0.05); transition: 0.3s; width: 100%;
+        }
+        .google-btn:hover { transform: translateY(-3px); box-shadow: 0 12px 20px rgba(0,0,0,0.1); }
+        .btn-logout {
+            background: #eee; color: #666; border: none; padding: 8px 15px; border-radius: 10px;
+            cursor: pointer; font-size: 12px; font-weight: bold; margin-top: 15px;
+        }
+
+        /* Quiz Styles */
         .progress-bar {
             height: 8px; background: #E5E7EB; border-radius: 10px;
             margin: 20px 0; overflow: hidden;
         }
         #progress-fill { height: 100%; width: 0; background: var(--primary); transition: 0.4s; }
 
-        #quiz-screen, #result-screen { display: none; }
+        .screen { display: none; }
+        .active { display: block; animation: slideIn 0.4s ease; }
         
         h2 { font-size: 1.4rem; line-height: 1.4; margin-bottom: 25px; color: var(--primary); }
         
@@ -63,7 +77,6 @@
         .correct { background: var(--success) !important; color: white; border-color: var(--success); }
         .wrong { background: var(--error) !important; color: white; border-color: var(--error); }
 
-        /* Giải thích tiếng Việt */
         #explanation {
             margin-top: 25px;
             padding: 20px;
@@ -72,7 +85,6 @@
             border-left: 5px solid var(--primary);
             text-align: left;
             display: none;
-            animation: slideIn 0.4s ease;
         }
         .expl-label { font-weight: 700; font-size: 1.1rem; display: block; margin-bottom: 5px; }
         .quote { display: block; margin-top: 10px; font-style: italic; color: #4F46E5; font-size: 0.95rem; opacity: 0.8; }
@@ -96,14 +108,28 @@
 <body>
 
 <div id="quiz-app">
-    <div id="start-screen">
+    <div id="login-screen" class="screen active">
+        <div style="font-size: 60px;">🔐</div>
+        <h1>Listening Quiz</h1>
+        <p>Vui lòng đăng nhập để bắt đầu bài kiểm tra.</p>
+        <button id="login-btn" class="google-btn">
+            <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59L2.56 13.22C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path></svg>
+            Tiếp tục với Google
+        </button>
+        <p id="login-msg" style="color: var(--error); font-size: 0.9rem; font-weight: bold;"></p>
+    </div>
+
+    <div id="start-screen" class="screen">
         <div style="font-size: 60px;">🎧</div>
+        <h2 id="user-welcome" style="margin-bottom: 5px;"></h2>
         <h1>Listening Challenge</h1>
         <p>Listen to the conversation and choose the best answers.</p>
         <button class="btn-action" onclick="startQuiz()">Start Quiz</button>
+        <br>
+        <button id="logout-btn" class="btn-logout">ĐĂNG XUẤT</button>
     </div>
 
-    <div id="quiz-screen">
+    <div id="quiz-screen" class="screen">
         <div class="progress-bar"><div id="progress-fill"></div></div>
         <p id="q-counter" style="font-weight: bold; color: #888;"></p>
         <h2 id="q-text"></h2>
@@ -118,13 +144,84 @@
         <button class="btn-action" id="btn-next" onclick="nextQuestion()" style="display: none;">Next Question</button>
     </div>
 
-    <div id="result-screen">
+    <div id="result-screen" class="screen">
         <h1>Your Result</h1>
         <div style="font-size: 3.5rem; font-weight: 800; color: var(--primary);" id="final-score"></div>
         <p id="result-msg"></p>
         <button class="btn-action" onclick="location.reload()">Try Again</button>
     </div>
 </div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+    import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyCdlTVHwiLOGMnrFe12DE1dQSEHZaJ594I",
+        authDomain: "nguyen-am-tieng-anh.firebaseapp.com",
+        projectId: "nguyen-am-tieng-anh",
+        storageBucket: "nguyen-am-tieng-anh.firebasestorage.app",
+        messagingSenderId: "878440633705",
+        appId: "1:878440633705:web:755de6cb273eb139ebd9f8",
+        measurementId: "G-EM8Y1QW6QH"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth();
+    const db = getFirestore(app);
+    const provider = new GoogleAuthProvider();
+
+    // 1. Kiểm tra trạng thái đăng nhập
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            const allowed = await checkAccess(user.email);
+            if (allowed) {
+                document.getElementById("user-welcome").innerText = "Chào " + user.displayName + "!";
+                showScreen('start-screen');
+            } else {
+                document.getElementById("login-msg").innerText = "Email không có quyền truy cập.";
+                await signOut(auth);
+            }
+        } else {
+            showScreen('login-screen');
+        }
+    });
+
+    // 2. Kiểm tra quyền truy cập Firestore
+    async function checkAccess(email) {
+        const q = query(collection(db, "Tienganh_so_cap"), where("email", "==", email));
+        const snap = await getDocs(q);
+        return !snap.empty;
+    }
+
+    // 3. Xử lý nút đăng nhập
+    document.getElementById("login-btn").onclick = async () => {
+        const msg = document.getElementById("login-msg");
+        msg.innerText = "Đang kiểm tra...";
+        try {
+            const res = await signInWithPopup(auth, provider);
+            const allowed = await checkAccess(res.user.email);
+            if (!allowed) {
+                msg.innerText = "Email không có quyền truy cập.";
+                await signOut(auth);
+            }
+        } catch (e) {
+            msg.innerText = "Lỗi đăng nhập.";
+        }
+    };
+
+    // 4. Xử lý nút đăng xuất
+    document.getElementById("logout-btn").onclick = async () => {
+        await signOut(auth);
+        location.reload(); 
+    };
+
+    function showScreen(id) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+    }
+</script>
 
 <script>
     const sfxCorrect = new Audio('https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3');
@@ -207,8 +304,8 @@
     let score = 0;
 
     function startQuiz() {
-        document.getElementById('start-screen').style.display = 'none';
-        document.getElementById('quiz-screen').style.display = 'block';
+        document.getElementById('start-screen').classList.remove('active');
+        document.getElementById('quiz-screen').classList.add('active');
         showQuestion();
     }
 
@@ -239,19 +336,18 @@
 
         if (idx === data.correct) {
             btn.classList.add('correct');
-            sfxCorrect.play();
+            sfxCorrect.play().catch(e => {});
             score++;
             document.getElementById('feedback-text').innerText = "Correct! ✨";
             document.getElementById('feedback-text').style.color = "var(--success)";
         } else {
             btn.classList.add('wrong');
-            sfxWrong.play();
+            sfxWrong.play().catch(e => {});
             allBtns[data.correct].classList.add('correct');
             document.getElementById('feedback-text').innerText = "Incorrect! ❌";
             document.getElementById('feedback-text').style.color = "var(--error)";
         }
 
-        // Giải thích bằng tiếng Việt
         document.getElementById('expl-vn').innerText = data.vn;
         document.getElementById('expl-en').innerText = `Evidence: "${data.en}"`;
         document.getElementById('explanation').style.display = 'block';
@@ -268,8 +364,8 @@
     }
 
     function showResult() {
-        document.getElementById('quiz-screen').style.display = 'none';
-        document.getElementById('result-screen').style.display = 'block';
+        document.getElementById('quiz-screen').classList.remove('active');
+        document.getElementById('result-screen').classList.add('active');
         document.getElementById('final-score').innerText = `${score}/${quizData.length}`;
         document.getElementById('result-msg').innerText = score >= 7 ? "Great job! Your listening skills are sharp." : "Keep practicing! Listen again to improve.";
     }
