@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tennis Phrases - Dual Mode with Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366F1;
+            --success: #10B981;
+            --error: #EF4444;
+            --bg: #F8FAFC;
+            --card: #FFFFFF;
+        }
+
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background-color: var(--bg);
+            margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh;
+        }
+
+        /* --- AUTH STYLES --- */
+        #login-screen {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            width: 100%; height: 100vh; text-align: center;
+        }
+        .login-card {
+            background: var(--card); padding: 50px; border-radius: 30px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.05); max-width: 400px; width: 90%;
+        }
+        .google-btn {
+            background: white; color: #444; border: 1px solid #ddd; padding: 12px 25px;
+            border-radius: 50px; cursor: pointer; font-weight: bold; display: flex;
+            align-items: center; justify-content: center; gap: 10px; margin: 20px auto; 
+            transition: 0.3s; width: 100%; font-family: inherit;
+        }
+        .google-btn:hover { background: #f8f9fa; transform: translateY(-2px); box-shadow: 0 5px 10px rgba(0,0,0,0.1); }
+        
+        .user-bar {
+            position: fixed; top: 15px; right: 20px; display: flex; align-items: center;
+            gap: 15px; background: white; padding: 8px 18px; border-radius: 50px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05); z-index: 1000; font-size: 0.9rem;
+        }
+        .btn-logout { background: #F1F5F9; border: none; padding: 5px 12px; border-radius: 20px; cursor: pointer; color: #64748B; font-weight: bold; }
+
+        /* --- GAME CONTAINER --- */
+        #game-container {
+            background: var(--card);
+            width: 95%; max-width: 650px;
+            padding: 40px; border-radius: 30px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.05);
+            text-align: center;
+            position: relative;
+            display: none; /* Ẩn cho đến khi đăng nhập */
+        }
+
+        .exit-btn {
+            position: absolute; top: 20px; right: 20px;
+            background: #F1F5F9; border: none; border-radius: 12px;
+            padding: 8px 15px; cursor: pointer; font-weight: 700;
+            color: #64748B; transition: 0.3s; z-index: 10;
+        }
+        .exit-btn:hover { background: #E2E8F0; color: var(--error); }
+
+        .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 30px; }
+        .mode-card {
+            padding: 30px 20px; border: 2px solid #F1F5F9; border-radius: 20px;
+            cursor: pointer; transition: 0.3s;
+        }
+        .mode-card:hover { border-color: var(--primary); transform: translateY(-5px); background: #F5F3FF; }
+        .mode-card h3 { margin: 10px 0; color: var(--primary); }
+
+        #quiz-screen, #result-screen { display: none; }
+        .progress-bar { height: 8px; background: #E2E8F0; border-radius: 10px; margin-bottom: 30px; overflow: hidden; margin-top: 20px; }
+        #progress-fill { height: 100%; width: 0; background: var(--primary); transition: 0.4s; }
+
+        h2 { font-size: 1.4rem; margin-bottom: 25px; color: #1E293B; line-height: 1.6; }
+        .blank-space { color: var(--primary); font-weight: 800; border-bottom: 2px dashed var(--primary); padding: 0 5px; }
+
+        .options-grid { display: grid; gap: 12px; }
+        .opt-btn {
+            padding: 18px; border: 2px solid #F1F5F9; border-radius: 15px;
+            background: white; font-weight: 600; cursor: pointer; transition: 0.2s; font-size: 1.1rem; font-family: inherit;
+        }
+        .opt-btn.correct { background: var(--success) !important; color: white; border-color: var(--success); }
+        .opt-btn.wrong { background: var(--error) !important; color: white; border-color: var(--error); }
+
+        #input-container { display: none; }
+        .answer-input {
+            width: 100%; padding: 18px; border: 3px solid #E2E8F0; border-radius: 15px;
+            font-size: 1.3rem; text-align: center; outline: none; transition: 0.3s; font-family: inherit; box-sizing: border-box;
+        }
+        .answer-input.correct-style { border-color: var(--success); color: var(--success); font-weight: 800; }
+        .answer-input.error-shake { border-color: var(--error); animation: shake 0.4s; }
+
+        #hint-text { color: var(--error); font-weight: 700; margin-top: 15px; display: none; font-size: 1rem; }
+        .btn-next {
+            margin-top: 30px; padding: 15px 45px; background: #1E293B; color: white;
+            border: none; border-radius: 50px; font-weight: 700; cursor: pointer; display: none; font-size: 1.1rem; font-family: inherit;
+        }
+
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
+    </style>
+</head>
+<body>
+
+<div id="login-screen">
+    <div class="login-card">
+        <h1 style="color: var(--primary); margin-bottom: 10px;">🎾 Tennis Phrases</h1>
+        <p style="color: #64748B;">Vui lòng đăng nhập để bắt đầu thử thách</p>
+        <button id="login-btn" class="google-btn">
+            <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59L2.56 13.22C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path></svg>
+            &nbsp;Tiếp tục với Google
+        </button>
+        <p id="login-msg" style="color: var(--error); font-size: 0.9rem; margin-top: 10px; font-weight: bold;"></p>
+    </div>
+</div>
+
+<div id="user-bar-container" style="display: none;">
+    <div class="user-bar">
+        <span id="user-welcome" style="font-weight: 600; color: #1E293B;"></span>
+        <button id="logout-btn" class="btn-logout">Đăng xuất</button>
+    </div>
+</div>
+
+<div id="game-container">
+    <button class="exit-btn" id="global-exit" style="display: none;" onclick="goHome()">Exit ✖</button>
+
+    <div id="start-screen">
+        <h1>🎾 Tennis Conversation</h1>
+        <p>Master the phrases! Choose your challenge level:</p>
+        <div class="menu-grid">
+            <div class="mode-card" onclick="startQuiz('selection')">
+                <div style="font-size: 40px;">🔘</div>
+                <h3>Selection</h3>
+                <p>Choose from options</p>
+            </div>
+            <div class="mode-card" onclick="startQuiz('input')">
+                <div style="font-size: 40px;">⌨️</div>
+                <h3>Typing</h3>
+                <p>Translate the phrase</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="quiz-screen">
+        <div class="progress-bar"><div id="progress-fill"></div></div>
+        <h2 id="q-text"></h2>
+        <div id="options" class="options-grid"></div>
+        <div id="input-container">
+            <input type="text" id="user-input" class="answer-input" placeholder="Type answer and Enter..." autocomplete="off">
+            <div id="hint-text"></div>
+        </div>
+        <button class="btn-next" id="btn-next" onclick="nextQuestion()">Next Question →</button>
+    </div>
+
+    <div id="result-screen">
+        <h1>Challenge Complete!</h1>
+        <div style="font-size: 4rem; font-weight: 800; color: var(--primary);" id="final-score"></div>
+        <button class="btn-next" style="display:inline-block" onclick="goHome()">Return to Menu</button>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+    import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyCdlTVHwiLOGMnrFe12DE1dQSEHZaJ594I",
+        authDomain: "nguyen-am-tieng-anh.firebaseapp.com",
+        projectId: "nguyen-am-tieng-anh",
+        storageBucket: "nguyen-am-tieng-anh.firebasestorage.app",
+        messagingSenderId: "878440633705",
+        appId: "1:878440633705:web:755de6cb273eb139ebd9f8"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth();
+    const db = getFirestore(app);
+    const provider = new GoogleAuthProvider();
+
+    async function checkAccess(email) {
+        const q = query(collection(db, "Tienganh_so_cap"), where("email", "==", email));
+        const snap = await getDocs(q);
+        return !snap.empty;
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+        const msg = document.getElementById("login-msg");
+        if (user) {
+            msg.innerText = "Đang kiểm tra quyền truy cập...";
+            const allowed = await checkAccess(user.email);
+            if (allowed) {
+                document.getElementById("user-welcome").innerText = "Chào " + user.displayName.split(' ')[0];
+                document.getElementById("login-screen").style.display = "none";
+                document.getElementById("game-container").style.display = "block";
+                document.getElementById("user-bar-container").style.display = "block";
+                msg.innerText = "";
+            } else {
+                msg.innerText = "Email không có quyền truy cập hệ thống!";
+                setTimeout(() => signOut(auth), 2000);
+            }
+        } else {
+            document.getElementById("login-screen").style.display = "flex";
+            document.getElementById("game-container").style.display = "none";
+            document.getElementById("user-bar-container").style.display = "none";
+        }
+    });
+
+    document.getElementById("login-btn").onclick = async () => {
+        try { await signInWithPopup(auth, provider); } 
+        catch (e) { document.getElementById("login-msg").innerText = "Lỗi xác thực!"; }
+    };
+
+    document.getElementById("logout-btn").onclick = async () => {
+        await signOut(auth);
+        location.reload();
+    };
+</script>
+
+<script>
+    const sfxCorrect = new Audio('https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3');
+    const sfxWrong = new Audio('https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3');
+
+    const quizData = [
+        { sentence: "Hey Eddie, ___? (có chuyện gì thế)", correct: "what's up", options: ["what's up", "how are you", "what's matter", "how old are you?"] },
+        { sentence: "I ___ for my mother this evening. (có việc bận)", correct: "have a job to do", options: ["have a job to do", "have to job", "am very job", "go a job"] },
+        { sentence: "Eddie can't play tennis, ___. (tiếc thế)", correct: "what a pity", options: ["what a pity", "it's too pity", "so pity", "what a poty"] },
+        { sentence: "Maybe it's better to ___ with Jack? (hủy hẹn)", correct: "cancel", options: ["cancel", "stop", "postpone", "break"] },
+        { sentence: "Eddie has a problem and he can't come. Can you ___? (thay thế anh ấy)", correct: "take his place", options: ["take his place", "be him", "play him", "change him"] },
+        { sentence: "I am ___, but I can't play tennis. (rảnh)", correct: "free", options: ["free", "busy", "empty", "sad"] },
+        { sentence: "I can't play tennis ___. (cũng không)", correct: "either", options: ["either", "too", "neither", "also"] },
+        { sentence: "You're ___ the group! (rất phù hợp với)", correct: "perfect for", options: ["perfect for", "porfect", "perfect", "ready to"] },
+        { sentence: "Don't worry, it's ___. (cho vui thôi)", correct: "just for fun", options: ["just for fun", "sad", "boring", "charged"] },
+        { sentence: "___ the game? - At six. (Khi nào thì... diễn ra)", correct: "What time is", options: ["What time is", "Where is", " What time", "How time is"] }
+    ];
+
+    let currentQ = 0;
+    let score = 0;
+    let selectedMode = '';
+    let failedOnce = false;
+
+    window.startQuiz = function(mode) {
+        selectedMode = mode;
+        currentQ = 0;
+        score = 0;
+        document.getElementById('start-screen').style.display = 'none';
+        document.getElementById('quiz-screen').style.display = 'block';
+        document.getElementById('global-exit').style.display = 'block';
+        showQuestion();
+    }
+
+    function showQuestion() {
+        const data = quizData[currentQ];
+        failedOnce = false;
+        document.getElementById('progress-fill').style.width = `${(currentQ / quizData.length) * 100}%`;
+        const displaySentence = data.sentence.replace("___", `<span class="blank-space">___</span>`);
+        document.getElementById('q-text').innerHTML = displaySentence;
+        document.getElementById('btn-next').style.display = 'none';
+        document.getElementById('hint-text').style.display = 'none';
+
+        if (selectedMode === 'selection') {
+            document.getElementById('options').style.display = 'grid';
+            document.getElementById('input-container').style.display = 'none';
+            renderOptions(data);
+        } else {
+            document.getElementById('options').style.display = 'none';
+            document.getElementById('input-container').style.display = 'block';
+            const inputEl = document.getElementById('user-input');
+            inputEl.value = '';
+            inputEl.className = 'answer-input';
+            inputEl.disabled = false;
+            inputEl.focus();
+        }
+    }
+
+    function renderOptions(data) {
+        const container = document.getElementById('options');
+        container.innerHTML = '';
+        data.options.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'opt-btn';
+            btn.innerText = opt;
+            btn.onclick = () => {
+                if (opt.toLowerCase() === data.correct.toLowerCase()) {
+                    btn.classList.add('correct');
+                    sfxCorrect.play();
+                    if(!failedOnce) score++;
+                    document.getElementById('btn-next').style.display = 'inline-block';
+                    document.querySelectorAll('.opt-btn').forEach(b => b.disabled = true);
+                } else {
+                    btn.classList.add('wrong');
+                    sfxWrong.play();
+                    failedOnce = true;
+                }
+            };
+            container.appendChild(btn);
+        });
+    }
+
+    document.getElementById('user-input').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            const data = quizData[currentQ];
+            const val = this.value.trim().toLowerCase();
+            if (val === data.correct.toLowerCase()) {
+                this.classList.add('correct-style');
+                this.disabled = true;
+                sfxCorrect.play();
+                if(!failedOnce) score++;
+                document.getElementById('btn-next').style.display = 'inline-block';
+                document.getElementById('hint-text').style.display = 'none';
+            } else {
+                sfxWrong.play();
+                failedOnce = true;
+                this.classList.add('error-shake');
+                setTimeout(() => this.classList.remove('error-shake'), 400);
+                const hint = document.getElementById('hint-text');
+                hint.innerHTML = `Incorrect! You should type: <strong>${data.correct}</strong>`;
+                hint.style.display = 'block';
+            }
+        }
+    });
+
+    window.nextQuestion = function() {
+        currentQ++;
+        if (currentQ < quizData.length) {
+            showQuestion();
+        } else {
+            document.getElementById('quiz-screen').style.display = 'none';
+            document.getElementById('result-screen').style.display = 'block';
+            document.getElementById('final-score').innerText = `${score}/${quizData.length}`;
+            document.getElementById('global-exit').style.display = 'none';
+        }
+    }
+
+    window.goHome = function() {
+        document.getElementById('start-screen').style.display = 'block';
+        document.getElementById('quiz-screen').style.display = 'none';
+        document.getElementById('result-screen').style.display = 'none';
+        document.getElementById('global-exit').style.display = 'none';
+    }
+</script>
+</body>
+</html>
