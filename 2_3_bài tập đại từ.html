@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pronoun Master v3.1 - Firebase Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;600;800&family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-bg: #fffbe6; 
+            --card-bg: #f9e79f;    
+            --accent: #f39c12;     
+            --text: #2c3e50;
+            --success: #27ae60;
+            --error: #e74c3c;
+            --font-main: 'Quicksand', sans-serif;
+            --font-title: 'Lexend', sans-serif;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--primary-bg);
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* --- Background Floating Shapes --- */
+        #bg-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; overflow: hidden; }
+        .shape { position: absolute; opacity: 0.3; z-index: 0; animation: float 20s infinite linear; }
+        @keyframes float {
+            from { transform: translateY(110vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.3; }
+            90% { opacity: 0.3; }
+            to { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+        }
+
+        /* --- Screens Management --- */
+        .screen { display: none; }
+        .active-screen { display: flex !important; animation: cardPop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+
+        /* --- Cards & UI --- */
+        .card {
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 40px;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(243, 156, 18, 0.2);
+            border: 5px solid white;
+            max-width: 500px;
+            width: 90%;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        @keyframes cardPop {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        h1, .jump-text {
+            font-family: var(--font-title);
+            font-weight: 800;
+            color: #d35400;
+            margin: 0 0 15px 0;
+            text-transform: uppercase;
+        }
+        h1 { font-size: 2.5rem; }
+
+        /* --- Buttons --- */
+        .btn-main {
+            background: white;
+            color: var(--accent);
+            border: none;
+            padding: 18px 40px;
+            font-size: 1.2rem;
+            font-family: var(--font-title);
+            font-weight: 800;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 8px 0px #e67e22;
+            transition: all 0.2s ease;
+            margin-top: 20px;
+            text-transform: uppercase;
+            width: 100%;
+        }
+        .btn-main:hover { transform: translateY(-4px); box-shadow: 0 12px 20px rgba(230, 126, 34, 0.3); }
+        .btn-main:active { transform: translateY(2px); box-shadow: 0 4px 0px #e67e22; }
+
+        .google-btn {
+            background: white; color: #2d3436; border: 1px solid #dfe6e9; padding: 15px; border-radius: 50px; 
+            cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 12px; 
+            font-weight: bold; margin: 20px 0; width: 100%; font-family: var(--font-main);
+        }
+
+        .btn-logout { background: #eee; color: #666; border: none; padding: 8px 15px; border-radius: 10px; cursor: pointer; font-size: 12px; margin-top: 15px; font-weight: bold; }
+
+        /* --- Game Play Area --- */
+        .game-container {
+            display: none;
+            width: 90%;
+            max-width: 700px;
+            background: white;
+            padding: 35px;
+            border-radius: 35px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.1);
+            position: relative;
+            z-index: 5;
+        }
+
+        .stats-bar { display: flex; justify-content: space-between; margin-bottom: 20px; font-weight: 700; color: var(--text); }
+        .progress-container { height: 12px; background: #f0f0f0; border-radius: 10px; margin-bottom: 30px; overflow: hidden; }
+        #progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--accent), #f1c40f); transition: width 0.4s; }
+
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        button.option {
+            padding: 16px; border: 3px solid #f0f0f0; border-radius: 20px; background: white;
+            cursor: pointer; font-size: 1.1rem; font-weight: 700; font-family: var(--font-main);
+        }
+        button.option.correct { background: var(--success) !important; color: white; }
+        button.option.wrong { background: var(--error) !important; color: white; }
+
+        input.fill-input {
+            width: 100%; padding: 18px; border: 3px solid #f0f0f0; border-radius: 20px; font-size: 1.2rem;
+            box-sizing: border-box; font-family: var(--font-main); text-align: center;
+        }
+
+        .feedback { margin-top: 25px; padding: 20px; border-radius: 20px; display: none; font-weight: 600; }
+        .feedback.show { display: block; }
+        .f-correct { background: #e8f8f5; color: var(--success); border-left: 8px solid var(--success); }
+        .f-wrong { background: #fdedec; color: var(--error); border-left: 8px solid var(--error); }
+
+        .footer-btns { display: flex; justify-content: space-between; margin-top: 30px; }
+    </style>
+</head>
+<body>
+
+    <div id="bg-layer"></div>
+
+    <div id="login-screen" class="screen active-screen">
+        <div class="card">
+            <h1>Pronoun Master</h1>
+            <p style="color: #7f8c8d; font-weight: 600;">Vui lòng đăng nhập để bắt đầu thử thách</p>
+            <button id="login-btn" class="google-btn">
+                <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59L2.56 13.22C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path></svg>
+                Tiếp tục với Google
+            </button>
+            <p id="login-msg" style="color: var(--error); font-size: 0.9rem; font-weight: bold;"></p>
+        </div>
+    </div>
+
+    <div id="splash-screen" class="screen">
+        <div class="card">
+            <h1>SẴN SÀNG?</h1>
+            <p id="user-welcome" style="font-weight: bold; color: #d35400; font-size: 1.2rem;"></p>
+            <p style="color: #7f8c8d; font-weight: 600;">Bạn đã được cấp quyền truy cập.<br>Nhấn nút để bắt đầu thử thách!</p>
+            <button class="btn-main" onclick="startGame()">Bắt đầu chơi</button>
+            <button id="logout-btn" class="btn-logout">ĐĂNG XUẤT</button>
+        </div>
+    </div>
+
+    <div class="game-container screen" id="game-box">
+        <div class="stats-bar">
+            <span>CÂU HỎI: <span id="q-count">1</span>/16</span>
+            <span>ĐIỂM: <span id="score">0</span></span>
+        </div>
+        <div class="progress-container"><div id="progress-fill"></div></div>
+        <div id="quiz-area"></div>
+        <div class="footer-btns">
+            <button class="btn-main" style="width: auto; padding: 10px 20px; font-size: 1rem;" onclick="showFinal()">Bỏ cuộc</button>
+            <button class="btn-main" id="next-btn" style="display:none; width: auto; padding: 10px 20px; font-size: 1rem;" onclick="nextQuestion()">Tiếp tục ➔</button>
+        </div>
+    </div>
+
+    <div id="result-screen" class="screen">
+        <div class="card">
+            <div class="jump-text">Tuyệt vời!</div>
+            <p style="font-size: 1.2rem;">Bạn đã trả lời đúng:</p>
+            <h2 style="font-size: 3rem; color: var(--success); margin: 10px 0;"><span id="final-correct">0</span> / 16</h2>
+            <p style="font-weight: 600; color: #7f8c8d;">Tổng điểm: <span id="final-score">0</span></p>
+            <button class="btn-main" onclick="location.reload()">Chơi lại</button>
+        </div>
+    </div>
+
+    <audio id="bg-music" loop src="https://cdn.pixabay.com/audio/2025/07/20/audio_2ddcd43e0d.mp3"></audio>
+    <audio id="snd-correct" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3"></audio>
+    <audio id="snd-wrong" src="https://assets.mixkit.co/active_storage/sfx/951/951-preview.mp3"></audio>
+    <audio id="snd-win" src="https://tiengdong.com/wp-content/uploads/Tieng-yeah-tre-con-www_tiengdong_com.mp3?_=1"></audio>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+        import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCdlTVHwiLOGMnrFe12DE1dQSEHZaJ594I",
+            authDomain: "nguyen-am-tieng-anh.firebaseapp.com",
+            projectId: "nguyen-am-tieng-anh",
+            storageBucket: "nguyen-am-tieng-anh.firebasestorage.app",
+            messagingSenderId: "878440633705",
+            appId: "1:878440633705:web:755de6cb273eb139ebd9f8"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth();
+        const db = getFirestore(app);
+        const provider = new GoogleAuthProvider();
+
+        // Kiểm tra trạng thái đăng nhập
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                const allowed = await checkAccess(user.email);
+                if (allowed) {
+                    document.getElementById("user-welcome").innerText = "Chào " + user.displayName + "!";
+                    showScreen('splash-screen');
+                } else {
+                    alert("Email này không có quyền truy cập!");
+                    await signOut(auth);
+                    showScreen('login-screen');
+                }
+            } else {
+                showScreen('login-screen');
+            }
+        });
+
+        async function checkAccess(email) {
+            const q = query(collection(db, "Tienganh_so_cap"), where("email", "==", email));
+            const snap = await getDocs(q);
+            return !snap.empty;
+        }
+
+        document.getElementById("login-btn").onclick = async () => {
+            const msg = document.getElementById("login-msg");
+            msg.innerText = "Đang kiểm tra...";
+            try {
+                const res = await signInWithPopup(auth, provider);
+                const allowed = await checkAccess(res.user.email);
+                if (!allowed) {
+                    msg.innerText = "Email không có quyền truy cập.";
+                    await signOut(auth);
+                }
+            } catch (e) {
+                msg.innerText = "Đăng nhập thất bại.";
+            }
+        };
+
+        document.getElementById("logout-btn").onclick = async () => {
+            await signOut(auth);
+            location.reload();
+        };
+
+        function showScreen(id) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active-screen'));
+            document.getElementById(id).classList.add('active-screen');
+        }
+
+        // --- GAME LOGIC ---
+        const questions = [
+            { t: "mcq", q: "______ am a student.", o: ["I", "Myself", "She", "Her"], a: "I", e: "'am' luôn đi với chủ ngữ là 'I'." },
+            { t: "mcq", q: "______ is a doctor.", o: ["You", "Them", "He", "They"], a: "He", e: "Ngôi thứ 3 số ít (He/She/It) đi với 'is'." },
+            { t: "mcq", q: "______ are my friends.", o: ["Us", "We", "They", "She"], a: "They", e: "Số nhiều dùng 'are', 'They' là 'Họ'." },
+            { t: "mcq", q: "My dog is cute. ______ is very small.", o: ["Our", "Its", "My", "It"], a: "It", e: "Dùng 'It' để thay thế cho con vật số ít." },
+            { t: "mcq", q: "I love my mother. I love ______ so much.", o: ["my", "her", "she", "me"], a: "her", e: "'her' là tân ngữ thay thế cho người nữ số ít." },
+            { t: "mcq", q: "Where is my book? I can't find ______.", o: ["it", "them", "my", "its"], a: "it", e: "'it' làm tân ngữ cho vật số ít." },
+            { t: "mcq", q: "I cut ______ while cooking.", o: ["himself", "myself", "itself", "herself"], a: "myself", e: "Chủ ngữ là 'I' thì đại từ phản thân là 'myself'." },
+            { t: "mcq", q: "She looks at ______ in the mirror.", o: ["himself", "herself", "itself", "themselves"], a: "herself", e: "Chủ ngữ là 'She' thì đại từ phản thân là 'herself'." },
+            { t: "fill", q: "My sister and I are hungry. ______ want to eat.", a: "We", e: "'My sister and I' tương đương với 'Chúng tôi' (We)." },
+            { t: "fill", q: "There is a secret between ______ (chúng tôi).", a: "us", e: "Sau giới từ 'between' dùng tân ngữ 'us'." },
+            { t: "fill", q: "We are lost. Can you help ______?", a: "us", e: "Cần tân ngữ 'us' để thay thế cho 'We'." },
+            { t: "fill", q: "They are loud. I don't like ______.", a: "them", e: "Tân ngữ thay thế cho 'They' là 'them'." },
+            { t: "fill", q: "He bought a new car for ______ (tự mua).", a: "himself", e: "Đại từ phản thân của 'He' là 'himself'." },
+            { t: "fill", q: "We can do it ______ (tự làm).", a: "ourselves", e: "Đại từ phản thân của 'We' là 'ourselves'." },
+            { t: "fill", q: "The cat cleans ______ after eating.", a: "itself", e: "Đại từ phản thân cho con vật là 'itself'." },
+            { t: "fill", q: "This gift is for ______ (bạn).", a: "you", e: "Đại từ tân ngữ của 'bạn' vẫn là 'you'." }
+        ];
+
+        let currentIdx = 0, score = 0, correctCount = 0, canAnswer = true;
+
+        window.startGame = function() {
+            showScreen('game-box');
+            document.getElementById('bg-music').play().catch(e => console.log("Audio blocked"));
+            renderQuestion();
+        };
+
+        function renderQuestion() {
+            canAnswer = true;
+            document.getElementById('next-btn').style.display = 'none';
+            const quizArea = document.getElementById('quiz-area');
+            const q = questions[currentIdx];
+            
+            let html = `<div style="font-size: 1.5rem; font-weight: 700; margin-bottom: 20px;">${q.q}</div>`;
+            if(q.t === "mcq") {
+                html += `<div class="options-grid">${q.o.map(o => `<button class="option" onclick="checkAnswer('${o}', this)">${o}</button>`).join('')}</div>`;
+            } else {
+                html += `<input type="text" class="fill-input" id="f-input" placeholder="Nhập đáp án...">`;
+            }
+            html += `<div id="fb" class="feedback"></div>`;
+            quizArea.innerHTML = html;
+            if(q.t === "fill") {
+                const input = document.getElementById('f-input');
+                input.focus();
+                input.onkeydown = (e) => { if(e.key === 'Enter') checkAnswer(); };
+            }
+            updateStats();
+        }
+
+        window.checkAnswer = function(ans, btnElement) {
+            if(!canAnswer) return;
+            const q = questions[currentIdx];
+            const userAns = ans || document.getElementById('f-input').value.trim();
+            if(!userAns) return;
+
+            canAnswer = false;
+            const isCorrect = userAns.toLowerCase() === q.a.toLowerCase();
+            const fb = document.getElementById('fb');
+            
+            if(q.t === "mcq" && btnElement) {
+                document.querySelectorAll('.option').forEach(b => {
+                    b.disabled = true;
+                    if(b.innerText === q.a) b.classList.add('correct');
+                });
+                if(!isCorrect) btnElement.classList.add('wrong');
+            } else if(q.t === "fill") {
+                document.getElementById('f-input').disabled = true;
+            }
+
+            if(isCorrect) {
+                score += 10; correctCount++;
+                fb.className = "feedback show f-correct";
+                fb.innerHTML = `🌟 Đúng rồi! +10 điểm.<br><small>${q.e}</small>`;
+                document.getElementById('snd-correct').play();
+            } else {
+                fb.className = "feedback show f-wrong";
+                fb.innerHTML = `💡 Chưa đúng. Đáp án là: <b>${q.a}</b><br><small>${q.e}</small>`;
+                document.getElementById('snd-wrong').play();
+            }
+            document.getElementById('next-btn').style.display = 'inline-block';
+        };
+
+        window.nextQuestion = function() {
+            currentIdx++;
+            if(currentIdx < questions.length) renderQuestion();
+            else showFinal();
+        };
+
+        function updateStats() {
+            document.getElementById('q-count').innerText = currentIdx + 1;
+            document.getElementById('score').innerText = score;
+            document.getElementById('progress-fill').style.width = (currentIdx / 16 * 100) + '%';
+        }
+
+        window.showFinal = function() {
+            showScreen('result-screen');
+            document.getElementById('final-correct').innerText = correctCount;
+            document.getElementById('final-score').innerText = score;
+            document.getElementById('bg-music').pause();
+            document.getElementById('snd-win').play();
+        };
+
+        // Create background shapes
+        const bg = document.getElementById('bg-layer');
+        for(let i=0; i<15; i++) {
+            const s = document.createElement('div');
+            s.className = 'shape';
+            const size = Math.random() * 50 + 20;
+            s.style.width = size + 'px'; s.style.height = size + 'px';
+            s.style.left = Math.random() * 100 + 'vw';
+            s.style.animationDuration = (Math.random() * 10 + 10) + 's';
+            s.style.borderRadius = i % 2 === 0 ? '50%' : '10px';
+            s.style.background = i % 2 === 0 ? '#f1c40f' : '#e67e22';
+            bg.appendChild(s);
+        }
+    </script>
+</body>
+</html>

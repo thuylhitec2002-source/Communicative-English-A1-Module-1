@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Danny's English Family Hub - Firebase Edition</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            --primary: #2980b9;
+            --primary-dark: #1c5982;
+            --bg: #f0f7ff;
+            --card-bg: #ffffff;
+            --text: #2d3436;
+            --success: #27ae60;
+            --error: #e74c3c;
+            --shadow: 0 8px 15px rgba(0,0,0,0.08);
+            --shadow-h: 0 15px 30px rgba(41, 128, 185, 0.2);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background-color: var(--bg);
+            margin: 0; padding: 20px;
+            display: flex; justify-content: center; align-items: center; min-height: 100vh;
+        }
+
+        .container { width: 100%; max-width: 900px; text-align: center; }
+
+        /* --- SCREEN MANAGEMENT --- */
+        .screen { display: none; animation: fadeIn 0.5s; }
+        .active-screen { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- LOGIN & WELCOME CARDS --- */
+        .auth-card {
+            background: white; padding: 50px; border-radius: 40px; 
+            box-shadow: var(--shadow-h); max-width: 500px; margin: 0 auto;
+        }
+
+        .google-btn {
+            background: white; color: #2d3436; border: 1px solid #dfe6e9; padding: 15px 25px; border-radius: 50px; 
+            cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 12px; 
+            font-weight: bold; margin: 25px auto; width: 100%; transition: 0.3s;
+        }
+        .google-btn:hover { background: #f8f9fa; transform: translateY(-2px); }
+
+        /* --- MENU CHÍNH --- */
+        .main-menu { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; margin-top: 30px; }
+        .menu-card {
+            background: white; padding: 50px 20px; border-radius: 30px; box-shadow: var(--shadow);
+            cursor: pointer; transition: all 0.3s ease-out; border: 1px solid transparent;
+        }
+        .menu-card:hover { transform: translateY(-12px); box-shadow: var(--shadow-h); border-color: rgba(41, 128, 185, 0.3); }
+        .menu-card h2 { font-size: 2.2rem; color: var(--primary); margin: 0; }
+
+        /* --- FLASHCARD --- */
+        #flashcard-section { max-width: 700px; margin: 0 auto; }
+        .card-container { perspective: 1200px; width: 100%; height: 450px; margin-bottom: 30px; }
+        .card {
+            position: relative; width: 100%; height: 100%; 
+            transform-style: preserve-3d; transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .card.flipped { transform: rotateY(180deg); }
+        .front, .back {
+            position: absolute; width: 100%; height: 100%; backface-visibility: hidden;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            padding: 40px; border-radius: 40px; box-shadow: var(--shadow); box-sizing: border-box; background: white;
+        }
+        .back { transform: rotateY(180deg); border: 3px solid var(--primary); }
+
+        .card-btn {
+            position: absolute; top: 20px; left: 20px; width: 55px; height: 55px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 50%; cursor: pointer; border: none; background: #f8f9fa;
+            font-size: 1.6rem; transition: 0.2s; z-index: 100; color: #636e72;
+        }
+        .card-btn:hover { transform: scale(1.1); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+
+        .term-main { font-size: 3.2rem; font-weight: 800; color: var(--primary-dark); }
+        .ipa { font-size: 1.6rem; color: #7f8c8d; margin: 10px 0; }
+        .mean-text { font-size: 2.2rem; color: var(--primary); font-style: italic; }
+
+        /* --- QUIZ SECTION --- */
+        #quiz-section-content { background: white; padding: 50px; border-radius: 40px; box-shadow: var(--shadow); position: relative;}
+        .quiz-input {
+            width: 85%; padding: 15px; font-size: 1.8rem; border-radius: 15px; border: 3px solid #eee;
+            text-align: center; outline: none; transition: 0.3s; margin-top: 20px;
+        }
+        .quiz-input.correct { border-color: var(--success); background: #f0fff4; color: var(--success); }
+        .quiz-input.incorrect { border-color: var(--error); background: #fff5f5; color: var(--error); }
+
+        /* --- UI ELEMENTS --- */
+        .btn-nav {
+            padding: 16px 40px; border: none; border-radius: 20px;
+            font-size: 1.2rem; font-weight: bold; cursor: pointer;
+            background: var(--primary); color: white; box-shadow: 0 6px 0 var(--primary-dark);
+        }
+        .btn-nav:disabled { background: #bdc3c7; box-shadow: 0 6px 0 #95a5a6; cursor: not-allowed; }
+        .btn-logout { background: #eee; border: none; padding: 10px 20px; border-radius: 10px; cursor: pointer; margin-top: 20px; font-weight: bold; color: #666; }
+
+        .grid-items { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; margin: 30px 0; }
+        .item-box { padding: 15px; background: white; border: 1px solid #eee; border-radius: 15px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        .item-box:hover { transform: translateY(-5px); border-color: var(--primary); color: var(--primary); }
+
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
+        .shake { animation: shake 0.3s; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="login-screen" class="screen active-screen">
+        <div class="auth-card">
+            <h1 style="color: var(--primary-dark);">Danny's English Hub</h1>
+            <p>Vui lòng đăng nhập để bắt đầu học tập</p>
+            <button id="login-btn" class="google-btn">
+                <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59L2.56 13.22C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path></svg>
+                Tiếp tục với Google
+            </button>
+            <p id="login-msg" style="color: var(--error); font-weight: bold;"></p>
+        </div>
+    </div>
+
+    <div id="home-screen" class="screen">
+        <h1 style="font-size: 2.5rem; color: var(--primary-dark);">Danny's English Hub</h1>
+        <p id="user-welcome" style="font-weight: bold; color: var(--primary);"></p>
+        <div class="main-menu">
+            <div class="menu-card" onclick="startSection('study')">
+                <h2>Thẻ Từ Vựng</h2>
+                <p>Học kèm phiên âm & ví dụ</p>
+            </div>
+            <div class="menu-card" onclick="startSection('quiz')">
+                <h2>Kiểm Tra Ghi Nhớ</h2>
+                <p>Gõ tiếng Anh theo nghĩa</p>
+            </div>
+        </div>
+        <button id="logout-btn" class="btn-logout">ĐĂNG XUẤT TÀI KHOẢN</button>
+    </div>
+
+    <div id="list-selection" class="screen">
+        <div style="background: white; padding: 40px; border-radius: 35px; box-shadow: var(--shadow);">
+            <h2 style="color: var(--primary);">Chọn từ để học</h2>
+            <div id="items-grid" class="grid-items"></div>
+            <button class="btn-nav" style="background: #636e72; box-shadow: 0 6px 0 #2d3436;" onclick="showScreen('home-screen')">Quay lại</button>
+        </div>
+    </div>
+
+    <div id="flashcard-section" class="screen">
+        <div class="card-container">
+            <div class="card" id="main-card">
+                <div class="front">
+                    <button class="card-btn" onclick="showScreen('home-screen')">🏠</button>
+                    <div id="display-term" class="term-main"></div>
+                    <div id="display-ipa" class="ipa"></div>
+                    <div style="cursor:pointer; font-size: 3rem;" onclick="speakCurrent(event)">🔊</div>
+                </div>
+                <div class="back">
+                    <button class="card-btn" onclick="showScreen('home-screen')">🏠</button>
+                    <div style="font-size: 1.2rem; font-weight: bold; color: var(--primary); margin-bottom: 10px;">NGHĨA TIẾNG VIỆT</div>
+                    <div id="display-mean" class="mean-text"></div>
+                    <div style="cursor:pointer; font-size: 3rem;" onclick="speakCurrent(event)">🔊</div>
+                </div>
+            </div>
+        </div>
+        <div class="nav-controls">
+            <button class="btn-nav" style="background: #636e72; box-shadow: 0 6px 0 #2d3436;" onclick="prev()">Trước</button>
+            <button style="width:70px; height:70px; border-radius:50%; border:none; background:#e3f2fd; color:#2980b9; font-size:1.8rem; cursor:pointer;" onclick="flipCard()">🔄</button>
+            <button class="btn-nav" onclick="next()">Tiếp theo</button>
+        </div>
+    </div>
+
+    <div id="quiz-section" class="screen">
+        <div id="quiz-section-content">
+            <button class="card-btn" onclick="showScreen('home-screen')">🏠</button>
+            <h2 style="color: #7f8c8d;">Viết lại từ này bằng tiếng Anh:</h2>
+            <div id="quiz-vn" class="mean-text" style="font-size: 3rem; margin: 20px 0;"></div>
+            <input type="text" id="quiz-input" class="quiz-input" placeholder="Gõ chính xác..." autocomplete="off">
+            <div id="quiz-feedback" style="margin-top: 20px; font-weight: bold; height: 30px;"></div>
+            <div class="nav-controls">
+                <button class="btn-nav" id="btn-next-quiz" onclick="nextQuiz()" disabled>Tiếp theo (Enter)</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="congrats-screen" class="screen">
+        <h1 style="font-size: 3.5rem; color: var(--success);">Hoàn Thành! 🎉</h1>
+        <button class="btn-nav" onclick="showScreen('home-screen')">Quay lại Menu</button>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+    import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyCdlTVHwiLOGMnrFe12DE1dQSEHZaJ594I",
+        authDomain: "nguyen-am-tieng-anh.firebaseapp.com",
+        projectId: "nguyen-am-tieng-anh",
+        storageBucket: "nguyen-am-tieng-anh.firebasestorage.app",
+        messagingSenderId: "878440633705",
+        appId: "1:878440633705:web:755de6cb273eb139ebd9f8"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth();
+    const db = getFirestore(app);
+    const provider = new GoogleAuthProvider();
+
+    // --- AUTH LOGIC ---
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            const allowed = await checkAccess(user.email);
+            if (allowed) {
+                document.getElementById("user-welcome").innerText = "Chào mừng " + user.displayName + "!";
+                showScreen('home-screen');
+            } else {
+                alert("Email này không có quyền truy cập ứng dụng!");
+                await signOut(auth);
+                showScreen('login-screen');
+            }
+        } else {
+            showScreen('login-screen');
+        }
+    });
+
+    async function checkAccess(email) {
+        const q = query(collection(db, "Tienganh_so_cap"), where("email", "==", email));
+        const snap = await getDocs(q);
+        return !snap.empty;
+    }
+
+    document.getElementById("login-btn").onclick = async () => {
+        const msg = document.getElementById("login-msg");
+        msg.innerText = "Đang kiểm tra quyền truy cập...";
+        try {
+            const res = await signInWithPopup(auth, provider);
+            const allowed = await checkAccess(res.user.email);
+            if (!allowed) {
+                msg.innerText = "Email không được cấp quyền.";
+                await signOut(auth);
+            }
+        } catch (e) {
+            msg.innerText = "Đăng nhập thất bại.";
+        }
+    };
+
+    document.getElementById("logout-btn").onclick = async () => {
+        await signOut(auth);
+        location.reload();
+    };
+
+    // --- GAME DATA & LOGIC ---
+    const database = [
+        { en: "grandmother", ipa: "/ˈɡræn.mʌð.ər/", vn: "bà" },
+        { en: "grandson", ipa: "/ˈɡræn.sʌn/", vn: "cháu trai (của ông bà)" },
+        { en: "grandfather", ipa: "/ˈɡræn.fɑː.ðər/", vn: "ông" },
+        { en: "granddaughter", ipa: "/ˈɡræn.dɔː.tər/", vn: "cháu gái (của ông bà)" },
+        { en: "uncle", ipa: "/ˈʌŋ.kəl/", vn: "chú, bác, cậu" },
+        { en: "aunt", ipa: "/ˈɑːnt/", vn: "cô, dì, mợ" },
+        { en: "wife", ipa: "/waɪf/", vn: "vợ" },
+        { en: "husband", ipa: "/ˈhʌz.bənd/", vn: "chồng" },
+        { en: "cousin", ipa: "/ˈkʌz.ən/", vn: "anh chị em họ" },
+        { en: "nephew", ipa: "/ˈnef.juː/", vn: "cháu trai (của cô dì...)" },
+        { en: "niece", ipa: "/niːs/", vn: "cháu gái (của cô dì...)" },
+        { en: "son", ipa: "/sʌn/", vn: "con trai" },
+        { en: "daughter", ipa: "/ˈdɔː.tər/", vn: "con gái" }
+    ];
+
+    let curIdx = 0;
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    window.showScreen = function(id) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active-screen'));
+        document.getElementById(id).classList.add('active-screen');
+    }
+
+    window.startSection = function(mode) {
+        curIdx = 0;
+        if(mode === 'study') {
+            const grid = document.getElementById('items-grid');
+            grid.innerHTML = '';
+            database.forEach((item, i) => {
+                const d = document.createElement('div');
+                d.className = 'item-box';
+                d.textContent = item.en;
+                d.onclick = () => { curIdx = i; showCard(); };
+                grid.appendChild(d);
+            });
+            showScreen('list-selection');
+        } else {
+            showScreen('quiz-section');
+            loadQuiz();
+        }
+    }
+
+    function showCard() {
+        showScreen('flashcard-section');
+        updateCard();
+    }
+
+    function updateCard() {
+        const item = database[curIdx];
+        document.getElementById('main-card').classList.remove('flipped');
+        document.getElementById('display-term').textContent = item.en;
+        document.getElementById('display-ipa').textContent = item.ipa;
+        document.getElementById('display-mean').textContent = item.vn;
+    }
+
+    window.flipCard = () => document.getElementById('main-card').classList.toggle('flipped');
+
+    window.next = () => {
+        if(curIdx < database.length - 1) { curIdx++; updateCard(); }
+        else { finish(); }
+    }
+
+    window.prev = () => { if(curIdx > 0) { curIdx--; updateCard(); } }
+
+    // QUIZ
+    function loadQuiz() {
+        const item = database[curIdx];
+        const input = document.getElementById('quiz-input');
+        document.getElementById('quiz-vn').textContent = item.vn;
+        document.getElementById('quiz-feedback').textContent = '';
+        document.getElementById('btn-next-quiz').disabled = true;
+        input.value = '';
+        input.className = 'quiz-input';
+        input.focus();
+    }
+
+    document.getElementById('quiz-input').addEventListener('keydown', function(e) {
+        if(e.key === 'Enter') {
+            const btnNext = document.getElementById('btn-next-quiz');
+            if(!btnNext.disabled) { nextQuiz(); return; }
+
+            const val = this.value.trim().toLowerCase();
+            const correct = database[curIdx].en.toLowerCase();
+
+            if(val === correct) {
+                this.classList.add('correct');
+                playSysSound('correct');
+                document.getElementById('quiz-feedback').innerHTML = "<span style='color:var(--success)'>Đúng rồi!</span>";
+                btnNext.disabled = false;
+                speak(correct);
+            } else {
+                this.classList.add('shake', 'incorrect');
+                playSysSound('wrong');
+                document.getElementById('quiz-feedback').innerHTML = `<span style='color:var(--error)'>Sai rồi! Đáp án: ${correct}</span>`;
+                setTimeout(() => this.classList.remove('shake', 'incorrect'), 500);
+            }
+        }
+    });
+
+    window.nextQuiz = () => {
+        if(curIdx < database.length - 1) { curIdx++; loadQuiz(); }
+        else { finish(); }
+    }
+
+    function finish() {
+        showScreen('congrats-screen');
+        confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+    }
+
+    window.speakCurrent = (e) => {
+        if(e) e.stopPropagation();
+        speak(database[curIdx].en);
+    }
+
+    function speak(t) {
+        const m = new SpeechSynthesisUtterance(t);
+        m.lang = 'en-US';
+        window.speechSynthesis.speak(m);
+    }
+
+    function playSysSound(type) {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        if(type === 'correct') {
+            osc.frequency.setValueAtTime(523, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.1);
+        } else {
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(110, audioCtx.currentTime);
+        }
+        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.2);
+        osc.start(); osc.stop(audioCtx.currentTime + 0.2);
+    }
+</script>
+</body>
+</html>
